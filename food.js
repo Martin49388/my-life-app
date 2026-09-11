@@ -2,9 +2,36 @@ const FOOD_KEY = "food";
 const MEALS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 const MAX_QUICK_ADD = 8;
 
+const ACTIVITY_FACTORS = {
+  sedentary: 1.2,
+  light: 1.375,
+  moderate: 1.55,
+  active: 1.725,
+  veryActive: 1.9,
+};
+
+const DEFAULT_FOOD = {
+  target: 2000,
+  days: {},
+  showEstimator: false,
+  body: { weight: null, height: null, age: null, sex: "male", activity: "moderate" },
+};
+
 function loadFood() {
   const raw = localStorage.getItem(FOOD_KEY);
-  return raw ? JSON.parse(raw) : { target: 2000, days: {} };
+  if (!raw) return structuredClone(DEFAULT_FOOD);
+  const saved = JSON.parse(raw);
+  return { ...structuredClone(DEFAULT_FOOD), ...saved, body: { ...DEFAULT_FOOD.body, ...saved.body } };
+}
+
+// Mifflin-St Jeor: the equation most fitness tools use. Needs age and sex
+// as well as size — without them the result drifts by hundreds of kcal.
+function maintenanceCalories() {
+  const { weight, height, age, sex, activity } = food.body;
+  if (!weight || !height || !age) return null;
+  const base = 10 * weight + 6.25 * height - 5 * age;
+  const bmr = sex === "female" ? base - 161 : base + 5;
+  return Math.round(bmr * ACTIVITY_FACTORS[activity]);
 }
 
 function saveFood() {
@@ -181,13 +208,99 @@ function renderMeals() {
   });
 }
 
+function renderEstimator() {
+  const toggle = document.getElementById("estimator-toggle-btn");
+  const panel = document.getElementById("estimator");
+
+  panel.hidden = !food.showEstimator;
+  toggle.classList.toggle("on", food.showEstimator);
+  toggle.setAttribute("aria-pressed", String(food.showEstimator));
+
+  document.getElementById("body-weight").value = food.body.weight ?? "";
+  document.getElementById("body-height").value = food.body.height ?? "";
+  document.getElementById("body-age").value = food.body.age ?? "";
+  document.getElementById("body-sex").value = food.body.sex;
+  document.getElementById("body-activity").value = food.body.activity;
+
+  const estimate = maintenanceCalories();
+  document.getElementById("estimator-value").textContent = estimate ? estimate.toLocaleString() : "—";
+  const useBtn = document.getElementById("use-estimate-btn");
+  useBtn.disabled = !estimate;
+  useBtn.textContent = estimate && estimate === food.target ? "In use" : "Use as target";
+
+  renderScale(estimate);
+}
+
+// One axis carrying all three numbers: today's intake as a filled bar,
+// with ticks where the target and the maintenance estimate fall.
+function renderScale(maintain) {
+  const eaten = entriesFor(viewedDate).reduce((sum, e) => sum + e.kcal, 0);
+  const target = food.target;
+  const ceiling = Math.max(eaten, target, maintain || 0) * 1.08 || 1;
+  const pct = (value) => `${Math.min(100, (value / ceiling) * 100)}%`;
+
+  document.getElementById("scale-eaten").style.width = pct(eaten);
+  document.getElementById("scale-eaten").classList.toggle("over", eaten > target);
+  document.getElementById("scale-tick-target").style.left = pct(target);
+
+  const maintainTick = document.getElementById("scale-tick-maintain");
+  maintainTick.hidden = !maintain;
+  if (maintain) maintainTick.style.left = pct(maintain);
+
+  document.getElementById("scale-legend").innerHTML = `
+    <span class="legend-item"><span class="scale-key key-eaten"></span>Eaten ${eaten.toLocaleString()}</span>
+    <span class="legend-item"><span class="scale-key key-target"></span>Target ${target.toLocaleString()}</span>
+    ${maintain ? `<span class="legend-item"><span class="scale-key key-maintain"></span>Maintain ${maintain.toLocaleString()}</span>` : ""}`;
+
+  const relation = document.getElementById("scale-relation");
+  if (!maintain) {
+    relation.textContent = "";
+    return;
+  }
+  const diff = target - maintain;
+  if (diff === 0) relation.textContent = "Your target sits at maintenance.";
+  else relation.textContent = `Your target is ${Math.abs(diff).toLocaleString()} kcal ${diff > 0 ? "above" : "below"} maintenance.`;
+}
+
 window.renderFood = function renderFood() {
   document.getElementById("kcal-target-input").value = food.target;
   document.getElementById("food-date-label").textContent = formatDateLabel(viewedDate);
+  renderEstimator();
   renderBudget();
   renderQuickAdd();
   renderMeals();
 };
+
+document.getElementById("estimator-toggle-btn").addEventListener("click", () => {
+  food.showEstimator = !food.showEstimator;
+  saveFood();
+  renderEstimator();
+});
+
+const BODY_FIELDS = {
+  "body-weight": "weight",
+  "body-height": "height",
+  "body-age": "age",
+  "body-sex": "sex",
+  "body-activity": "activity",
+};
+
+for (const [elementId, key] of Object.entries(BODY_FIELDS)) {
+  document.getElementById(elementId).addEventListener("input", (e) => {
+    const raw = e.target.value;
+    food.body[key] = e.target.type === "number" ? parseFloat(raw) || null : raw;
+    saveFood();
+    renderEstimator();
+  });
+}
+
+document.getElementById("use-estimate-btn").addEventListener("click", () => {
+  const estimate = maintenanceCalories();
+  if (!estimate) return;
+  food.target = estimate;
+  saveFood();
+  window.renderFood();
+});
 
 document.getElementById("food-prev-day").addEventListener("click", () => shiftDay(-1));
 document.getElementById("food-next-day").addEventListener("click", () => shiftDay(1));
