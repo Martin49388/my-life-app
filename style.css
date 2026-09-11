@@ -604,27 +604,101 @@ body {
   list-style: none;
 }
 
-.goal-columns {
+.horizon {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: auto 1fr auto;
   align-items: start;
+  gap: 14px;
+  padding: 2px 4px 6px;
+}
+
+.horizon-node {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.horizon-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 99px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.horizon-node.active .horizon-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px var(--accent-soft);
+}
+
+.horizon-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-faint);
+  transition: color 0.25s ease;
+}
+
+.horizon-node.active .horizon-label {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.horizon-meta {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+/* Dashed stretch = distance still ahead; the solid fill is ground covered. */
+.horizon-rail {
+  height: 2px;
+  margin-top: 5px;
+  border-radius: 99px;
+  background: repeating-linear-gradient(90deg, var(--border) 0 6px, transparent 6px 12px);
+}
+
+.horizon-rail-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.goal-carousel-viewport {
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
+.goal-carousel-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.3s ease;
 }
 
 .goal-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex: 0 0 50%;
+  width: 50%;
   min-width: 0;
+  align-self: flex-start;
 }
 
-.goal-group-title {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  margin: 4px 0 0;
+@media (prefers-reduced-motion: reduce) {
+  .goal-carousel-viewport,
+  .goal-carousel-track,
+  .horizon-rail-fill,
+  .horizon-dot,
+  .horizon-label {
+    transition: none;
+  }
 }
 
 #goal-list-short,

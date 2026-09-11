@@ -139,12 +139,79 @@ function renderGoalGroup(listId, term) {
 }
 
 window.renderGoals = function renderGoals() {
-  document.getElementById("goals-active-count").textContent = goals.filter((g) => g.current < g.target).length;
-  document.getElementById("goals-done-count").textContent = goals.filter((g) => g.current >= g.target).length;
+  const active = goals.filter((g) => g.current < g.target);
+  document.getElementById("goals-active-count").textContent = active.length;
+  document.getElementById("goals-done-count").textContent = goals.length - active.length;
+  document.getElementById("horizon-count-short").textContent = active.filter((g) => g.term === "short").length;
+  document.getElementById("horizon-count-long").textContent = active.filter((g) => g.term === "long").length;
 
   renderGoalGroup("goal-list-short", "short");
   renderGoalGroup("goal-list-long", "long");
+  syncViewportHeight(false);
 };
+
+// Horizon carousel: the two panels sit side by side in a track twice the
+// viewport's width. Swiping drags the track with your finger and snaps on
+// release; the rail fill tracks that movement so the nav reads as a
+// position along the time axis rather than a pair of toggles.
+const goalTrack = document.getElementById("goal-carousel-track");
+const goalViewport = document.getElementById("goal-carousel-viewport");
+const railFill = document.getElementById("horizon-rail-fill");
+const horizonNodes = document.querySelectorAll(".horizon-node");
+const goalPanels = goalTrack.children;
+let goalPanelIndex = 0; // 0 = short-term (near), 1 = long-term (far)
+
+function syncViewportHeight(useTallest) {
+  const heights = [goalPanels[0].offsetHeight, goalPanels[1].offsetHeight];
+  goalViewport.style.height = `${useTallest ? Math.max(...heights) : heights[goalPanelIndex]}px`;
+}
+
+function setGoalPanel(index, animate = true) {
+  goalPanelIndex = Math.max(0, Math.min(1, index));
+  goalTrack.style.transition = animate ? "" : "none";
+  goalTrack.style.transform = `translateX(-${goalPanelIndex * 50}%)`;
+  railFill.style.width = `${goalPanelIndex * 100}%`;
+  horizonNodes.forEach((node, i) => node.classList.toggle("active", i === goalPanelIndex));
+  syncViewportHeight(false);
+}
+
+horizonNodes.forEach((node, i) => {
+  node.addEventListener("click", () => setGoalPanel(i));
+});
+
+let touchStartX = null;
+let dragging = false;
+
+goalViewport.addEventListener("touchstart", (e) => {
+  touchStartX = e.touches[0].clientX;
+  dragging = true;
+  goalTrack.style.transition = "none";
+  syncViewportHeight(true);
+});
+
+goalViewport.addEventListener("touchmove", (e) => {
+  if (!dragging) return;
+  const deltaX = e.touches[0].clientX - touchStartX;
+  const viewportWidth = goalViewport.offsetWidth;
+  // Resist dragging past either end so the track feels bounded.
+  const atEdge = (goalPanelIndex === 0 && deltaX > 0) || (goalPanelIndex === 1 && deltaX < 0);
+  const applied = atEdge ? deltaX * 0.25 : deltaX;
+  goalTrack.style.transform = `translateX(calc(-${goalPanelIndex * 50}% + ${applied}px))`;
+  railFill.style.width = `${Math.max(0, Math.min(100, goalPanelIndex * 100 - (applied / viewportWidth) * 100))}%`;
+});
+
+goalViewport.addEventListener("touchend", (e) => {
+  if (!dragging) return;
+  dragging = false;
+  goalTrack.style.transition = "";
+  const deltaX = e.changedTouches[0].clientX - touchStartX;
+  const SWIPE_THRESHOLD = 45;
+  if (deltaX < -SWIPE_THRESHOLD) setGoalPanel(goalPanelIndex + 1);
+  else if (deltaX > SWIPE_THRESHOLD) setGoalPanel(goalPanelIndex - 1);
+  else setGoalPanel(goalPanelIndex);
+});
+
+window.addEventListener("resize", () => syncViewportHeight(false));
 
 const goalToggleBtn = document.getElementById("add-goal-toggle-btn");
 const goalForm = document.getElementById("add-goal-form");

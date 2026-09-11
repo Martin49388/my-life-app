@@ -125,15 +125,30 @@
         </div>
       </header>
 
-      <div class="goal-columns">
-        <div class="goal-group">
-          <h2 class="goal-group-title">Short-term</h2>
-          <ul id="goal-list-short"></ul>
+      <nav class="horizon" aria-label="Goal time horizon">
+        <button type="button" class="horizon-node active" data-index="0">
+          <span class="horizon-dot"></span>
+          <span class="horizon-label">Short-term</span>
+          <span class="horizon-meta">weeks &middot; <span id="horizon-count-short">0</span> active</span>
+        </button>
+        <div class="horizon-rail">
+          <div class="horizon-rail-fill" id="horizon-rail-fill"></div>
         </div>
+        <button type="button" class="horizon-node" data-index="1">
+          <span class="horizon-dot"></span>
+          <span class="horizon-label">Long-term</span>
+          <span class="horizon-meta">years &middot; <span id="horizon-count-long">0</span> active</span>
+        </button>
+      </nav>
 
-        <div class="goal-group">
-          <h2 class="goal-group-title">Long-term</h2>
-          <ul id="goal-list-long"></ul>
+      <div class="goal-carousel-viewport" id="goal-carousel-viewport">
+        <div class="goal-carousel-track" id="goal-carousel-track">
+          <div class="goal-group">
+            <ul id="goal-list-short"></ul>
+          </div>
+          <div class="goal-group">
+            <ul id="goal-list-long"></ul>
+          </div>
         </div>
       </div>
 
