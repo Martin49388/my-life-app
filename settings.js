@@ -1,5 +1,10 @@
 const ACCENT_KEY = "accent";
 const TINT_KEY = "bgTint";
+const INTENSITY_KEY = "bgIntensity";
+
+// Ceiling on any single neutral's saturation, so cranking the slider deepens
+// the tint without turning text and surfaces into solid colour.
+const MAX_NEUTRAL_SATURATION = 70;
 
 // Each palette carries a light and a dark value, because one hex can't serve
 // both grounds — a deep violet that reads well on white disappears on near
@@ -29,6 +34,11 @@ function currentPalette() {
 
 function currentTint() {
   return localStorage.getItem(TINT_KEY) || "match";
+}
+
+function currentIntensity() {
+  const saved = parseInt(localStorage.getItem(INTENSITY_KEY), 10);
+  return Number.isFinite(saved) ? saved : 100;
 }
 
 // Which hue tints the background greys, and whether to tint them at all.
@@ -122,9 +132,12 @@ function applyPalette(palette) {
   root.style.setProperty("--accent-ink", inkFor(accent));
 
   const { hue, achromatic } = resolveTint(palette, dark);
+  const strength = currentIntensity() / 100;
   const ramp = NEUTRAL_RAMP[dark ? "dark" : "light"];
+
   for (const [token, [sat, light]] of Object.entries(ramp)) {
-    root.style.setProperty(token, `hsl(${hue.toFixed(0)} ${achromatic ? 0 : sat}% ${light}%)`);
+    const saturation = achromatic ? 0 : Math.min(MAX_NEUTRAL_SATURATION, sat * strength);
+    root.style.setProperty(token, `hsl(${hue.toFixed(0)} ${saturation.toFixed(1)}% ${light}%)`);
   }
 }
 
@@ -204,6 +217,17 @@ function renderSwatches() {
       })
     );
   }
+
+  const intensity = currentIntensity();
+  const slider = document.getElementById("intensity-slider");
+  slider.value = intensity;
+  document.getElementById("intensity-value").textContent = `${intensity}%`;
+
+  // Nothing to intensify when the tint has no hue.
+  const accentHasHue = hexToHsl(activeAccent.dark).s >= 12;
+  const noHue = activeTint === "neutral" || (activeTint === "match" && !accentHasHue);
+  slider.disabled = noHue;
+  slider.closest(".settings-panel").classList.toggle("no-tint", noHue);
 }
 
 const settingsBtn = document.getElementById("settings-btn");
@@ -214,6 +238,19 @@ function setSettingsOpen(open) {
   settingsBtn.classList.toggle("on", open);
   settingsBtn.setAttribute("aria-expanded", String(open));
 }
+
+const intensitySlider = document.getElementById("intensity-slider");
+
+intensitySlider.addEventListener("input", (e) => {
+  const value = parseInt(e.target.value, 10);
+  localStorage.setItem(INTENSITY_KEY, value);
+  document.getElementById("intensity-value").textContent = `${value}%`;
+  applyPalette(currentPalette());
+});
+
+// The slider lives inside the panel, so its clicks must not reach the
+// outside-click handler that closes it.
+intensitySlider.addEventListener("click", (e) => e.stopPropagation());
 
 settingsBtn.addEventListener("click", (e) => {
   e.stopPropagation();

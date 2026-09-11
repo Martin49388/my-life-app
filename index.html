@@ -40,6 +40,17 @@
         <p class="settings-title">Background tint</p>
         <div class="swatch-grid" id="tint-grid"></div>
         <p class="settings-note">The hue mixed into the black background and the greys.</p>
+
+        <div class="intensity-row">
+          <span class="settings-title intensity-label">Intensity</span>
+          <span class="intensity-value" id="intensity-value">100%</span>
+        </div>
+        <input type="range" id="intensity-slider" min="0" max="250" step="5" value="100"
+               aria-label="Background tint intensity" />
+        <div class="intensity-ends">
+          <span>Black</span>
+          <span>Saturated</span>
+        </div>
       </div>
     </header>
 

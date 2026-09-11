@@ -1807,3 +1807,50 @@ body {
   color: var(--accent);
   border-color: var(--accent);
 }
+
+.intensity-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.intensity-label {
+  margin: 0;
+}
+
+.intensity-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#intensity-slider {
+  width: 100%;
+  margin: 8px 0 3px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+#intensity-slider:disabled {
+  cursor: default;
+}
+
+.settings-panel.no-tint .intensity-row,
+.settings-panel.no-tint #intensity-slider,
+.settings-panel.no-tint .intensity-ends {
+  opacity: 0.35;
+}
+
+.intensity-ends {
+  display: flex;
+  justify-content: space-between;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
