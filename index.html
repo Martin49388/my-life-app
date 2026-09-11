@@ -26,6 +26,7 @@
     <nav class="section-tabs">
       <button type="button" class="section-btn active" data-section="habits">Habits</button>
       <button type="button" class="section-btn" data-section="news">News</button>
+      <button type="button" class="section-btn" data-section="goals">Goals</button>
     </nav>
 
     <section id="habits-section">
@@ -108,9 +109,41 @@
         </div>
       </div>
     </section>
+
+    <section id="goals-section" hidden>
+      <header class="app-header">
+        <p class="eyebrow">in progress</p>
+        <div class="stat-tiles">
+          <div class="stat-tile">
+            <span class="stat-label">Active</span>
+            <span class="stat-value" id="goals-active-count">0</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Completed</span>
+            <span class="stat-value" id="goals-done-count">0</span>
+          </div>
+        </div>
+      </header>
+
+      <ul id="goal-list"></ul>
+
+      <div class="add-habit-toggle">
+        <button type="button" id="add-goal-toggle-btn">+ Add goal</button>
+        <form id="add-goal-form" hidden>
+          <input type="text" id="goal-name-input" placeholder="Goal, e.g. Read 12 books" required />
+          <input type="number" id="goal-target-input" placeholder="Target" min="1" required />
+          <input type="text" id="goal-unit-input" placeholder="Unit (optional)" />
+          <input type="date" id="goal-deadline-input" />
+          <button type="submit">Add</button>
+        </form>
+      </div>
+
+      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
+    </section>
   </main>
 
   <script src="script.js"></script>
   <script src="news.js"></script>
+  <script src="goals.js"></script>
 </body>
 </html>

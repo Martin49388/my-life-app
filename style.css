@@ -603,3 +603,164 @@ body {
   color: var(--text-faint);
   list-style: none;
 }
+
+#goal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.goal-row.complete {
+  border-color: var(--accent);
+}
+
+.goal-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.goal-name {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+
+.goal-badge {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.goal-badge-complete {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.goal-badge-overdue {
+  color: var(--danger);
+}
+
+.goal-bar-track {
+  height: 8px;
+  background: var(--track);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.goal-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.goal-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.goal-progress-text {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.goal-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-step-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.goal-step-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.goal-step-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#add-goal-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#add-goal-form[hidden] {
+  display: none;
+}
+
+#add-goal-form input {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#add-goal-form input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#goal-name-input {
+  flex: 1 1 100%;
+}
+
+#goal-target-input {
+  flex: 1 1 70px;
+  width: 70px;
+}
+
+#goal-unit-input {
+  flex: 1 1 120px;
+}
+
+#goal-deadline-input {
+  flex: 1 1 140px;
+}
+
+#add-goal-form button {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
