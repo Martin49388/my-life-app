@@ -1,4 +1,5 @@
 const ACCENT_KEY = "accent";
+const TINT_KEY = "bgTint";
 
 // Each palette carries a light and a dark value, because one hex can't serve
 // both grounds — a deep violet that reads well on white disappears on near
@@ -24,6 +25,21 @@ function prefersDark() {
 function currentPalette() {
   const savedId = localStorage.getItem(ACCENT_KEY);
   return PALETTES.find((p) => p.id === savedId) || PALETTES[0];
+}
+
+function currentTint() {
+  return localStorage.getItem(TINT_KEY) || "match";
+}
+
+// Which hue tints the background greys, and whether to tint them at all.
+// Independent of the accent unless "match" is chosen.
+function resolveTint(palette, dark) {
+  const tint = currentTint();
+  if (tint === "neutral") return { hue: 0, achromatic: true };
+
+  const source = tint === "match" ? palette : PALETTES.find((p) => p.id === tint) || palette;
+  const { h, s } = hexToHsl(dark ? source.dark : source.light);
+  return { hue: h, achromatic: s < 12 };
 }
 
 // The greys aren't neutral — they carry a faint tint of the accent's hue, which
@@ -105,50 +121,88 @@ function applyPalette(palette) {
   root.style.setProperty("--accent-soft", dark ? palette.darkSoft : palette.lightSoft);
   root.style.setProperty("--accent-ink", inkFor(accent));
 
-  // Grey, black & white and black-on-black have no hue worth carrying, so their
-  // neutrals go properly neutral instead of picking up a phantom tint.
-  const { h, s } = hexToHsl(accent);
-  const achromatic = s < 12;
-
+  const { hue, achromatic } = resolveTint(palette, dark);
   const ramp = NEUTRAL_RAMP[dark ? "dark" : "light"];
   for (const [token, [sat, light]] of Object.entries(ramp)) {
-    root.style.setProperty(token, `hsl(${h.toFixed(0)} ${achromatic ? 0 : sat}% ${light}%)`);
+    root.style.setProperty(token, `hsl(${hue.toFixed(0)} ${achromatic ? 0 : sat}% ${light}%)`);
   }
 }
 
+function buildSwatch({ id, name, background, selected, onPick }) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "swatch" + (selected ? " selected" : "");
+  btn.setAttribute("aria-label", name);
+  btn.setAttribute("aria-pressed", String(selected));
+
+  const dot = document.createElement("span");
+  dot.className = "swatch-dot";
+  dot.style.background = background;
+
+  const label = document.createElement("span");
+  label.className = "swatch-name";
+  label.textContent = name;
+
+  btn.append(dot, label);
+  btn.addEventListener("click", (e) => {
+    // Re-rendering detaches this button, so the outside-click check further
+    // down would see a detached target and close the panel. Stop it here
+    // instead and let people try several combinations in a row.
+    e.stopPropagation();
+    onPick(id);
+    applyPalette(currentPalette());
+    renderSwatches();
+  });
+
+  return btn;
+}
+
 function renderSwatches() {
-  const grid = document.getElementById("swatch-grid");
-  const active = currentPalette();
-  grid.innerHTML = "";
+  const activeAccent = currentPalette();
+  const activeTint = currentTint();
 
+  const accentGrid = document.getElementById("swatch-grid");
+  accentGrid.innerHTML = "";
   for (const palette of PALETTES) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "swatch" + (palette.id === active.id ? " selected" : "");
-    btn.setAttribute("aria-label", palette.name);
-    btn.setAttribute("aria-pressed", String(palette.id === active.id));
+    accentGrid.appendChild(
+      buildSwatch({
+        id: palette.id,
+        name: palette.name,
+        // Split fill shows how the palette reads on a light and a dark ground.
+        background: `linear-gradient(135deg, ${palette.light} 0 50%, ${palette.dark} 50% 100%)`,
+        selected: palette.id === activeAccent.id,
+        onPick: (id) => localStorage.setItem(ACCENT_KEY, id),
+      })
+    );
+  }
 
-    const dot = document.createElement("span");
-    dot.className = "swatch-dot";
-    // Split fill shows how the palette reads on a light and a dark ground.
-    dot.style.background = `linear-gradient(135deg, ${palette.light} 0 50%, ${palette.dark} 50% 100%)`;
+  const tintGrid = document.getElementById("tint-grid");
+  tintGrid.innerHTML = "";
 
-    const label = document.createElement("span");
-    label.className = "swatch-name";
-    label.textContent = palette.name;
+  const tintOptions = [
+    {
+      id: "match",
+      name: "Match accent",
+      background: `linear-gradient(135deg, ${activeAccent.light} 0 50%, ${activeAccent.dark} 50% 100%)`,
+    },
+    { id: "neutral", name: "Neutral", background: "hsl(0 0% 45%)" },
+    // Only the hue matters here, so the achromatic palettes are left out —
+    // choosing one of those is what "Neutral" already does.
+    ...PALETTES.filter((p) => hexToHsl(p.dark).s >= 12).map((p) => ({
+      id: p.id,
+      name: p.name,
+      background: `hsl(${hexToHsl(p.dark).h.toFixed(0)} 42% 45%)`,
+    })),
+  ];
 
-    btn.append(dot, label);
-    btn.addEventListener("click", (e) => {
-      // Re-rendering detaches this button, so the outside-click check below
-      // would see a detached target and close the panel. Stop it here instead
-      // and let people try several colours in a row.
-      e.stopPropagation();
-      localStorage.setItem(ACCENT_KEY, palette.id);
-      applyPalette(palette);
-      renderSwatches();
-    });
-
-    grid.appendChild(btn);
+  for (const option of tintOptions) {
+    tintGrid.appendChild(
+      buildSwatch({
+        ...option,
+        selected: option.id === activeTint,
+        onPick: (id) => localStorage.setItem(TINT_KEY, id),
+      })
+    );
   }
 }
 
