@@ -3,13 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Life App</title>
+  <title>BatCave</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
+    <header class="brand-header">
+      <div class="brand-mark">
+        <svg class="brand-icon" viewBox="0 0 48 26" aria-hidden="true">
+          <ellipse cx="24" cy="14" rx="3.6" ry="5.6" fill="currentColor"/>
+          <polygon points="21,10.5 22.6,3 24,10" fill="currentColor"/>
+          <polygon points="24,10 25.4,3 27,10.5" fill="currentColor"/>
+          <polygon points="20.5,12 9,4 12,12.5 2,9 8,17.5 20.5,17" fill="currentColor"/>
+          <polygon points="27.5,12 39,4 36,12.5 46,9 40,17.5 27.5,17" fill="currentColor"/>
+        </svg>
+        <span class="brand-name">BatCave</span>
+      </div>
+    </header>
+
     <nav class="section-tabs">
       <button type="button" class="section-btn active" data-section="habits">Habits</button>
       <button type="button" class="section-btn" data-section="news">News</button>
@@ -17,10 +30,7 @@
 
     <section id="habits-section">
       <header class="app-header">
-        <div class="title-block">
-          <p class="eyebrow">habit tracker</p>
-          <h1>My Life App</h1>
-        </div>
+        <p class="eyebrow">today's overview</p>
         <div class="stat-tiles">
           <div class="stat-tile ring-tile">
             <svg class="ring" viewBox="0 0 40 40" id="today-ring">
@@ -75,10 +85,7 @@
 
     <section id="news-section" hidden>
       <header class="app-header">
-        <div class="title-block">
-          <p class="eyebrow">headlines</p>
-          <h1>News</h1>
-        </div>
+        <p class="eyebrow">headlines, last 48h</p>
         <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
       </header>
 
