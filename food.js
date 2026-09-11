@@ -10,8 +10,11 @@ const ACTIVITY_FACTORS = {
   veryActive: 1.9,
 };
 
+// target and maintenance are stored separately and never write to each other —
+// they're two independent stops on the scale.
 const DEFAULT_FOOD = {
   target: 2000,
+  maintenance: null,
   days: {},
   showEstimator: false,
   body: { weight: null, height: null, age: null, sex: "male", activity: "moderate" },
@@ -224,18 +227,25 @@ function renderEstimator() {
 
   const estimate = maintenanceCalories();
   document.getElementById("estimator-value").textContent = estimate ? estimate.toLocaleString() : "—";
+
+  const pinBtn = document.getElementById("pin-maintenance-btn");
+  pinBtn.disabled = !estimate;
+  pinBtn.textContent = estimate && estimate === food.maintenance ? "Maintenance set" : "Set as maintenance";
+
   const useBtn = document.getElementById("use-estimate-btn");
   useBtn.disabled = !estimate;
-  useBtn.textContent = estimate && estimate === food.target ? "In use" : "Use as target";
+  useBtn.textContent = estimate && estimate === food.target ? "Is target" : "Set as target";
 
-  renderScale(estimate);
+  renderScale();
 }
 
-// One axis carrying all three numbers: today's intake as a filled bar,
-// with ticks where the target and the maintenance estimate fall.
-function renderScale(maintain) {
+// One axis carrying all three numbers: today's intake as a filled bar, with a
+// stop marking the target and another marking maintenance. The two stops are
+// independent values, so they only coincide if you deliberately match them.
+function renderScale() {
   const eaten = entriesFor(viewedDate).reduce((sum, e) => sum + e.kcal, 0);
   const target = food.target;
+  const maintain = food.maintenance;
   const ceiling = Math.max(eaten, target, maintain || 0) * 1.08 || 1;
   const pct = (value) => `${Math.min(100, (value / ceiling) * 100)}%`;
 
@@ -243,9 +253,9 @@ function renderScale(maintain) {
   document.getElementById("scale-eaten").classList.toggle("over", eaten > target);
   document.getElementById("scale-tick-target").style.left = pct(target);
 
-  const maintainTick = document.getElementById("scale-tick-maintain");
-  maintainTick.hidden = !maintain;
-  if (maintain) maintainTick.style.left = pct(maintain);
+  const maintainStop = document.getElementById("scale-tick-maintain");
+  maintainStop.hidden = !maintain;
+  if (maintain) maintainStop.style.left = pct(maintain);
 
   document.getElementById("scale-legend").innerHTML = `
     <span class="legend-item"><span class="scale-key key-eaten"></span>Eaten ${eaten.toLocaleString()}</span>
@@ -254,11 +264,11 @@ function renderScale(maintain) {
 
   const relation = document.getElementById("scale-relation");
   if (!maintain) {
-    relation.textContent = "";
+    relation.textContent = "Set a maintenance figure to see it as a second stop on the line.";
     return;
   }
   const diff = target - maintain;
-  if (diff === 0) relation.textContent = "Your target sits at maintenance.";
+  if (diff === 0) relation.textContent = "Your target sits exactly at maintenance.";
   else relation.textContent = `Your target is ${Math.abs(diff).toLocaleString()} kcal ${diff > 0 ? "above" : "below"} maintenance.`;
 }
 
@@ -293,6 +303,14 @@ for (const [elementId, key] of Object.entries(BODY_FIELDS)) {
     renderEstimator();
   });
 }
+
+document.getElementById("pin-maintenance-btn").addEventListener("click", () => {
+  const estimate = maintenanceCalories();
+  if (!estimate) return;
+  food.maintenance = estimate;
+  saveFood();
+  window.renderFood();
+});
 
 document.getElementById("use-estimate-btn").addEventListener("click", () => {
   const estimate = maintenanceCalories();

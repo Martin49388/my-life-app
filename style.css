@@ -1589,24 +1589,43 @@ body {
   opacity: 0.5;
 }
 
-.scale-tick {
+.scale-stop {
   position: absolute;
-  top: -3px;
-  bottom: -3px;
+  top: -5px;
+  bottom: -5px;
   width: 2px;
   border-radius: 2px;
   transform: translateX(-1px);
 }
 
-.scale-tick-target {
+.stop-cap {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+}
+
+.scale-stop-target {
   background: var(--accent);
 }
 
-.scale-tick-maintain {
+.scale-stop-target .stop-cap {
+  background: var(--accent);
+}
+
+.scale-stop-maintain {
   background: var(--text-dim);
 }
 
-.scale-tick-maintain[hidden] {
+.scale-stop-maintain .stop-cap {
+  background: var(--bg);
+  border: 2px solid var(--text-dim);
+}
+
+.scale-stop-maintain[hidden] {
   display: none;
 }
 
@@ -1648,4 +1667,44 @@ body {
   font-size: 11px;
   color: var(--text-faint);
   margin: 0;
+}
+
+.estimator-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#pin-maintenance-btn {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#pin-maintenance-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ghost-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+#use-estimate-btn.ghost-btn {
+  background: none;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+#use-estimate-btn.ghost-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
 }

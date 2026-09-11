@@ -275,14 +275,17 @@
             <span class="estimator-value" id="estimator-value">—</span>
             <span class="estimator-unit">kcal/day to maintain</span>
           </p>
-          <button type="button" id="use-estimate-btn" disabled>Use as target</button>
+          <div class="estimator-actions">
+            <button type="button" id="pin-maintenance-btn" disabled>Set as maintenance</button>
+            <button type="button" id="use-estimate-btn" class="ghost-btn" disabled>Set as target</button>
+          </div>
         </div>
 
         <div class="scale">
           <div class="scale-track">
             <div class="scale-eaten" id="scale-eaten"></div>
-            <div class="scale-tick scale-tick-target" id="scale-tick-target"></div>
-            <div class="scale-tick scale-tick-maintain" id="scale-tick-maintain"></div>
+            <div class="scale-stop scale-stop-maintain" id="scale-tick-maintain"><span class="stop-cap"></span></div>
+            <div class="scale-stop scale-stop-target" id="scale-tick-target"><span class="stop-cap"></span></div>
           </div>
           <div class="scale-legend" id="scale-legend"></div>
           <p class="scale-relation" id="scale-relation"></p>
