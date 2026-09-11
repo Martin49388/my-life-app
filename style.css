@@ -604,10 +604,18 @@ body {
   list-style: none;
 }
 
+.goal-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
 .goal-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .goal-group-title {
