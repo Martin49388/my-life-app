@@ -319,7 +319,16 @@ document.getElementById("next-month").addEventListener("click", () => {
   renderMonthly();
 });
 
-document.getElementById("add-habit-form").addEventListener("submit", (e) => {
+const addToggleBtn = document.getElementById("add-habit-toggle-btn");
+const addForm = document.getElementById("add-habit-form");
+
+addToggleBtn.addEventListener("click", () => {
+  addToggleBtn.hidden = true;
+  addForm.hidden = false;
+  document.getElementById("habit-name-input").focus();
+});
+
+addForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const input = document.getElementById("habit-name-input");
   const name = input.value.trim();
@@ -327,6 +336,18 @@ document.getElementById("add-habit-form").addEventListener("submit", (e) => {
     addHabit(name);
     input.value = "";
   }
+  addForm.hidden = true;
+  addToggleBtn.hidden = false;
+});
+
+document.querySelectorAll(".section-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const section = btn.dataset.section;
+    document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b === btn));
+    document.getElementById("habits-section").hidden = section !== "habits";
+    document.getElementById("news-section").hidden = section !== "news";
+    if (section === "news" && window.loadNews) window.loadNews();
+  });
 });
 
 render();

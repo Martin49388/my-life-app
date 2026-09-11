@@ -10,61 +10,100 @@
 </head>
 <body>
   <main class="app">
-    <header class="app-header">
-      <div class="title-block">
-        <p class="eyebrow">habit tracker</p>
-        <h1>My Life App</h1>
-      </div>
-      <div class="stat-tiles">
-        <div class="stat-tile ring-tile">
-          <svg class="ring" viewBox="0 0 40 40" id="today-ring">
-            <circle class="ring-track" cx="20" cy="20" r="17"></circle>
-            <circle class="ring-fill" cx="20" cy="20" r="17"></circle>
-          </svg>
-          <div class="ring-label">
-            <span class="stat-label">Today</span>
-            <span class="stat-value" id="today-count">0/0</span>
-          </div>
-        </div>
-        <div class="stat-tile">
-          <span class="stat-label">Best streak</span>
-          <span class="stat-value" id="best-streak">0d</span>
-        </div>
-        <div class="stat-tile">
-          <span class="stat-label">Perfect days</span>
-          <span class="stat-value" id="perfect-days">0</span>
-        </div>
-      </div>
-    </header>
-
-    <nav class="view-tabs">
-      <button type="button" class="tab-btn" data-view="daily">Daily</button>
-      <button type="button" class="tab-btn" data-view="monthly">Monthly</button>
+    <nav class="section-tabs">
+      <button type="button" class="section-btn active" data-section="habits">Habits</button>
+      <button type="button" class="section-btn" data-section="news">News</button>
     </nav>
 
-    <form id="add-habit-form">
-      <input type="text" id="habit-name-input" placeholder="New habit, e.g. Drink water" required />
-      <button type="submit">Add</button>
-    </form>
+    <section id="habits-section">
+      <header class="app-header">
+        <div class="title-block">
+          <p class="eyebrow">habit tracker</p>
+          <h1>My Life App</h1>
+        </div>
+        <div class="stat-tiles">
+          <div class="stat-tile ring-tile">
+            <svg class="ring" viewBox="0 0 40 40" id="today-ring">
+              <circle class="ring-track" cx="20" cy="20" r="17"></circle>
+              <circle class="ring-fill" cx="20" cy="20" r="17"></circle>
+            </svg>
+            <div class="ring-label">
+              <span class="stat-label">Today</span>
+              <span class="stat-value" id="today-count">0/0</span>
+            </div>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Best streak</span>
+            <span class="stat-value" id="best-streak">0d</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Perfect days</span>
+            <span class="stat-value" id="perfect-days">0</span>
+          </div>
+        </div>
+      </header>
 
-    <section id="daily-view">
-      <ul id="habit-list"></ul>
+      <nav class="view-tabs">
+        <button type="button" class="tab-btn" data-view="daily">Daily</button>
+        <button type="button" class="tab-btn" data-view="monthly">Monthly</button>
+      </nav>
+
+      <section id="daily-view">
+        <ul id="habit-list"></ul>
+        <div class="add-habit-toggle">
+          <button type="button" id="add-habit-toggle-btn">+ Add habit</button>
+          <form id="add-habit-form" hidden>
+            <input type="text" id="habit-name-input" placeholder="New habit, e.g. Drink water" required />
+            <button type="submit">Add</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="monthly-view" hidden>
+        <div class="month-nav">
+          <button type="button" id="prev-month" aria-label="Previous month">‹</button>
+          <span id="month-label"></span>
+          <button type="button" id="next-month" aria-label="Next month">›</button>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="calendar" id="calendar"></div>
+        <p class="calendar-footer" id="calendar-footer"></p>
+      </section>
+
+      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
 
-    <section id="monthly-view" hidden>
-      <div class="month-nav">
-        <button type="button" id="prev-month" aria-label="Previous month">‹</button>
-        <span id="month-label"></span>
-        <button type="button" id="next-month" aria-label="Next month">›</button>
+    <section id="news-section" hidden>
+      <header class="app-header">
+        <div class="title-block">
+          <p class="eyebrow">headlines</p>
+          <h1>News</h1>
+        </div>
+        <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
+      </header>
+
+      <div class="news-grid">
+        <div class="news-column">
+          <h2 class="news-col-title">World</h2>
+          <ul class="news-list" id="news-world"></ul>
+        </div>
+        <div class="news-column">
+          <h2 class="news-col-title">Germany</h2>
+          <ul class="news-list" id="news-germany"></ul>
+        </div>
+        <div class="news-column">
+          <h2 class="news-col-title">Austria</h2>
+          <ul class="news-list" id="news-austria"></ul>
+        </div>
+        <div class="news-column">
+          <h2 class="news-col-title">Czechia</h2>
+          <ul class="news-list" id="news-czechia"></ul>
+        </div>
       </div>
-      <div class="legend" id="legend"></div>
-      <div class="calendar" id="calendar"></div>
-      <p class="calendar-footer" id="calendar-footer"></p>
     </section>
-
-    <p class="sync-note" id="sync-note">Saved on this device only &middot; not yet synced across devices</p>
   </main>
 
   <script src="script.js"></script>
+  <script src="news.js"></script>
 </body>
 </html>

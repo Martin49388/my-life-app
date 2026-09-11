@@ -183,6 +183,10 @@ h1 {
   gap: 8px;
 }
 
+#add-habit-form[hidden] {
+  display: none;
+}
+
 #habit-name-input {
   flex: 1;
   padding: 10px 12px;
@@ -434,4 +438,138 @@ h1 {
   font-size: 11px;
   color: var(--text-faint);
   margin: 4px 0 0;
+}
+
+.section-tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.section-btn {
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  padding: 6px 2px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.section-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.add-habit-toggle {
+  margin-top: 4px;
+}
+
+#add-habit-toggle-btn {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--text-faint);
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#add-habit-toggle-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.refresh-btn {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.refresh-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .news-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.news-column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.news-col-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.news-item a {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.news-item a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.news-time {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+
+.news-loading,
+.news-empty {
+  font-size: 12px;
+  color: var(--text-faint);
+  list-style: none;
 }
