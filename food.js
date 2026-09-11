@@ -245,7 +245,9 @@ function renderEstimator() {
 function renderScale() {
   const eaten = entriesFor(viewedDate).reduce((sum, e) => sum + e.kcal, 0);
   const target = food.target;
-  const maintain = food.maintenance;
+  // Show the live estimate as soon as the stats allow one; the pinned value
+  // keeps the stop on the line when the stats aren't filled in.
+  const maintain = maintenanceCalories() ?? food.maintenance;
   const ceiling = Math.max(eaten, target, maintain || 0) * 1.08 || 1;
   const pct = (value) => `${Math.min(100, (value / ceiling) * 100)}%`;
 
@@ -264,7 +266,7 @@ function renderScale() {
 
   const relation = document.getElementById("scale-relation");
   if (!maintain) {
-    relation.textContent = "Set a maintenance figure to see it as a second stop on the line.";
+    relation.textContent = "Fill in weight, height and age to place the maintenance stop.";
     return;
   }
   const diff = target - maintain;

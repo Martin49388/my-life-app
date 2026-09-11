@@ -1574,6 +1574,7 @@ body {
   height: 14px;
   background: var(--track);
   border-radius: 4px;
+  margin: 18px 0 16px;
 }
 
 .scale-eaten {
@@ -1617,12 +1618,36 @@ body {
 }
 
 .scale-stop-maintain {
-  background: var(--text-dim);
+  background: var(--text);
 }
 
 .scale-stop-maintain .stop-cap {
   background: var(--bg);
-  border: 2px solid var(--text-dim);
+  border: 2px solid var(--text);
+}
+
+/* Maintenance labels above the track, target below, so the two never collide
+   when the values sit close together. */
+.stop-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.scale-stop-maintain .stop-label {
+  bottom: calc(100% + 6px);
+  color: var(--text-dim);
+}
+
+.scale-stop-target .stop-label {
+  top: calc(100% + 6px);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .scale-stop-maintain[hidden] {
