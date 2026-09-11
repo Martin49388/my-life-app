@@ -604,7 +604,23 @@ body {
   list-style: none;
 }
 
-#goal-list {
+.goal-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-group-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 4px 0 0;
+}
+
+#goal-list-short,
+#goal-list-long {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -721,7 +737,8 @@ body {
   display: none;
 }
 
-#add-goal-form input {
+#add-goal-form input,
+#add-goal-form select {
   padding: 10px 12px;
   font-size: 14px;
   font-family: inherit;
@@ -731,13 +748,18 @@ body {
   border-radius: 8px;
 }
 
-#add-goal-form input:focus-visible {
+#add-goal-form input:focus-visible,
+#add-goal-form select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
 #goal-name-input {
   flex: 1 1 100%;
+}
+
+#goal-term-input {
+  flex: 1 1 120px;
 }
 
 #goal-target-input {

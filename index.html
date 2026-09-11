@@ -125,12 +125,24 @@
         </div>
       </header>
 
-      <ul id="goal-list"></ul>
+      <div class="goal-group">
+        <h2 class="goal-group-title">Short-term</h2>
+        <ul id="goal-list-short"></ul>
+      </div>
+
+      <div class="goal-group">
+        <h2 class="goal-group-title">Long-term</h2>
+        <ul id="goal-list-long"></ul>
+      </div>
 
       <div class="add-habit-toggle">
         <button type="button" id="add-goal-toggle-btn">+ Add goal</button>
         <form id="add-goal-form" hidden>
           <input type="text" id="goal-name-input" placeholder="Goal, e.g. Read 12 books" required />
+          <select id="goal-term-input">
+            <option value="short">Short-term</option>
+            <option value="long">Long-term</option>
+          </select>
           <input type="number" id="goal-target-input" placeholder="Target" min="1" required />
           <input type="text" id="goal-unit-input" placeholder="Unit (optional)" />
           <input type="date" id="goal-deadline-input" />
