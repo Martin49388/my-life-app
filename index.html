@@ -27,6 +27,7 @@
       <button type="button" class="section-btn active" data-section="habits">Habits</button>
       <button type="button" class="section-btn" data-section="news">News</button>
       <button type="button" class="section-btn" data-section="goals">Goals</button>
+      <button type="button" class="section-btn" data-section="fitness">Fitness</button>
     </nav>
 
     <section id="habits-section">
@@ -169,10 +170,49 @@
 
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
+    <section id="fitness-section" hidden>
+      <header class="app-header">
+        <p class="eyebrow">weekly plan</p>
+        <div class="stat-tiles">
+          <div class="stat-tile">
+            <span class="stat-label">Train days</span>
+            <span class="stat-value" id="fitness-traindays">0</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Today</span>
+            <span class="stat-value" id="fitness-today">0/0</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="week-strip" id="week-strip"></div>
+
+      <div class="session">
+        <div class="session-head">
+          <h2 class="session-day" id="session-day">Monday</h2>
+          <input type="text" id="session-title-input" class="session-title-input" placeholder="Rest day — name a session to train" maxlength="24" />
+        </div>
+
+        <ul class="exercise-list" id="exercise-list"></ul>
+
+        <div class="add-habit-toggle">
+          <button type="button" id="add-exercise-toggle-btn">+ Add exercise</button>
+          <form id="add-exercise-form" hidden>
+            <input type="text" id="exercise-name-input" placeholder="Exercise, e.g. Bench press" required />
+            <input type="number" id="exercise-sets-input" placeholder="Sets" min="1" max="20" />
+            <input type="text" id="exercise-reps-input" placeholder="Reps, e.g. 8-10" maxlength="12" />
+            <button type="submit">Add</button>
+          </form>
+        </div>
+      </div>
+
+      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
+    </section>
   </main>
 
   <script src="script.js"></script>
   <script src="news.js"></script>
   <script src="goals.js"></script>
+  <script src="fitness.js"></script>
 </body>
 </html>

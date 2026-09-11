@@ -6,4 +6,4 @@ Built as a web app so it's accessible from both iPhone and Mac via the browser. 
 
 ## Status
 
-Habit tracking and a live News section (world, Germany, Austria, Czechia) are built. Goals, fitness, and calorie counting are next.
+Built so far: habit tracking (streaks, monthly calendar), a live News section (world, Germany, Austria, Czechia), Goals split into short- and long-term horizons, and a weekly Fitness plan. Calorie counting is next, then Supabase sync.
