@@ -1569,34 +1569,22 @@ body {
   border-top: 1px solid var(--border);
 }
 
-.scale-track {
+.budget-bar-wrap {
   position: relative;
-  height: 14px;
-  background: var(--track);
-  border-radius: 4px;
-  margin: 18px 0 16px;
+  margin: 14px 0 13px;
 }
 
-.scale-eaten {
-  height: 100%;
-  background: var(--accent);
-  opacity: 0.55;
-  border-radius: 4px 0 0 4px;
-  transition: width 0.3s ease;
-}
-
-.scale-eaten.over {
-  background: var(--danger);
-  opacity: 0.5;
-}
-
-.scale-stop {
+.budget-stop {
   position: absolute;
-  top: -5px;
-  bottom: -5px;
+  top: -4px;
+  bottom: -4px;
   width: 2px;
   border-radius: 2px;
   transform: translateX(-1px);
+}
+
+.budget-stop[hidden] {
+  display: none;
 }
 
 .stop-cap {
@@ -1609,24 +1597,24 @@ body {
   border-radius: 99px;
 }
 
-.scale-stop-target {
+.budget-stop-target {
   background: var(--accent);
 }
 
-.scale-stop-target .stop-cap {
+.budget-stop-target .stop-cap {
   background: var(--accent);
 }
 
-.scale-stop-maintain {
+.budget-stop-maintain {
   background: var(--text);
 }
 
-.scale-stop-maintain .stop-cap {
+.budget-stop-maintain .stop-cap {
   background: var(--bg);
   border: 2px solid var(--text);
 }
 
-/* Maintenance labels above the track, target below, so the two never collide
+/* Maintenance labels above the bar, target below, so the two never collide
    when the values sit close together. */
 .stop-label {
   position: absolute;
@@ -1639,52 +1627,15 @@ body {
   white-space: nowrap;
 }
 
-.scale-stop-maintain .stop-label {
-  bottom: calc(100% + 6px);
+.budget-stop-maintain .stop-label {
+  bottom: calc(100% + 5px);
   color: var(--text-dim);
 }
 
-.scale-stop-target .stop-label {
-  top: calc(100% + 6px);
+.budget-stop-target .stop-label {
+  top: calc(100% + 5px);
   color: var(--accent);
   font-weight: 600;
-}
-
-.scale-stop-maintain[hidden] {
-  display: none;
-}
-
-.scale-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  font-size: 11.5px;
-  color: var(--text-dim);
-}
-
-.scale-key {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.key-eaten {
-  background: var(--accent);
-  opacity: 0.55;
-}
-
-.key-target {
-  background: var(--accent);
-  width: 3px;
-  height: 11px;
-}
-
-.key-maintain {
-  background: var(--text-dim);
-  width: 3px;
-  height: 11px;
 }
 
 .scale-relation {

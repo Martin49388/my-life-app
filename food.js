@@ -112,11 +112,22 @@ function renderBudget() {
     `${entries.reduce((sum, e) => sum + (e.protein || 0), 0)}g`;
 
   // One bar, split into a segment per meal: shows how much of the budget is
-  // gone and where it went, without needing a second chart.
-  const scale = Math.max(target, consumed) || 1;
+  // gone and where it went, without needing a second chart. Target and
+  // maintenance sit on the same bar as stops, so the scale has to reach
+  // whichever of the three is largest.
+  const maintain = maintenanceCalories() ?? food.maintenance;
+  // Headroom past the largest value keeps the rightmost stop's label from
+  // running off the edge of the bar.
+  const scale = Math.max(target, consumed, maintain || 0) * 1.15 || 1;
   const bar = document.getElementById("budget-bar");
   bar.innerHTML = "";
   bar.classList.toggle("over", over);
+
+  const stopPct = (value) => `${Math.min(100, (value / scale) * 100)}%`;
+  document.getElementById("budget-stop-target").style.left = stopPct(target);
+  const maintainStop = document.getElementById("budget-stop-maintain");
+  maintainStop.hidden = !maintain;
+  if (maintain) maintainStop.style.left = stopPct(maintain);
 
   MEALS.forEach((meal, i) => {
     const mealTotal = entries.filter((e) => e.meal === meal).reduce((sum, e) => sum + e.kcal, 0);
@@ -239,37 +250,17 @@ function renderEstimator() {
   renderScale();
 }
 
-// One axis carrying all three numbers: today's intake as a filled bar, with a
-// stop marking the target and another marking maintenance. The two stops are
-// independent values, so they only coincide if you deliberately match them.
+// The stops themselves live on the main budget bar; this just states the gap
+// between target and maintenance in words.
 function renderScale() {
-  const eaten = entriesFor(viewedDate).reduce((sum, e) => sum + e.kcal, 0);
-  const target = food.target;
-  // Show the live estimate as soon as the stats allow one; the pinned value
-  // keeps the stop on the line when the stats aren't filled in.
   const maintain = maintenanceCalories() ?? food.maintenance;
-  const ceiling = Math.max(eaten, target, maintain || 0) * 1.08 || 1;
-  const pct = (value) => `${Math.min(100, (value / ceiling) * 100)}%`;
-
-  document.getElementById("scale-eaten").style.width = pct(eaten);
-  document.getElementById("scale-eaten").classList.toggle("over", eaten > target);
-  document.getElementById("scale-tick-target").style.left = pct(target);
-
-  const maintainStop = document.getElementById("scale-tick-maintain");
-  maintainStop.hidden = !maintain;
-  if (maintain) maintainStop.style.left = pct(maintain);
-
-  document.getElementById("scale-legend").innerHTML = `
-    <span class="legend-item"><span class="scale-key key-eaten"></span>Eaten ${eaten.toLocaleString()}</span>
-    <span class="legend-item"><span class="scale-key key-target"></span>Target ${target.toLocaleString()}</span>
-    ${maintain ? `<span class="legend-item"><span class="scale-key key-maintain"></span>Maintain ${maintain.toLocaleString()}</span>` : ""}`;
-
   const relation = document.getElementById("scale-relation");
+
   if (!maintain) {
-    relation.textContent = "Fill in weight, height and age to place the maintenance stop.";
+    relation.textContent = "Fill in weight, height and age to place the maintenance stop on the bar.";
     return;
   }
-  const diff = target - maintain;
+  const diff = food.target - maintain;
   if (diff === 0) relation.textContent = "Your target sits exactly at maintenance.";
   else relation.textContent = `Your target is ${Math.abs(diff).toLocaleString()} kcal ${diff > 0 ? "above" : "below"} maintenance.`;
 }

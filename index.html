@@ -282,18 +282,6 @@
         </div>
 
         <div class="scale">
-          <div class="scale-track">
-            <div class="scale-eaten" id="scale-eaten"></div>
-            <div class="scale-stop scale-stop-maintain" id="scale-tick-maintain">
-              <span class="stop-cap"></span>
-              <span class="stop-label" id="stop-label-maintain">Maintain</span>
-            </div>
-            <div class="scale-stop scale-stop-target" id="scale-tick-target">
-              <span class="stop-cap"></span>
-              <span class="stop-label" id="stop-label-target">Target</span>
-            </div>
-          </div>
-          <div class="scale-legend" id="scale-legend"></div>
           <p class="scale-relation" id="scale-relation"></p>
         </div>
 
@@ -311,7 +299,17 @@
           <span class="budget-number" id="budget-number">0</span>
           <span class="budget-caption" id="budget-caption">kcal left</span>
         </p>
-        <div class="budget-bar" id="budget-bar"></div>
+        <div class="budget-bar-wrap">
+          <div class="budget-bar" id="budget-bar"></div>
+          <div class="budget-stop budget-stop-maintain" id="budget-stop-maintain" hidden>
+            <span class="stop-cap"></span>
+            <span class="stop-label">Maintain</span>
+          </div>
+          <div class="budget-stop budget-stop-target" id="budget-stop-target">
+            <span class="stop-cap"></span>
+            <span class="stop-label">Target</span>
+          </div>
+        </div>
         <div class="budget-legend" id="budget-legend"></div>
       </div>
 
