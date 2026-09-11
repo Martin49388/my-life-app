@@ -28,6 +28,7 @@
       <button type="button" class="section-btn" data-section="news">News</button>
       <button type="button" class="section-btn" data-section="goals">Goals</button>
       <button type="button" class="section-btn" data-section="fitness">Fitness</button>
+      <button type="button" class="section-btn" data-section="food">Food</button>
     </nav>
 
     <section id="habits-section">
@@ -208,11 +209,64 @@
 
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
+    <section id="food-section" hidden>
+      <header class="app-header">
+        <p class="eyebrow">daily intake</p>
+        <div class="stat-tiles">
+          <div class="stat-tile">
+            <span class="stat-label">Target</span>
+            <input type="number" id="kcal-target-input" class="target-input" min="500" max="10000" step="50" />
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Protein</span>
+            <span class="stat-value" id="protein-total">0g</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="month-nav">
+        <button type="button" id="food-prev-day" aria-label="Previous day">‹</button>
+        <span id="food-date-label"></span>
+        <button type="button" id="food-next-day" aria-label="Next day">›</button>
+      </div>
+
+      <div class="budget">
+        <p class="budget-headline">
+          <span class="budget-number" id="budget-number">0</span>
+          <span class="budget-caption" id="budget-caption">kcal left</span>
+        </p>
+        <div class="budget-bar" id="budget-bar"></div>
+        <div class="budget-legend" id="budget-legend"></div>
+      </div>
+
+      <div class="quick-add" id="quick-add"></div>
+
+      <div id="meal-groups"></div>
+
+      <div class="add-habit-toggle">
+        <button type="button" id="add-food-toggle-btn">+ Log food</button>
+        <form id="add-food-form" hidden>
+          <input type="text" id="food-name-input" placeholder="Food, e.g. Porridge" required />
+          <input type="number" id="food-kcal-input" placeholder="kcal" min="0" max="5000" required />
+          <input type="number" id="food-protein-input" placeholder="Protein g" min="0" max="500" />
+          <select id="food-meal-input">
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snacks">Snacks</option>
+          </select>
+          <button type="submit">Add</button>
+        </form>
+      </div>
+
+      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
+    </section>
   </main>
 
   <script src="script.js"></script>
   <script src="news.js"></script>
   <script src="goals.js"></script>
   <script src="fitness.js"></script>
+  <script src="food.js"></script>
 </body>
 </html>

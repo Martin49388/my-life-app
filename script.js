@@ -348,9 +348,11 @@ document.querySelectorAll(".section-btn").forEach((btn) => {
     document.getElementById("news-section").hidden = section !== "news";
     document.getElementById("goals-section").hidden = section !== "goals";
     document.getElementById("fitness-section").hidden = section !== "fitness";
+    document.getElementById("food-section").hidden = section !== "food";
     if (section === "news" && window.loadNews) window.loadNews();
     if (section === "goals" && window.renderGoals) window.renderGoals();
     if (section === "fitness" && window.renderFitness) window.renderFitness();
+    if (section === "food" && window.renderFood) window.renderFood();
   });
 });
 
