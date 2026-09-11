@@ -4,19 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Life App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>My Life App</h1>
+  <main class="app">
+    <header class="app-header">
+      <div class="title-block">
+        <p class="eyebrow">habit tracker</p>
+        <h1>My Life App</h1>
+      </div>
+      <div class="stat-tiles">
+        <div class="stat-tile ring-tile">
+          <svg class="ring" viewBox="0 0 40 40" id="today-ring">
+            <circle class="ring-track" cx="20" cy="20" r="17"></circle>
+            <circle class="ring-fill" cx="20" cy="20" r="17"></circle>
+          </svg>
+          <div class="ring-label">
+            <span class="stat-label">Today</span>
+            <span class="stat-value" id="today-count">0/0</span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Best streak</span>
+          <span class="stat-value" id="best-streak">0d</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Perfect days</span>
+          <span class="stat-value" id="perfect-days">0</span>
+        </div>
+      </div>
+    </header>
 
-  <section>
-    <h2>Habits</h2>
+    <nav class="view-tabs">
+      <button type="button" class="tab-btn" data-view="daily">Daily</button>
+      <button type="button" class="tab-btn" data-view="monthly">Monthly</button>
+    </nav>
+
     <form id="add-habit-form">
       <input type="text" id="habit-name-input" placeholder="New habit, e.g. Drink water" required />
       <button type="submit">Add</button>
     </form>
-    <ul id="habit-list"></ul>
-  </section>
+
+    <section id="daily-view">
+      <ul id="habit-list"></ul>
+    </section>
+
+    <section id="monthly-view" hidden>
+      <div class="month-nav">
+        <button type="button" id="prev-month" aria-label="Previous month">‹</button>
+        <span id="month-label"></span>
+        <button type="button" id="next-month" aria-label="Next month">›</button>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="calendar" id="calendar"></div>
+      <p class="calendar-footer" id="calendar-footer"></p>
+    </section>
+
+    <p class="sync-note" id="sync-note">Saved on this device only &middot; not yet synced across devices</p>
+  </main>
 
   <script src="script.js"></script>
 </body>
