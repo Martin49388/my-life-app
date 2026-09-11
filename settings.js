@@ -26,6 +26,55 @@ function currentPalette() {
   return PALETTES.find((p) => p.id === savedId) || PALETTES[0];
 }
 
+// The greys aren't neutral — they carry a faint tint of the accent's hue, which
+// is what stops the app looking like coloured controls dropped onto grey chrome.
+// Saturation and lightness are fixed per token so contrast never changes; only
+// the hue swings with the palette.
+const NEUTRAL_RAMP = {
+  dark: {
+    "--bg": [22, 9],
+    "--surface": [25, 12],
+    "--surface-2": [25, 15],
+    "--border": [22, 23],
+    "--track": [22, 18],
+    "--text": [38, 94],
+    "--text-dim": [21, 68],
+    "--text-faint": [13, 48],
+  },
+  // Both ramps must declare the same tokens. Inline properties persist on the
+  // element, so a token missing from one ramp keeps the other theme's value
+  // when the system switches — which rendered light-mode cards near-black.
+  light: {
+    "--bg": [33, 98],
+    "--surface": [0, 100],
+    "--surface-2": [27, 94],
+    "--border": [27, 88],
+    "--track": [38, 91],
+    "--text": [21, 14],
+    "--text-dim": [9, 43],
+    "--text-faint": [15, 65],
+  },
+};
+
+function hexToHsl(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+  const l = (max + min) / 2;
+  if (delta === 0) return { h: 0, s: 0, l: l * 100 };
+
+  const s = delta / (1 - Math.abs(2 * l - 1));
+  let h;
+  if (max === r) h = (((g - b) / delta) % 6 + 6) % 6;
+  else if (max === g) h = (b - r) / delta + 2;
+  else h = (r - g) / delta + 4;
+
+  return { h: h * 60, s: s * 100, l: l * 100 };
+}
+
 function relativeLuminance(hex) {
   const channel = (v) => {
     const c = parseInt(v, 16) / 255;
@@ -51,9 +100,20 @@ function applyPalette(palette) {
   const dark = prefersDark();
   const accent = dark ? palette.dark : palette.light;
   const root = document.documentElement;
+
   root.style.setProperty("--accent", accent);
   root.style.setProperty("--accent-soft", dark ? palette.darkSoft : palette.lightSoft);
   root.style.setProperty("--accent-ink", inkFor(accent));
+
+  // Grey, black & white and black-on-black have no hue worth carrying, so their
+  // neutrals go properly neutral instead of picking up a phantom tint.
+  const { h, s } = hexToHsl(accent);
+  const achromatic = s < 12;
+
+  const ramp = NEUTRAL_RAMP[dark ? "dark" : "light"];
+  for (const [token, [sat, light]] of Object.entries(ramp)) {
+    root.style.setProperty(token, `hsl(${h.toFixed(0)} ${achromatic ? 0 : sat}% ${light}%)`);
+  }
 }
 
 function renderSwatches() {
