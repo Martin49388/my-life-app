@@ -339,8 +339,8 @@ body {
 }
 
 .ring {
-  width: 34px;
-  height: 34px;
+  width: 46px;
+  height: 46px;
   transform: rotate(-90deg);
   flex-shrink: 0;
 }
@@ -378,6 +378,27 @@ body {
   font-variant-numeric: tabular-nums;
   font-size: 16px;
   font-weight: 600;
+}
+
+/* One number per screen gets to be the thing you actually look at —
+   everything else in the header stays small and muted (.stat-tile-muted). */
+.stat-value-primary {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.stat-tile-muted {
+  padding: 6px 10px;
+}
+
+.stat-tile-muted .stat-value {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.stat-tile-muted .stat-label {
+  font-size: 9px;
 }
 
 .view-tabs {
