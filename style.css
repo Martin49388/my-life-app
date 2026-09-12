@@ -616,7 +616,6 @@ body {
   align-items: center;
   gap: 12px;
   padding: 12px 4px;
-  border-left: 3px solid var(--habit-color, transparent);
 }
 
 .habit-row + .habit-row {
@@ -626,14 +625,9 @@ body {
 .habit-row input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: var(--habit-color, var(--accent));
+  accent-color: var(--accent);
   flex-shrink: 0;
   cursor: pointer;
-}
-
-.habit-icon {
-  font-size: 18px;
-  flex-shrink: 0;
 }
 
 .habit-body {
@@ -681,6 +675,10 @@ body {
   height: 14px;
   border-radius: 3px;
   background: var(--track);
+}
+
+.history-cell.filled {
+  background: var(--accent);
 }
 
 .delete-btn {
@@ -734,13 +732,6 @@ body {
   font-family: "IBM Plex Mono", monospace;
 }
 
-.legend-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 99px;
-  display: inline-block;
-}
-
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -792,6 +783,7 @@ body {
   width: 5px;
   height: 5px;
   border-radius: 99px;
+  background: var(--accent);
 }
 
 .calendar-footer {

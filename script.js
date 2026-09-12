@@ -1,37 +1,6 @@
 const STORAGE_KEY = "habits";
 const VIEW_KEY = "habitView";
 
-const COLORS = ["#8b5cf6", "#22c55e", "#3b82f6", "#14b8a6", "#ef4444", "#eab308", "#ec4899", "#06b6d4"];
-
-const ICON_RULES = [
-  [/water|hydrat/, "💧"],
-  [/exercis|gym|workout|run|jog/, "💪"],
-  [/read|book/, "📖"],
-  [/medicin|pill|vitamin/, "💊"],
-  [/sleep|bed/, "😴"],
-  [/meditat|mindful/, "🧘"],
-  [/piano|guitar|music|practice/, "🎹"],
-  [/chess/, "♟️"],
-  [/journal|write|diary/, "📓"],
-  [/walk/, "🚶"],
-  [/stretch|yoga/, "🤸"],
-  [/smok|alcohol|sugar|^stop|quit/, "🚫"],
-  [/code|program|study|learn/, "💻"],
-  [/clean|tidy/, "🧹"],
-  [/cook|meal/, "🍳"],
-];
-const DEFAULT_ICON = "✅";
-
-function pickIcon(name) {
-  const lower = name.toLowerCase();
-  const match = ICON_RULES.find(([re]) => re.test(lower));
-  return match ? match[1] : DEFAULT_ICON;
-}
-
-function pickColor(index) {
-  return COLORS[index % COLORS.length];
-}
-
 // Uses local Y/M/D (not toISOString, which is UTC and can land on the
 // wrong calendar day depending on your timezone offset).
 function dateKey(date) {
@@ -105,7 +74,7 @@ function loadHabits() {
     if (h.history) return h;
     const history = {};
     for (const d of h.doneDates || []) history[d] = true;
-    return { id: h.id, name: h.name, icon: pickIcon(h.name), color: pickColor(i), history };
+    return { id: h.id, name: h.name, history };
   });
 }
 
@@ -119,7 +88,7 @@ let viewedYear = new Date().getFullYear();
 let viewedMonth = new Date().getMonth(); // 0-indexed
 
 function addHabit(name) {
-  habits.push({ id: crypto.randomUUID(), name, icon: pickIcon(name), color: pickColor(habits.length), history: {} });
+  habits.push({ id: crypto.randomUUID(), name, history: {} });
   saveHabits(habits);
   render();
 }
@@ -202,7 +171,6 @@ function renderDaily() {
 
     const li = document.createElement("li");
     li.className = "habit-row" + (isDone ? " done" : "");
-    li.style.setProperty("--habit-color", habit.color);
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -212,10 +180,6 @@ function renderDaily() {
       // Let the pulse actually show before the row gets rebuilt on render.
       setTimeout(() => toggleDate(habit.id, today), 150);
     });
-
-    const icon = document.createElement("span");
-    icon.className = "habit-icon";
-    icon.textContent = habit.icon;
 
     const body = document.createElement("div");
     body.className = "habit-body";
@@ -236,7 +200,6 @@ function renderDaily() {
       const d = addDays(today, -i);
       const cell = document.createElement("span");
       cell.className = "history-cell" + (habit.history[d] ? " filled" : "");
-      if (habit.history[d]) cell.style.background = habit.color;
       history.appendChild(cell);
     }
 
@@ -248,7 +211,7 @@ function renderDaily() {
     deleteBtn.setAttribute("aria-label", `Delete ${habit.name}`);
     deleteBtn.addEventListener("click", () => deleteHabit(habit.id));
 
-    li.append(checkbox, icon, body, deleteBtn);
+    li.append(checkbox, body, deleteBtn);
     list.appendChild(li);
   }
 }
@@ -261,7 +224,7 @@ function renderMonthly() {
 
   const legend = document.getElementById("legend");
   legend.innerHTML = habits
-    .map((h) => `<span class="legend-item"><span class="legend-dot" style="background:${h.color}"></span>${h.name}</span>`)
+    .map((h) => `<span class="legend-item">${h.name}</span>`)
     .join("");
 
   const calendar = document.getElementById("calendar");
@@ -299,7 +262,6 @@ function renderMonthly() {
       if (h.history[date]) {
         const dot = document.createElement("span");
         dot.className = "day-dot";
-        dot.style.background = h.color;
         dots.appendChild(dot);
       }
     }
@@ -323,7 +285,7 @@ function renderMonthly() {
       for (let d = 1; d <= elapsedDays; d++) {
         if (h.history[dateKey(new Date(viewedYear, viewedMonth, d))]) count++;
       }
-      return `<span class="legend-item"><span class="legend-dot" style="background:${h.color}"></span>${count}/${elapsedDays}</span>`;
+      return `<span class="legend-item">${h.name} ${count}/${elapsedDays}</span>`;
     })
     .join("");
 
