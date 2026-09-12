@@ -104,7 +104,9 @@ function renderBudget() {
   const remaining = target - consumed;
   const over = remaining < 0;
 
-  document.getElementById("budget-number").textContent = Math.abs(remaining).toLocaleString();
+  const budgetEl = document.getElementById("budget-number");
+  if (window.animateNumber) window.animateNumber(budgetEl, Math.abs(remaining));
+  else budgetEl.textContent = Math.abs(remaining).toLocaleString();
   document.getElementById("budget-caption").textContent = over ? "kcal over" : "kcal left";
   document.getElementById("budget-number").classList.toggle("over", over);
 

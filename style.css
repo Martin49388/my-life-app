@@ -921,6 +921,49 @@ body {
   .horizon-label {
     transition: none;
   }
+
+  .tab-fade-in,
+  .habit-pulse {
+    animation: none !important;
+  }
+}
+
+/* Tab switch: content fades/slides in instead of just appearing.
+   Reduced-motion users never get the class added (see script.js). */
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-fade-in {
+  animation: tabFadeIn 0.22s ease;
+}
+
+/* Habit row: a brief pulse on check-off, on top of the existing
+   strikethrough, instead of just the strikethrough alone. */
+@keyframes habitPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1.015);
+    opacity: 0.82;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.habit-pulse {
+  animation: habitPulse 0.15s ease;
 }
 
 #goal-list-short,

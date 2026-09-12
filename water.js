@@ -35,7 +35,9 @@ function renderWater() {
   const targetLiters = (water.target / 1000).toFixed(1);
   const pct = Math.min(100, Math.round((ml / water.target) * 100));
 
-  document.getElementById("water-total").textContent = `${liters}L`;
+  const totalEl = document.getElementById("water-total");
+  if (window.animateNumber) window.animateNumber(totalEl, ml / 1000, { duration: 300, decimals: 2 });
+  else totalEl.textContent = `${liters}L`;
   document.getElementById("water-target-label").textContent = `of ${targetLiters}L`;
   document.getElementById("water-bar").style.width = `${pct}%`;
   if (window.renderGlance) window.renderGlance();

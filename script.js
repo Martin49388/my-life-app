@@ -45,6 +45,51 @@ function todayKey() {
   return dateKey(new Date());
 }
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Tweens a number element's text from its current displayed value to a new
+// one instead of jumping straight to it. Keeps whatever non-digit
+// characters (like "g" or "%") already surround the number, and does
+// nothing but set the final value when the user prefers reduced motion.
+function animateNumber(el, newValue, { duration = 400, decimals = 0 } = {}) {
+  const prevText = el.textContent || "";
+  const numberPattern = /-?[\d,]+(\.\d+)?/;
+  const prevMatch = prevText.match(numberPattern);
+  const from = prevMatch ? parseFloat(prevMatch[0].replace(/,/g, "")) : 0;
+  const to = Number(newValue.toFixed(decimals));
+
+  const format = (n) =>
+    decimals > 0
+      ? n.toFixed(decimals)
+      : Math.round(n).toLocaleString();
+
+  if (prefersReducedMotion || from === to) {
+    el.textContent = prevMatch ? prevText.replace(numberPattern, format(to)) : format(to);
+    return;
+  }
+
+  const start = performance.now();
+  function tick(now) {
+    const progress = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const value = from + (to - from) * eased;
+    el.textContent = prevMatch ? prevText.replace(numberPattern, format(value)) : format(value);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+window.animateNumber = animateNumber;
+
+// Replays a short fade/slide-in on a section when it becomes the active
+// tab, instead of the content just appearing instantly.
+function playTabEnter(section) {
+  if (prefersReducedMotion) return;
+  section.classList.remove("tab-fade-in");
+  void section.offsetWidth; // force reflow so the animation restarts
+  section.classList.add("tab-fade-in");
+}
+window.playTabEnter = playTabEnter;
+
 function addDays(dateStr, n) {
   const d = new Date(dateStr + "T00:00:00");
   d.setDate(d.getDate() + n);
@@ -162,7 +207,11 @@ function renderDaily() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = isDone;
-    checkbox.addEventListener("change", () => toggleDate(habit.id, today));
+    checkbox.addEventListener("change", () => {
+      li.classList.add("habit-pulse");
+      // Let the pulse actually show before the row gets rebuilt on render.
+      setTimeout(() => toggleDate(habit.id, today), 150);
+    });
 
     const icon = document.createElement("span");
     icon.className = "habit-icon";
@@ -355,6 +404,7 @@ document.querySelectorAll(".section-btn").forEach((btn) => {
     if (section === "goals" && window.renderGoals) window.renderGoals();
     if (section === "fitness" && window.renderFitness) window.renderFitness();
     if (section === "food" && window.renderFood) window.renderFood();
+    playTabEnter(document.getElementById(`${section}-section`));
   });
 });
 
