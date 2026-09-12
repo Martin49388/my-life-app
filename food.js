@@ -13,7 +13,7 @@ const ACTIVITY_FACTORS = {
 // target and maintenance are stored separately and never write to each other —
 // they're two independent stops on the scale.
 const DEFAULT_FOOD = {
-  target: 2000,
+  target: 3500,
   maintenance: null,
   days: {},
   showEstimator: false,
