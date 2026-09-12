@@ -1,5 +1,10 @@
 const FITNESS_KEY = "fitness";
 
+// Martin's real weekly target (see profile/about-me.md in the vault) —
+// how many DISTINCT calendar days this week had at least one exercise
+// checked off, not how many days the template happens to have a plan for.
+const TRAIN_TARGET = 5;
+
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -27,6 +32,23 @@ let selectedDay = todayIndex;
 
 function completedToday() {
   return plan.log[todayKey()] || [];
+}
+
+// Monday of the current week, through today — future days in the week
+// can't have been trained yet, so they don't count against the target.
+function weekDatesSoFar() {
+  const mondayOffset = -((new Date().getDay() + 6) % 7);
+  const monday = addDays(todayKey(), mondayOffset);
+  const dates = [];
+  for (let d = monday; ; d = addDays(d, 1)) {
+    dates.push(d);
+    if (d === todayKey()) break;
+  }
+  return dates;
+}
+
+function trainedThisWeek() {
+  return weekDatesSoFar().filter((d) => (plan.log[d] || []).length > 0).length;
 }
 
 function toggleExerciseDone(exerciseId) {
@@ -155,11 +177,10 @@ function renderSession() {
 }
 
 window.renderFitness = function renderFitness() {
-  const trainDays = plan.days.filter((d) => d.exercises.length > 0).length;
   const todayExercises = plan.days[todayIndex].exercises;
   const doneCount = completedToday().filter((id) => todayExercises.some((ex) => ex.id === id)).length;
 
-  document.getElementById("fitness-traindays").textContent = `${trainDays}/7`;
+  document.getElementById("fitness-traindays").textContent = `${trainedThisWeek()}/${TRAIN_TARGET}`;
   document.getElementById("fitness-today").textContent = `${doneCount}/${todayExercises.length}`;
 
   renderWeekStrip();
