@@ -23,44 +23,31 @@
 </head>
 <body>
   <main class="app">
-    <header class="brand-header">
-      <div class="brand-mark">
-        <svg class="brand-icon" viewBox="0 0 48 26" aria-hidden="true">
-          <ellipse cx="24" cy="14" rx="3.6" ry="5.6" fill="currentColor"/>
-          <polygon points="21,10.5 22.6,3 24,10" fill="currentColor"/>
-          <polygon points="24,10 25.4,3 27,10.5" fill="currentColor"/>
-          <polygon points="20.5,12 9,4 12,12.5 2,9 8,17.5 20.5,17" fill="currentColor"/>
-          <polygon points="27.5,12 39,4 36,12.5 46,9 40,17.5 27.5,17" fill="currentColor"/>
-        </svg>
-        <span class="brand-name">BatCave</span>
-      </div>
-
-      <button type="button" id="settings-btn" class="settings-btn" aria-label="Settings" aria-expanded="false">
-        <svg viewBox="0 0 20 20" aria-hidden="true">
-          <circle cx="10" cy="10" r="2.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M10 1.8v2.1M10 16.1v2.1M16.8 10h-2.1M5.3 10H3.2M14.8 5.2l-1.5 1.5M6.7 13.3l-1.5 1.5M14.8 14.8l-1.5-1.5M6.7 6.7L5.2 5.2"
-                stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </button>
-
-      <div class="settings-panel" id="settings-panel" hidden>
-        <p class="settings-version">BatCave &middot; Prototype 1</p>
-      </div>
-    </header>
-
-    <nav class="section-tabs">
-      <button type="button" class="section-btn active" data-section="habits">Habits</button>
-      <button type="button" class="section-btn" data-section="news">News</button>
-      <button type="button" class="section-btn" data-section="goals">Goals</button>
-      <button type="button" class="section-btn" data-section="fitness">Fitness</button>
-      <button type="button" class="section-btn" data-section="food">Food</button>
-      <button type="button" class="section-btn" data-section="jarvis">Jarvis</button>
-    </nav>
-
     <div class="layout">
       <aside class="sidebar" id="sidebar">
-        <p class="eyebrow">at a glance</p>
-        <div class="sidebar-inner" id="sidebar-content"></div>
+        <div class="sidebar-brand">
+          <span class="sidebar-brand-name">BATCAVE</span>
+          <span class="sidebar-brand-tag">Personal OS</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button type="button" class="nav-link section-btn active" data-section="habits">Habits</button>
+          <button type="button" class="nav-link section-btn" data-section="goals">Goals</button>
+          <button type="button" class="nav-link section-btn" data-section="jarvis">Jarvis</button>
+
+          <p class="nav-group-label">Body</p>
+          <button type="button" class="nav-link section-btn" data-section="fitness">Fitness</button>
+          <button type="button" class="nav-link section-btn" data-section="food">Food</button>
+          <button type="button" class="nav-link section-btn" data-section="water">Water</button>
+
+          <p class="nav-group-label">System</p>
+          <button type="button" class="nav-link section-btn" data-section="news">News</button>
+          <button type="button" class="nav-link" id="settings-nav-btn" aria-expanded="false">Settings</button>
+        </nav>
+
+        <div class="settings-panel" id="settings-panel" hidden>
+          <p class="settings-version">BatCave &middot; Prototype 1</p>
+        </div>
       </aside>
 
       <div class="content">

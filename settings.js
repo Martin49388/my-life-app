@@ -2,7 +2,7 @@
 // black-and-grey palette (see style.css :root), so there is nothing left
 // to choose. This file only owns the settings panel's open/close chrome.
 
-const settingsBtn = document.getElementById("settings-btn");
+const settingsBtn = document.getElementById("settings-nav-btn");
 const settingsPanel = document.getElementById("settings-panel");
 
 function setSettingsOpen(open) {

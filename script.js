@@ -392,7 +392,12 @@ addForm.addEventListener("submit", (e) => {
 
 document.querySelectorAll(".section-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const section = btn.dataset.section;
+    const requested = btn.dataset.section;
+    // "Water" has no section of its own — it lives inside Food (see
+    // water.js/index.html) — so it activates Food and then scrolls the
+    // water widget into view instead of pretending it's a separate tab.
+    const section = requested === "water" ? "food" : requested;
+
     document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b === btn));
     document.getElementById("habits-section").hidden = section !== "habits";
     document.getElementById("news-section").hidden = section !== "news";
@@ -405,6 +410,10 @@ document.querySelectorAll(".section-btn").forEach((btn) => {
     if (section === "fitness" && window.renderFitness) window.renderFitness();
     if (section === "food" && window.renderFood) window.renderFood();
     playTabEnter(document.getElementById(`${section}-section`));
+
+    if (requested === "water") {
+      document.querySelector(".water-widget")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    }
   });
 });
 
