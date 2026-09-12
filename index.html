@@ -34,14 +34,23 @@
           <button type="button" class="nav-link section-btn active" data-section="habits">Habits</button>
           <button type="button" class="nav-link section-btn" data-section="goals">Goals</button>
           <button type="button" class="nav-link section-btn" data-section="jarvis">Jarvis</button>
+          <button type="button" class="nav-link section-btn" data-section="blueprint">Blueprint</button>
+          <button type="button" class="nav-link section-btn" data-section="review">Review</button>
 
           <p class="nav-group-label">Body</p>
           <button type="button" class="nav-link section-btn" data-section="fitness">Fitness</button>
           <button type="button" class="nav-link section-btn" data-section="food">Food</button>
           <button type="button" class="nav-link section-btn" data-section="water">Water</button>
+          <button type="button" class="nav-link section-btn" data-section="recovery">Recovery</button>
+
+          <p class="nav-group-label">Mind</p>
+          <button type="button" class="nav-link section-btn" data-section="mindset">Mindset</button>
+          <button type="button" class="nav-link section-btn" data-section="reading">Reading</button>
 
           <p class="nav-group-label">System</p>
           <button type="button" class="nav-link section-btn" data-section="news">News</button>
+          <button type="button" class="nav-link section-btn" data-section="markets">Markets</button>
+          <button type="button" class="nav-link section-btn" data-section="notes">Notes</button>
           <button type="button" class="nav-link" id="settings-nav-btn" aria-expanded="false">Settings</button>
         </nav>
 
@@ -394,6 +403,105 @@
 
       <p class="sync-note">Uses the Gemini API &middot; key lives in config.js, not committed</p>
     </section>
+
+    <section id="blueprint-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">blueprint</p>
+        <p class="section-hint">Sketch the plan — outline, structure, direction. Short entries, most recent first.</p>
+      </header>
+
+      <form class="journal-form" data-journal="blueprint">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="blueprint-journal-list"></ul>
+    </section>
+
+    <section id="review-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">review</p>
+        <p class="section-hint">Look back — what worked, what didn't, what's next.</p>
+      </header>
+
+      <form class="journal-form" data-journal="review">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="review-journal-list"></ul>
+    </section>
+
+    <section id="recovery-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">recovery</p>
+        <p class="section-hint">Sleep, soreness, rest days — anything affecting how your body's recovering.</p>
+      </header>
+
+      <form class="journal-form" data-journal="recovery">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="recovery-journal-list"></ul>
+    </section>
+
+    <section id="mindset-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">mindset</p>
+        <p class="section-hint">Headspace, focus, mood — short notes on how you're thinking.</p>
+      </header>
+
+      <form class="journal-form" data-journal="mindset">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="mindset-journal-list"></ul>
+    </section>
+
+    <section id="reading-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">reading</p>
+        <p class="section-hint">What you're reading and what's sticking.</p>
+      </header>
+
+      <form class="journal-form" data-journal="reading">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="reading-journal-list"></ul>
+    </section>
+
+    <section id="markets-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">markets</p>
+        <p class="section-hint">Watchlist notes, trade ideas, things to revisit.</p>
+      </header>
+
+      <form class="journal-form" data-journal="markets">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="markets-journal-list"></ul>
+    </section>
+
+    <section id="notes-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">notes</p>
+        <p class="section-hint">Anything that doesn't have a home yet.</p>
+      </header>
+
+      <form class="journal-form" data-journal="notes">
+        <input type="text" class="journal-input" placeholder="Add a note…" required />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul class="journal-list" id="notes-journal-list"></ul>
+    </section>
+
       </div>
     </div>
   </main>
@@ -413,6 +521,7 @@
   <script src="water.js"></script>
   <script src="jarvis.js"></script>
   <script src="glance.js"></script>
+  <script src="journal.js"></script>
   <script src="global-bar.js"></script>
 </body>
 </html>

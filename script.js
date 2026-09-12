@@ -354,6 +354,16 @@ addForm.addEventListener("submit", (e) => {
 
 // Shared by the sidebar nav buttons and the persistent bottom input bar
 // (global-bar.js), which jumps to Jarvis after asking a question.
+// Every section that lives behind the sidebar nav. Add new ones here (and
+// give them a matching #<name>-section in index.html) rather than hand-wiring
+// another hidden-toggle line per section.
+const ALL_SECTIONS = [
+  "habits", "goals", "jarvis", "blueprint", "review",
+  "fitness", "food", "recovery",
+  "mindset", "reading",
+  "news", "markets", "notes",
+];
+
 function switchSection(requested) {
   // "Water" has no section of its own — it lives inside Food (see
   // water.js/index.html) — so it activates Food and then scrolls the
@@ -361,12 +371,10 @@ function switchSection(requested) {
   const section = requested === "water" ? "food" : requested;
 
   document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b.dataset.section === requested));
-  document.getElementById("habits-section").hidden = section !== "habits";
-  document.getElementById("news-section").hidden = section !== "news";
-  document.getElementById("goals-section").hidden = section !== "goals";
-  document.getElementById("fitness-section").hidden = section !== "fitness";
-  document.getElementById("food-section").hidden = section !== "food";
-  document.getElementById("jarvis-section").hidden = section !== "jarvis";
+  ALL_SECTIONS.forEach((s) => {
+    const el = document.getElementById(`${s}-section`);
+    if (el) el.hidden = s !== section;
+  });
   if (section === "news" && window.loadNews) window.loadNews();
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();

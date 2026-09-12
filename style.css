@@ -2322,3 +2322,98 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
+
+/* Blueprint / Review / Recovery / Mindset / Reading / Markets / Notes —
+   these are all the same simple timestamped-log pattern (journal.js), so
+   they share one set of styles instead of one per section. */
+.section-header-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-hint {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0;
+  max-width: 60ch;
+}
+
+.journal-form {
+  display: flex;
+  gap: 8px;
+}
+
+.journal-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 2px;
+}
+
+.journal-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.journal-input::placeholder {
+  color: var(--text-faint);
+}
+
+.journal-form button {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 7px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.journal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.journal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 2px;
+}
+
+.journal-row + .journal-row {
+  border-top: 1px solid var(--border);
+}
+
+.journal-row-body {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.journal-text {
+  margin: 0;
+  font-size: 14px;
+}
+
+.journal-time {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
