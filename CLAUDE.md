@@ -3,7 +3,7 @@
 ## Current state
 
 Prototype 1, live at https://martin49388.github.io/my-life-app/ (that copy
-has no API keys — Jarvis/food lookup show "no key configured" there,
+has no API keys — Alfred/food lookup show "no key configured" there,
 intentional; the real experience is local with config.js). Martin needs to
 `git push origin main` and wait for GitHub Pages to rebuild before this
 session's commits show up there.
@@ -33,10 +33,10 @@ done, each its own commit:
    indicator. `.sidebar` and the new input bar (below) are the only two
    real bordered boxes left in the app.
 4. **Persistent global input bar** — a fixed bottom bar ("Log, ask, or
-   restructure…") visible across every section, not just Jarvis.
-   Submitting it switches to the Jarvis section and calls the same
-   `handleJarvisQuestion()` the in-section form uses — one log, one code
-   path, not a parallel Jarvis. `script.js`'s section-switch logic is now
+   restructure…") visible across every section, not just Alfred.
+   Submitting it switches to the Alfred section and calls the same
+   `handleAlfredQuestion()` the in-section form uses — one log, one code
+   path, not a parallel Alfred. `script.js`'s section-switch logic is now
    a named `switchSection()` on `window` so both the sidebar nav and this
    bar can call it.
 
@@ -51,7 +51,7 @@ right-hand hairline; content fills the rest of the width with its own
 padding. Under 640px: sidebar collapses to a horizontal scrollable nav
 strip at the top, content full-width below it.
 
-Sidebar now has 13 sections in 4 groups: Habits/Goals/Jarvis/Blueprint/
+Sidebar now has 13 sections in 4 groups: Habits/Goals/Alfred/Blueprint/
 Review, Body (Fitness/Food/Water/Recovery), Mind (Mindset/Reading),
 System (News/Markets/Notes/Settings). The 7 new ones (Blueprint, Review,
 Recovery, Mindset, Reading, Markets, Notes) are all the same simple
@@ -68,7 +68,7 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
 - Overview — landing page. Hero 'X/4 banked' ring (how many of
   Habits/Water/Food/Training-this-week are on target right now) plus Best
   streak next to it, a status line naming what's open, a hairline
-  standards list, two quick actions (+250ml water, jump to Jarvis), and a
+  standards list, two quick actions (+250ml water, jump to Alfred), and a
   'Today's Plan' list pulling from Blueprint's week plan (see below) with
   its own per-date done checkboxes. Lives in overview.js, hooks into the
   same window.renderX() chain the dead renderGlance() used so it stays
@@ -92,11 +92,12 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
 - Food — 3500 kcal default target, FoodData Central lookup wired in,
   `budget-number` (64px) is the flagship hero number
 - Water — 4L target, daily tally, lives at the top of Food
-- Jarvis — Gemini-backed, blunt tone, reads real daily data, reachable
-  either from its own section or the persistent bottom bar. Built but
-  UNTESTED live (this dev environment has no path to generativelanguage.
-  googleapis.com or api.nal.usda.gov to verify end-to-end — first real
-  test has to happen in an actual browser)
+- Alfred — Gemini-backed, blunt tone, reads real daily data, reachable
+  either from its own section or the persistent bottom bar. CONFIRMED
+  WORKING live (tested for real, not from the sandboxed dev shell).
+  Uses gemini-3.6-flash — gemini-2.0-flash was retired by Google and
+  404ing on every request; swapped to the model Google's own error
+  named as the replacement. FoodData Central lookup is still untested.
 
 Client-side API keys (config.js, gitignored) are a deliberate tradeoff —
 no backend exists, personal non-public use case, accepted over adding a
@@ -104,9 +105,9 @@ proxy server.
 
 ## Next steps
 
-- Confirm Jarvis and Food lookup actually work in the browser (untested,
-  see above) — check the browser console for the exact error if either
-  fails
+- Confirm Food lookup actually works in the browser (Alfred is now
+  confirmed working, see above) — check the browser console for the
+  exact error if it fails
 - Sync/backend (Supabase or Firebase) — explicitly NOT done yet. This is
   a bigger, separate task: replace every localStorage call across script.js,
   goals.js, fitness.js, food.js, water.js with backend reads/writes, plus
