@@ -65,11 +65,21 @@ their new value instead of jumping (`animateNumber()` in script.js,
 reusable, handles decimals). Everything respects `prefers-reduced-motion`.
 
 Sections (Overview is now the sidebar's default landing page, not Habits):
-- Overview — new landing page. Hero 'X/4 banked' ring (how many of
-  Habits/Water/Food/Training-this-week are on target right now), a status
-  line naming what's open, a hairline standards list, two quick actions
-  (+250ml water, jump to Jarvis). Lives in overview.js, hooks into the same
-  window.renderX() chain the dead renderGlance() used so it stays live.
+- Overview — landing page. Hero 'X/4 banked' ring (how many of
+  Habits/Water/Food/Training-this-week are on target right now) plus Best
+  streak next to it, a status line naming what's open, a hairline
+  standards list, two quick actions (+250ml water, jump to Jarvis), and a
+  'Today's Plan' list pulling from Blueprint's week plan (see below) with
+  its own per-date done checkboxes. Lives in overview.js, hooks into the
+  same window.renderX() chain the dead renderGlance() used so it stays
+  live. A condensed version (#mini-overview: banked count + best streak
+  only) shows as a slim header above every OTHER section, toggled in
+  switchSection() — so those two numbers are visible everywhere, not just
+  on Overview itself.
+- Blueprint — its free-text notes journal is unchanged, plus a new Week
+  Plan editor (blueprint.js): pick a weekday tab, add time-blocked entries
+  (start/end/title). This is the 'week plan for every day' Martin plans to
+  fill in — Overview reads whichever day matches today automatically.
 - Habits — streaks, ten-day history, monthly calendar, hero completion
   ring/count as the section's primary number. No per-habit emoji/color
   anymore (removed for looking unprofessional) — checkbox/history/calendar
