@@ -38,6 +38,7 @@ function renderWater() {
   document.getElementById("water-total").textContent = `${liters}L`;
   document.getElementById("water-target-label").textContent = `of ${targetLiters}L`;
   document.getElementById("water-bar").style.width = `${pct}%`;
+  if (window.renderGlance) window.renderGlance();
 }
 
 document.getElementById("water-add-btn").addEventListener("click", () => addWater(WATER_STEP_ML));

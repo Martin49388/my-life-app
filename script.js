@@ -291,6 +291,7 @@ function render() {
   });
   if (currentView === "daily") renderDaily();
   else renderMonthly();
+  if (window.renderGlance) window.renderGlance();
 }
 
 document.querySelectorAll(".tab-btn").forEach((btn) => {

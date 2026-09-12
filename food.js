@@ -272,6 +272,7 @@ window.renderFood = function renderFood() {
   renderBudget();
   renderQuickAdd();
   renderMeals();
+  if (window.renderGlance) window.renderGlance();
 };
 
 document.getElementById("estimator-toggle-btn").addEventListener("click", () => {
