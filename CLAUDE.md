@@ -31,12 +31,15 @@ server, since this is a personal, non-public app.
 
 ## Next steps
 
-- Jarvis: in-app panel that reads the day's habit/goal/fitness/food state
-  and answers questions using the Gemini API (chosen over Anthropic —
-  cost), blunt tone, not yet built
+- Jarvis and the Food lookup (FoodData Central) are built but UNTESTED
+  live — both make real API calls from the browser using config.js keys,
+  but nothing in this dev environment could reach the internet to confirm
+  they actually work end-to-end. First real test happens by opening the
+  app in a browser and trying both; check the browser console for the
+  exact error if either fails
 - Goals-review: weekly/monthly reflection combining habit + goal data, not
   yet built
-- Layout restructure: still symmetric/centered: cards stacked in a single
+- Layout restructure: still symmetric/centered, cards stacked in a single
   column. Target is asymmetric — sticky-left key metrics, scrolling content
   on the right — not yet touched
 - Dead CSS cleanup: swatch/intensity selectors from the removed color
