@@ -61,6 +61,8 @@
       </aside>
 
       <div class="content">
+    <div class="mini-overview" id="mini-overview" hidden></div>
+
     <section id="overview-section">
       <header class="app-header">
         <p class="eyebrow" id="overview-date">Overview</p>
@@ -75,6 +77,10 @@
               <span class="stat-value stat-value-primary" id="overview-banked">0/0</span>
             </div>
           </div>
+          <div class="stat-tile stat-tile-muted">
+            <span class="stat-label">Best streak</span>
+            <span class="stat-value" id="overview-best-streak">0d</span>
+          </div>
         </div>
       </header>
 
@@ -88,6 +94,11 @@
       <div class="overview-actions">
         <button type="button" class="quick-chip" data-overview-action="water">+250ml water</button>
         <button type="button" class="quick-chip" data-overview-action="jarvis">Ask Jarvis</button>
+      </div>
+
+      <div>
+        <p class="eyebrow">Today's plan</p>
+        <ul class="journal-list" id="overview-plan"></ul>
       </div>
     </section>
 
@@ -441,12 +452,31 @@
         <p class="section-hint">Sketch the plan — outline, structure, direction. Short entries, most recent first.</p>
       </header>
 
-      <form class="journal-form" data-journal="blueprint">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
+      <div class="week-plan">
+        <p class="eyebrow">Week plan</p>
+        <p class="section-hint">One schedule per weekday — Overview shows today's automatically.</p>
 
-      <ul class="journal-list" id="blueprint-journal-list"></ul>
+        <div class="week-plan-days" id="week-plan-days"></div>
+
+        <form id="plan-entry-form">
+          <input type="time" id="plan-start" required />
+          <input type="time" id="plan-end" />
+          <input type="text" id="plan-title" placeholder="What happens…" required />
+          <button type="submit">Add</button>
+        </form>
+
+        <ul class="journal-list" id="week-plan-list"></ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">Notes</p>
+        <form class="journal-form" data-journal="blueprint">
+          <input type="text" class="journal-input" placeholder="Add a note…" required />
+          <button type="submit">Add</button>
+        </form>
+
+        <ul class="journal-list" id="blueprint-journal-list"></ul>
+      </div>
     </section>
 
     <section id="review-section" hidden>
@@ -550,6 +580,7 @@
   <script src="fitness.js"></script>
   <script src="food.js"></script>
   <script src="water.js"></script>
+  <script src="blueprint.js"></script>
   <script src="overview.js"></script>
   <script src="jarvis.js"></script>
   <script src="glance.js"></script>
