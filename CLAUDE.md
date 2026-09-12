@@ -99,6 +99,11 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   404ing on every request; swapped to the model Google's own error
   named as the replacement. FoodData Central lookup is still untested.
 
+Overview additionally shows Food's protein next to kcal, and a
+'Logged today' feed merging every timestamped entry from every
+journal-backed section (Blueprint/Review/Recovery/Mindset/Reading/
+Markets/Notes) plus Alfred check-ins, filtered to today.
+
 Client-side API keys (config.js, gitignored) are a deliberate tradeoff —
 no backend exists, personal non-public use case, accepted over adding a
 proxy server.
@@ -108,11 +113,18 @@ proxy server.
 - Confirm Food lookup actually works in the browser (Alfred is now
   confirmed working, see above) — check the browser console for the
   exact error if it fails
-- Sync/backend (Supabase or Firebase) — explicitly NOT done yet. This is
-  a bigger, separate task: replace every localStorage call across script.js,
-  goals.js, fitness.js, food.js, water.js with backend reads/writes, plus
-  some lightweight device-agnostic login (passphrase/PIN is enough). Do
-  this as its own pass, not bundled in with layout work
+- Sync (sync.js) — DONE, differently than originally planned: instead of
+  rewriting every module's localStorage calls, sync.js monkey-patches
+  localStorage.setItem itself, so every write from any file mirrors
+  (debounced) to one JSON blob per signed-in user in Supabase. Email/
+  password auth via a new Account panel in Settings. Last-write-wins,
+  no real conflict resolution — fine for one person on two devices.
+  STILL NEEDS: Martin has to run the SQL (given to him separately) in
+  his Supabase project's SQL editor to create the app_state table with
+  RLS before sync actually persists anything — confirmed via a live
+  'table not found' error that the client/keys/connection are all
+  correct, just waiting on that one step. Also untested past that:
+  actual sign-up/sign-in and a real two-device sync round-trip.
 - Dead CSS cleanup — grown across passes, still deferred: the removed
   color-picker's swatch/intensity selectors; `.glance-tile`/`.glance-label`
   etc. (glance.js's target `#sidebar-content` was removed from the HTML in
