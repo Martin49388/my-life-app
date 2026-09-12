@@ -249,6 +249,20 @@
         </div>
       </header>
 
+      <div class="water-widget">
+        <div class="water-headline">
+          <span class="water-total" id="water-total">0.00L</span>
+          <span class="water-target-label" id="water-target-label">of 4.0L</span>
+        </div>
+        <div class="water-bar-wrap">
+          <div class="water-bar" id="water-bar"></div>
+        </div>
+        <div class="water-actions">
+          <button type="button" id="water-remove-btn" aria-label="Remove 250ml">&minus; 250ml</button>
+          <button type="button" id="water-add-btn" aria-label="Add 250ml">+ 250ml</button>
+        </div>
+      </div>
+
       <div class="estimator-row">
         <button type="button" id="estimator-toggle-btn" aria-pressed="false">Maintenance estimate</button>
       </div>
@@ -369,5 +383,6 @@
   <script src="goals.js"></script>
   <script src="fitness.js"></script>
   <script src="food.js"></script>
+  <script src="water.js"></script>
 </body>
 </html>

@@ -1866,3 +1866,66 @@ body {
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
+
+/* Water tracker (Food section) */
+.water-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.water-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.water-total {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.water-target-label {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.water-bar-wrap {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.water-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.water-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.water-actions button {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.water-actions button:active {
+  background: var(--track);
+}
