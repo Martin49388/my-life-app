@@ -2,31 +2,51 @@
 
 ## Current state
 
-Prototype 1 — an early working web app, not a finished product. Reachable
-from both iPhone and Mac through the browser. Data is stored per-device in
-the browser; no cross-device sync yet.
+Prototype 1, mid-rebuild. Reachable from iPhone and Mac via browser. Data
+is stored per-device in `localStorage`; no cross-device sync yet.
 
-Built so far (per README.md):
-- Habits — streaks, ten-day history strip, monthly calendar, perfect-day tracking
-- News — live headlines from BBC World, Tagesschau, ORF, iROZHLAS
-- Goals — short/long-term horizons on a swipeable rail, targets and deadlines
-- Fitness — weekly training split, per-day sessions, completion logged
-- Food — daily calorie budget by meal, with a maintenance estimator
-- Settings — accent colour, background tint, tint intensity
+Design system: pure black/grey (no accent color, no shadows, no gradients).
+Font stack: IBM Plex Mono + Manrope (unchanged, already matched the chosen
+direction). The old 11-color accent/tint picker is gone.
 
-Files: index.html, script.js, style.css, plus per-feature JS modules
-(fitness.js, food.js, goals.js, news.js, settings.js), manifest.json and
-icons for PWA install.
+Sections:
+- Habits — streaks, ten-day history, monthly calendar (unchanged this pass)
+- News — live headlines via RSS + rss2json, no API key needed, refresh
+  actually re-fetches (unchanged, already worked)
+- Goals — short/long-term horizon rail (unchanged this pass)
+- Fitness — weekly plan + session logging. "This week" stat now shows real
+  completions vs Martin's actual target (5x/week), not just how many
+  template days have a plan
+- Food — daily calorie budget, default target set to 3500 (Martin's real
+  number). New: FoodData Central lookup — search a food name, pick a
+  result, kcal/protein autofill
+- Water — new: daily tally, 4L target (Martin's real number), +/-250ml,
+  flat progress bar, lives at the top of the Food section
 
-Repo: github.com/Martin49388/my-life-app
+Client-side API keys (News doesn't need one; Food/Jarvis do) live in
+`config.js` (gitignored, chmod 600) — `config.example.js` is the committed
+template. This app has no backend, so keys are visible to anyone who reads
+the shipped JS; that tradeoff was chosen deliberately over adding a proxy
+server, since this is a personal, non-public app.
 
 ## Next steps
 
-- Define tracked goals/domains more concretely (not yet done)
-- Redesign UI away from default AI styling
+- Jarvis: in-app panel that reads the day's habit/goal/fitness/food state
+  and answers questions using the Gemini API (chosen over Anthropic —
+  cost), blunt tone, not yet built
+- Goals-review: weekly/monthly reflection combining habit + goal data, not
+  yet built
+- Layout restructure: still symmetric/centered: cards stacked in a single
+  column. Target is asymmetric — sticky-left key metrics, scrolling content
+  on the right — not yet touched
+- Dead CSS cleanup: swatch/intensity selectors from the removed color
+  picker are still in style.css, unused but harmless
 - Cross-device sync (Supabase mentioned as an option, not built)
 
 ## Rules
 
-- No token/API key ever pasted into chat — config file only
+- No token/API key ever pasted into chat — config file only (this was
+  violated once this session; keys were moved to config.js/.env
+  immediately, not repeated back, but Martin should judge whether any of
+  them are worth rotating at their source)
 - Update this file before ending any session
