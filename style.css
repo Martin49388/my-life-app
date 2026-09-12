@@ -113,7 +113,7 @@ body {
 .sidebar-brand-name {
   font-family: "Manrope", sans-serif;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text);
 }
@@ -121,7 +121,7 @@ body {
 .sidebar-brand-tag {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -135,7 +135,7 @@ body {
 .nav-group-label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin: 14px 0 4px;
@@ -226,7 +226,7 @@ body {
 .eyebrow {
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin: 0;
@@ -292,7 +292,7 @@ body {
 .settings-title {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin: 0 0 10px;
@@ -430,7 +430,7 @@ body {
 .stat-label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -439,14 +439,15 @@ body {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* One number per screen gets to be the thing you actually look at —
    everything else in the header stays small and muted (.stat-tile-muted). */
 .stat-value-primary {
-  font-size: 30px;
-  line-height: 1.1;
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1.05;
 }
 
 .stat-tile-muted {
@@ -476,7 +477,7 @@ body {
 .tab-btn {
   font-family: "Manrope", sans-serif;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   border: none;
   background: transparent;
   color: var(--text-dim);
@@ -589,7 +590,7 @@ body {
 }
 
 .habit-name {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 14.5px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -639,7 +640,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 14px;
 }
 
@@ -822,7 +823,7 @@ body {
 
 .news-col-title {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
@@ -845,7 +846,7 @@ body {
 
 .news-item a {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.35;
   color: var(--text);
   text-decoration: none;
@@ -905,20 +906,20 @@ body {
 
 .horizon-label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-faint);
   transition: color 0.25s ease;
 }
 
 .horizon-node.active .horizon-label {
   color: var(--text);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .horizon-meta {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--text-faint);
 }
 
@@ -1042,7 +1043,7 @@ body {
 }
 
 .goal-name {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 14.5px;
 }
 
@@ -1055,7 +1056,7 @@ body {
 
 .goal-badge-complete {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .goal-badge-overdue {
@@ -1168,7 +1169,7 @@ body {
 #add-goal-form button {
   padding: 10px 16px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   font-family: inherit;
   color: var(--accent-ink);
   background: var(--accent);
@@ -1216,14 +1217,14 @@ body {
 .day-chip-label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 9.5px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
 
 .day-chip-title {
   font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   max-width: 100%;
   overflow: hidden;
@@ -1270,7 +1271,7 @@ body {
 .session-day {
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin: 0;
@@ -1281,7 +1282,7 @@ body {
 .session-title-input {
   font-family: "Manrope", sans-serif;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 500;
   color: var(--text);
   background: none;
   border: none;
@@ -1292,7 +1293,7 @@ body {
 
 .session-title-input::placeholder {
   color: var(--text-faint);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 15px;
 }
 
@@ -1344,7 +1345,7 @@ body {
 
 .exercise-name {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1403,7 +1404,7 @@ body {
 #add-exercise-form button {
   padding: 10px 16px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 400;
   font-family: inherit;
   color: var(--accent-ink);
   background: var(--accent);
@@ -1416,7 +1417,7 @@ body {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   background: none;
   border: none;
@@ -1446,8 +1447,8 @@ body {
 .budget-number {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 38px;
-  font-weight: 600;
+  font-size: 64px;
+  font-weight: 300;
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -1524,7 +1525,7 @@ body {
 .quick-add-label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10.5px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   margin-right: 2px;
@@ -1537,7 +1538,7 @@ body {
   padding: 5px 10px;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-dim);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1582,7 +1583,7 @@ body {
   align-items: center;
   gap: 7px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
@@ -1675,7 +1676,7 @@ body {
 #add-food-form button {
   padding: 10px 16px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   font-family: inherit;
   color: var(--accent-ink);
   background: var(--accent);
@@ -1753,7 +1754,7 @@ body {
 .field-label {
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -1834,7 +1835,7 @@ body {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--accent);
 }
 
@@ -1847,7 +1848,7 @@ body {
 #use-estimate-btn {
   font-family: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-ink);
   background: var(--accent);
   border: none;
@@ -1930,7 +1931,7 @@ body {
   transform: translateX(-50%);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9.5px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -1943,7 +1944,7 @@ body {
 .budget-stop-target .stop-label {
   top: calc(100% + 5px);
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .scale-relation {
@@ -1962,7 +1963,7 @@ body {
 #pin-maintenance-btn {
   font-family: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-ink);
   background: var(--accent);
   border: none;
@@ -2035,7 +2036,7 @@ body {
   justify-content: space-between;
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -2043,7 +2044,7 @@ body {
 .settings-version {
   font-family: "IBM Plex Mono", monospace;
   font-size: 9.5px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
   text-align: center;
@@ -2071,7 +2072,7 @@ body {
 
 .water-total {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
 }
 
@@ -2205,7 +2206,7 @@ body {
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--text-faint);
   margin-bottom: 2px;
 }
@@ -2262,7 +2263,7 @@ body {
 #jarvis-form button {
   padding: 10px 16px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   font-family: inherit;
   color: var(--accent-ink);
   background: var(--accent);
