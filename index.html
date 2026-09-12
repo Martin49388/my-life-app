@@ -359,7 +359,11 @@
       <div class="add-habit-toggle">
         <button type="button" id="add-food-toggle-btn">+ Log food</button>
         <form id="add-food-form" hidden>
-          <input type="text" id="food-name-input" placeholder="Food, e.g. Porridge" required />
+          <div class="food-lookup-row">
+            <input type="text" id="food-name-input" placeholder="Food, e.g. Porridge" required />
+            <button type="button" id="food-lookup-btn">Look up</button>
+          </div>
+          <ul class="food-lookup-results" id="food-lookup-results" hidden></ul>
           <input type="number" id="food-kcal-input" placeholder="kcal" min="0" max="5000" required />
           <input type="number" id="food-protein-input" placeholder="Protein g" min="0" max="500" />
           <select id="food-meal-input">

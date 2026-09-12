@@ -327,10 +327,71 @@ document.getElementById("kcal-target-input").addEventListener("change", (e) => {
 
 const foodToggleBtn = document.getElementById("add-food-toggle-btn");
 const foodForm = document.getElementById("add-food-form");
+const foodLookupBtn = document.getElementById("food-lookup-btn");
+const foodLookupResults = document.getElementById("food-lookup-results");
+
+// FoodData Central (USDA) — free-tier nutrition lookup. Client-side key,
+// see config.js/config.example.js for why (no backend in this app).
+async function lookupFood(query) {
+  const key = window.APP_CONFIG && window.APP_CONFIG.FOODDATA_API_KEY;
+  foodLookupResults.innerHTML = "";
+  if (!key) {
+    foodLookupResults.innerHTML = `<li class="food-lookup-empty">No FoodData Central key set in config.js.</li>`;
+    foodLookupResults.hidden = false;
+    return;
+  }
+
+  foodLookupResults.innerHTML = `<li class="food-lookup-empty">Searching…</li>`;
+  foodLookupResults.hidden = false;
+
+  try {
+    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(key)}&query=${encodeURIComponent(query)}&pageSize=6`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const foods = data.foods || [];
+
+    if (foods.length === 0) {
+      foodLookupResults.innerHTML = `<li class="food-lookup-empty">No matches.</li>`;
+      return;
+    }
+
+    foodLookupResults.innerHTML = "";
+    for (const item of foods) {
+      const nutrient = (id) => {
+        const n = (item.foodNutrients || []).find((fn) => fn.nutrientId === id);
+        return n ? Math.round(n.value) : null;
+      };
+      const kcal = nutrient(1008); // Energy (KCAL)
+      const protein = nutrient(1003); // Protein (g)
+
+      const li = document.createElement("li");
+      li.className = "food-lookup-item";
+      li.textContent = `${item.description}${kcal != null ? ` — ${kcal} kcal` : ""}${protein != null ? `, ${protein}g protein` : ""}`;
+      li.addEventListener("click", () => {
+        document.getElementById("food-name-input").value = item.description;
+        if (kcal != null) document.getElementById("food-kcal-input").value = kcal;
+        if (protein != null) document.getElementById("food-protein-input").value = protein;
+        foodLookupResults.hidden = true;
+        foodLookupResults.innerHTML = "";
+      });
+      foodLookupResults.appendChild(li);
+    }
+  } catch (err) {
+    foodLookupResults.innerHTML = `<li class="food-lookup-empty">Lookup failed — try again.</li>`;
+  }
+}
+
+foodLookupBtn.addEventListener("click", () => {
+  const query = document.getElementById("food-name-input").value.trim();
+  if (query) lookupFood(query);
+});
 
 foodToggleBtn.addEventListener("click", () => {
   foodToggleBtn.hidden = true;
   foodForm.hidden = false;
+  foodLookupResults.hidden = true;
+  foodLookupResults.innerHTML = "";
   document.getElementById("food-meal-input").value = defaultMeal();
   document.getElementById("food-name-input").focus();
 });
@@ -350,6 +411,8 @@ foodForm.addEventListener("submit", (e) => {
     kcalInput.value = "";
     proteinInput.value = "";
   }
+  foodLookupResults.hidden = true;
+  foodLookupResults.innerHTML = "";
   foodForm.hidden = true;
   foodToggleBtn.hidden = false;
 });

@@ -1929,3 +1929,58 @@ body {
 .water-actions button:active {
   background: var(--track);
 }
+
+/* Food lookup (FoodData Central search) */
+.food-lookup-row {
+  display: flex;
+  gap: 8px;
+}
+
+.food-lookup-row input {
+  flex: 1;
+}
+
+#food-lookup-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.food-lookup-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.food-lookup-item {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.food-lookup-item:last-child {
+  border-bottom: none;
+}
+
+.food-lookup-item:hover,
+.food-lookup-item:active {
+  background: var(--surface-2);
+}
+
+.food-lookup-empty {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
