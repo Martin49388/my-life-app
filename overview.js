@@ -23,6 +23,7 @@ function overviewStandards() {
 
   const foodToday = typeof entriesFor === "function" ? entriesFor(today) : [];
   const kcalToday = foodToday.reduce((sum, e) => sum + e.kcal, 0);
+  const proteinToday = foodToday.reduce((sum, e) => sum + (e.protein || 0), 0);
   const kcalTarget = typeof food !== "undefined" ? food.target : 0;
 
   const trained = typeof trainedThisWeek === "function" ? trainedThisWeek() : 0;
@@ -31,7 +32,7 @@ function overviewStandards() {
   return [
     { label: "Habits today", value: `${habitsDone}/${habitsTotal}`, met: habitsTotal > 0 && habitsDone === habitsTotal },
     { label: "Water", value: `${(waterMl / 1000).toFixed(2)}L / ${(waterTarget / 1000).toFixed(1)}L`, met: waterMl >= waterTarget },
-    { label: "Food", value: `${kcalToday} / ${kcalTarget} kcal`, met: kcalToday > 0 && kcalToday <= kcalTarget },
+    { label: "Food", value: `${kcalToday} / ${kcalTarget} kcal, ${proteinToday}g protein`, met: kcalToday > 0 && kcalToday <= kcalTarget },
     { label: "Training this week", value: `${trained}/${trainTarget}`, met: trained >= trainTarget },
   ];
 }
@@ -94,7 +95,75 @@ function renderOverview() {
     .join("");
 
   renderTodaysPlan();
+  renderTodaysLog();
   renderMiniOverview(banked, total, streak);
+}
+
+// Section labels for the combined "Logged today" feed below.
+const TODAY_LOG_LABELS = {
+  blueprint: "Blueprint",
+  review: "Review",
+  recovery: "Recovery",
+  mindset: "Mindset",
+  reading: "Reading",
+  markets: "Markets",
+  notes: "Notes",
+  alfred: "Alfred",
+};
+
+function isToday(timestamp) {
+  const d = new Date(timestamp);
+  const now = new Date();
+  return d.toDateString() === now.toDateString();
+}
+
+// Pulls every timestamped entry logged today from every journal-backed
+// section (journal.js) plus Alfred's check-in log (alfred.js), so
+// Overview shows what actually happened today across the whole app, not
+// just the four tracked standards above.
+function todaysLoggedEntries() {
+  const entries = [];
+
+  if (typeof JOURNAL_KEYS !== "undefined" && typeof loadJournal === "function") {
+    for (const key of JOURNAL_KEYS) {
+      for (const e of loadJournal(key)) {
+        if (isToday(e.at)) entries.push({ section: TODAY_LOG_LABELS[key] || key, text: e.text, at: e.at });
+      }
+    }
+  }
+
+  if (typeof alfredLog !== "undefined") {
+    for (const e of alfredLog) {
+      if (isToday(e.at)) entries.push({ section: "Alfred", text: e.question, at: e.at });
+    }
+  }
+
+  return entries.sort((a, b) => b.at - a.at);
+}
+
+function renderTodaysLog() {
+  const list = document.getElementById("overview-today-log");
+  if (!list) return;
+  const entries = todaysLoggedEntries();
+  if (entries.length === 0) {
+    list.innerHTML = `<li class="empty-state">Nothing logged anywhere yet today.</li>`;
+    return;
+  }
+  list.innerHTML = entries
+    .map(
+      (e) => `
+      <li class="journal-row">
+        <div class="journal-row-body">
+          <p class="journal-time">${e.section}</p>
+          <p class="journal-text"></p>
+        </div>
+        <p class="journal-time">${formatJournalTime(e.at)}</p>
+      </li>`
+    )
+    .join("");
+  list.querySelectorAll(".journal-row").forEach((row, i) => {
+    row.querySelector(".journal-text").textContent = entries[i].text;
+  });
 }
 
 function renderTodaysPlan() {

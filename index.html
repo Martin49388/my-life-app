@@ -56,6 +56,29 @@
         </nav>
 
         <div class="settings-panel" id="settings-panel" hidden>
+          <p class="settings-title">Account</p>
+          <p class="section-hint">Sign in to sync this device with others (Supabase).</p>
+
+          <div id="account-signed-out">
+            <form id="account-signin-form">
+              <input type="email" id="account-email" placeholder="Email" required autocomplete="email" />
+              <input type="password" id="account-password" placeholder="Password" required autocomplete="current-password" />
+              <div class="account-actions">
+                <button type="submit" id="account-signin-btn">Sign in</button>
+                <button type="button" id="account-signup-btn">Sign up</button>
+              </div>
+            </form>
+            <p class="account-status" id="account-status"></p>
+          </div>
+
+          <div id="account-signed-in" hidden>
+            <p class="account-status">Signed in as <strong id="account-email-display"></strong></p>
+            <p class="account-status" id="sync-status">Not synced yet</p>
+            <button type="button" class="quick-chip" id="account-signout-btn">Sign out</button>
+          </div>
+
+          <div class="settings-divider"></div>
+
           <p class="settings-version">BatCave &middot; Prototype 1</p>
         </div>
       </aside>
@@ -99,6 +122,11 @@
       <div>
         <p class="eyebrow">Today's plan</p>
         <ul class="journal-list" id="overview-plan"></ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">Logged today</p>
+        <ul class="journal-list" id="overview-today-log"></ul>
       </div>
     </section>
 
@@ -573,6 +601,8 @@
   </form>
 
   <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="sync.js"></script>
   <script src="settings.js"></script>
   <script src="script.js"></script>
   <script src="news.js"></script>
@@ -581,10 +611,10 @@
   <script src="food.js"></script>
   <script src="water.js"></script>
   <script src="blueprint.js"></script>
-  <script src="overview.js"></script>
   <script src="alfred.js"></script>
-  <script src="glance.js"></script>
   <script src="journal.js"></script>
+  <script src="overview.js"></script>
+  <script src="glance.js"></script>
   <script src="global-bar.js"></script>
 </body>
 </html>

@@ -2533,3 +2533,64 @@ body {
   cursor: pointer;
   flex-shrink: 0;
 }
+
+/* Account / sync (sync.js) */
+#account-signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#account-signin-form input {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 2px;
+}
+
+#account-signin-form input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.account-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.account-actions button {
+  flex: 1;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+#account-signin-btn {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+}
+
+#account-signup-btn {
+  background: none;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.account-status {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+#account-signed-in .account-status {
+  margin-top: 4px;
+}
