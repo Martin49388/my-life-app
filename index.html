@@ -34,7 +34,7 @@
           <button type="button" class="nav-link section-btn active" data-section="overview">Overview</button>
           <button type="button" class="nav-link section-btn" data-section="habits">Habits</button>
           <button type="button" class="nav-link section-btn" data-section="goals">Goals</button>
-          <button type="button" class="nav-link section-btn" data-section="jarvis">Jarvis</button>
+          <button type="button" class="nav-link section-btn" data-section="alfred">Alfred</button>
           <button type="button" class="nav-link section-btn" data-section="blueprint">Blueprint</button>
           <button type="button" class="nav-link section-btn" data-section="review">Review</button>
 
@@ -93,7 +93,7 @@
 
       <div class="overview-actions">
         <button type="button" class="quick-chip" data-overview-action="water">+250ml water</button>
-        <button type="button" class="quick-chip" data-overview-action="jarvis">Ask Jarvis</button>
+        <button type="button" class="quick-chip" data-overview-action="alfred">Ask Alfred</button>
       </div>
 
       <div>
@@ -425,21 +425,21 @@
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
 
-    <section id="jarvis-section" hidden>
+    <section id="alfred-section" hidden>
       <header class="app-header">
         <p class="eyebrow">check-in</p>
       </header>
 
-      <div class="jarvis-log" id="jarvis-log">
-        <p class="jarvis-empty">Ask how your week's going, or anything else — Jarvis reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>
+      <div class="alfred-log" id="alfred-log">
+        <p class="alfred-empty">Ask how your week's going, or anything else — Alfred reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>
       </div>
 
-      <div class="jarvis-quick">
-        <button type="button" id="jarvis-checkin-btn">How's my week going?</button>
+      <div class="alfred-quick">
+        <button type="button" id="alfred-checkin-btn">How's my week going?</button>
       </div>
 
-      <form id="jarvis-form">
-        <input type="text" id="jarvis-input" placeholder="Ask Jarvis…" required />
+      <form id="alfred-form">
+        <input type="text" id="alfred-input" placeholder="Ask Alfred…" required />
         <button type="submit">Send</button>
       </form>
 
@@ -582,7 +582,7 @@
   <script src="water.js"></script>
   <script src="blueprint.js"></script>
   <script src="overview.js"></script>
-  <script src="jarvis.js"></script>
+  <script src="alfred.js"></script>
   <script src="glance.js"></script>
   <script src="journal.js"></script>
   <script src="global-bar.js"></script>

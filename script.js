@@ -354,13 +354,13 @@ addForm.addEventListener("submit", (e) => {
 });
 
 // Shared by the sidebar nav buttons and the persistent bottom input bar
-// (global-bar.js), which jumps to Jarvis after asking a question.
+// (global-bar.js), which jumps to Alfred after asking a question.
 // Every section that lives behind the sidebar nav. Add new ones here (and
 // give them a matching #<name>-section in index.html) rather than hand-wiring
 // another hidden-toggle line per section.
 const ALL_SECTIONS = [
   "overview",
-  "habits", "goals", "jarvis", "blueprint", "review",
+  "habits", "goals", "alfred", "blueprint", "review",
   "fitness", "food", "recovery",
   "mindset", "reading",
   "news", "markets", "notes",

@@ -154,7 +154,7 @@ document.querySelectorAll("[data-overview-action]").forEach((btn) => {
   btn.addEventListener("click", () => {
     const action = btn.dataset.overviewAction;
     if (action === "water" && typeof addWater === "function") addWater(250);
-    if (action === "jarvis" && window.switchSection) window.switchSection("jarvis");
+    if (action === "alfred" && window.switchSection) window.switchSection("alfred");
   });
 });
 
