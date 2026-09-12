@@ -55,7 +55,10 @@ reusable, handles decimals). Everything respects `prefers-reduced-motion`.
 
 Sections:
 - Habits — streaks, ten-day history, monthly calendar, hero completion
-  ring/count as the section's primary number
+  ring/count as the section's primary number. No per-habit emoji/color
+  anymore (removed for looking unprofessional) — checkbox/history/calendar
+  dots all use the single app accent color; habits are told apart by
+  name only
 - News — live RSS headlines, no API key needed
 - Goals — short/long-term horizon rail
 - Fitness — "This week" stat is real completions vs the actual 5x/week
