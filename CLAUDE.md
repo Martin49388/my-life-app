@@ -43,10 +43,21 @@ done, each its own commit:
 Design system: pure black/grey, no shadows/gradients. Font stack unchanged
 (IBM Plex Mono + Manrope).
 
-Layout: no longer locked to a fixed 520px column. Under 640px it's a
-single centered column with the sidebar as a horizontal nav strip. Above
-640px, `.app` grows to 1100px and splits into the sidebar (pure nav, 220px)
-plus a flexible content column for the active section.
+Layout: edge-to-edge, matching a reference screenshot Martin sent of a
+similar app (his friend's). No more centered max-width card with gutters
+on either side. Above 640px: a full-height sidebar (260px, sticky, its own
+scroll) flush against the left edge, divided from content by a single
+right-hand hairline; content fills the rest of the width with its own
+padding. Under 640px: sidebar collapses to a horizontal scrollable nav
+strip at the top, content full-width below it.
+
+Sidebar now has 13 sections in 4 groups: Habits/Goals/Jarvis/Blueprint/
+Review, Body (Fitness/Food/Water/Recovery), Mind (Mindset/Reading),
+System (News/Markets/Notes/Settings). The 7 new ones (Blueprint, Review,
+Recovery, Mindset, Reading, Markets, Notes) are all the same simple
+pattern for now — a one-line note form + timestamped log, own localStorage
+key each (journal.js) — since none of them have real tracked structure
+specified yet, unlike Fitness/Food/Goals.
 
 Motion: tab switches fade/slide in (0.22s). Checking a habit pulses the
 row before it re-renders. `budget-number` and the water total tween to
