@@ -1,50 +1,50 @@
 :root {
-  --bg: #f8f7fb;
-  --surface: #ffffff;
-  --surface-2: #efecf5;
-  --border: #ddd8e8;
-  --text: #201c2b;
-  --text-dim: #6b6478;
-  --text-faint: #a49bb3;
-  --accent: #4b2e83;
-  --accent-soft: #ece4f7;
-  --accent-ink: #ffffff;
-  --track: #e6e1f0;
+  --bg: #f4f4f4;
+  --surface: #f4f4f4;
+  --surface-2: #e8e8e8;
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #111111;
+  --text-dim: #5c5c5c;
+  --text-faint: #8a8a8a;
+  --accent: #111111;
+  --accent-soft: #e0e0e0;
+  --accent-ink: #f4f4f4;
+  --track: #d8d8d8;
   --danger: #b8402f;
-  --shadow: 0 1px 2px rgba(32, 20, 60, 0.04), 0 2px 8px rgba(32, 20, 60, 0.05);
+  --shadow: none;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141019;
-    --surface: #1c1726;
-    --surface-2: #241d30;
-    --border: #362d47;
-    --text: #efeaf5;
-    --text-dim: #a99ebf;
-    --text-faint: #766a8a;
-    --accent: #9b6fe0;
-    --accent-soft: #33254e;
-    --accent-ink: #0c0c0e;
-    --track: #2c2438;
+    --bg: #0a0a0a;
+    --surface: #0a0a0a;
+    --surface-2: #141414;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f2f2f2;
+    --text-dim: #8a8a8a;
+    --text-faint: #5c5c5c;
+    --accent: #f2f2f2;
+    --accent-soft: #1c1c1c;
+    --accent-ink: #0a0a0a;
+    --track: #1c1c1c;
     --danger: #e0685a;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 14px rgba(0, 0, 0, 0.28);
+    --shadow: none;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141019;
-  --surface: #1c1726;
-  --surface-2: #241d30;
-  --border: #362d47;
-  --text: #efeaf5;
-  --text-dim: #a99ebf;
-  --text-faint: #766a8a;
-  --accent: #9b6fe0;
-  --accent-soft: #33254e;
-  --accent-ink: #0c0c0e;
-  --track: #2c2438;
+  --bg: #0a0a0a;
+  --surface: #0a0a0a;
+  --surface-2: #141414;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f2f2f2;
+  --text-dim: #8a8a8a;
+  --text-faint: #5c5c5c;
+  --accent: #f2f2f2;
+  --accent-soft: #1c1c1c;
+  --accent-ink: #0a0a0a;
+  --track: #1c1c1c;
   --danger: #e0685a;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 4px 14px rgba(0, 0, 0, 0.28);
+  --shadow: none;
 }
 
 * {
