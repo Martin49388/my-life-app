@@ -2417,3 +2417,15 @@ body {
   color: var(--text-faint);
   white-space: nowrap;
 }
+
+.overview-status {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.overview-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

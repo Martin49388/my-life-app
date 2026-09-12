@@ -303,6 +303,7 @@ function render() {
   if (currentView === "daily") renderDaily();
   else renderMonthly();
   if (window.renderGlance) window.renderGlance();
+  if (window.renderOverview) window.renderOverview();
 }
 
 document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -358,6 +359,7 @@ addForm.addEventListener("submit", (e) => {
 // give them a matching #<name>-section in index.html) rather than hand-wiring
 // another hidden-toggle line per section.
 const ALL_SECTIONS = [
+  "overview",
   "habits", "goals", "jarvis", "blueprint", "review",
   "fitness", "food", "recovery",
   "mindset", "reading",
@@ -379,6 +381,7 @@ function switchSection(requested) {
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
   if (section === "food" && window.renderFood) window.renderFood();
+  if (section === "overview" && window.renderOverview) window.renderOverview();
   playTabEnter(document.getElementById(`${section}-section`));
 
   if (requested === "water") {

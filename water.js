@@ -41,6 +41,7 @@ function renderWater() {
   document.getElementById("water-target-label").textContent = `of ${targetLiters}L`;
   document.getElementById("water-bar").style.width = `${pct}%`;
   if (window.renderGlance) window.renderGlance();
+  if (window.renderOverview) window.renderOverview();
 }
 
 document.getElementById("water-add-btn").addEventListener("click", () => addWater(WATER_STEP_ML));

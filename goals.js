@@ -149,6 +149,7 @@ window.renderGoals = function renderGoals() {
   renderGoalGroup("goal-list-long", "long");
   syncViewportHeight(false);
   if (window.renderGlance) window.renderGlance();
+  if (window.renderOverview) window.renderOverview();
 };
 
 // Horizon carousel: the two panels sit side by side in a track twice the
