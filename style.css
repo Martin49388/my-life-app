@@ -56,9 +56,72 @@ body {
   color: var(--text);
   font-family: "Manrope", system-ui, sans-serif;
   margin: 0;
-  padding: 32px 16px 64px;
+  padding: 32px 16px 110px;
   display: flex;
   justify-content: center;
+}
+
+/* Persistent input bar, visible across every section — a second front
+   door into Jarvis (see global-bar.js). This and .sidebar are the only
+   two real bordered boxes left in the app; everything else is flat
+   rows and hairlines (see the Step 3 commit). */
+#global-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 32px));
+  display: flex;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 10px 10px 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  z-index: 20;
+}
+
+#global-bar-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+#global-bar-input:focus {
+  outline: none;
+}
+
+#global-bar-input::placeholder {
+  color: var(--text-faint);
+}
+
+#global-bar button {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 7px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  #global-bar {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (max-width: 640px) {
+  #global-bar {
+    width: calc(100% - 24px);
+    bottom: 12px;
+  }
 }
 
 /* Above 640px the single 520px column is gone: .app grows to fit an

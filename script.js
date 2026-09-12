@@ -390,31 +390,35 @@ addForm.addEventListener("submit", (e) => {
   addToggleBtn.hidden = false;
 });
 
+// Shared by the sidebar nav buttons and the persistent bottom input bar
+// (global-bar.js), which jumps to Jarvis after asking a question.
+function switchSection(requested) {
+  // "Water" has no section of its own — it lives inside Food (see
+  // water.js/index.html) — so it activates Food and then scrolls the
+  // water widget into view instead of pretending it's a separate tab.
+  const section = requested === "water" ? "food" : requested;
+
+  document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b.dataset.section === requested));
+  document.getElementById("habits-section").hidden = section !== "habits";
+  document.getElementById("news-section").hidden = section !== "news";
+  document.getElementById("goals-section").hidden = section !== "goals";
+  document.getElementById("fitness-section").hidden = section !== "fitness";
+  document.getElementById("food-section").hidden = section !== "food";
+  document.getElementById("jarvis-section").hidden = section !== "jarvis";
+  if (section === "news" && window.loadNews) window.loadNews();
+  if (section === "goals" && window.renderGoals) window.renderGoals();
+  if (section === "fitness" && window.renderFitness) window.renderFitness();
+  if (section === "food" && window.renderFood) window.renderFood();
+  playTabEnter(document.getElementById(`${section}-section`));
+
+  if (requested === "water") {
+    document.querySelector(".water-widget")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  }
+}
+window.switchSection = switchSection;
+
 document.querySelectorAll(".section-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const requested = btn.dataset.section;
-    // "Water" has no section of its own — it lives inside Food (see
-    // water.js/index.html) — so it activates Food and then scrolls the
-    // water widget into view instead of pretending it's a separate tab.
-    const section = requested === "water" ? "food" : requested;
-
-    document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b === btn));
-    document.getElementById("habits-section").hidden = section !== "habits";
-    document.getElementById("news-section").hidden = section !== "news";
-    document.getElementById("goals-section").hidden = section !== "goals";
-    document.getElementById("fitness-section").hidden = section !== "fitness";
-    document.getElementById("food-section").hidden = section !== "food";
-    document.getElementById("jarvis-section").hidden = section !== "jarvis";
-    if (section === "news" && window.loadNews) window.loadNews();
-    if (section === "goals" && window.renderGoals) window.renderGoals();
-    if (section === "fitness" && window.renderFitness) window.renderFitness();
-    if (section === "food" && window.renderFood) window.renderFood();
-    playTabEnter(document.getElementById(`${section}-section`));
-
-    if (requested === "water") {
-      document.querySelector(".water-widget")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
-    }
-  });
+  btn.addEventListener("click", () => switchSection(btn.dataset.section));
 });
 
 render();

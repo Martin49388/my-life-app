@@ -123,6 +123,8 @@ async function handleJarvisQuestion(question) {
   renderJarvisLog();
 }
 
+window.handleJarvisQuestion = handleJarvisQuestion;
+
 document.getElementById("jarvis-checkin-btn").addEventListener("click", () => {
   handleJarvisQuestion("How's my week going?");
 });
