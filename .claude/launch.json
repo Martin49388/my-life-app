@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "my-life-app",
+      "name": "batcave",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "5173"],
-      "port": 5173
+      "runtimeArgs": ["-m", "http.server", "8934"],
+      "port": 8934
     }
   ]
 }

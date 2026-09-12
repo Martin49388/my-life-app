@@ -382,16 +382,16 @@ body {
 }
 
 .stat-tile {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 12px;
+  padding: 2px 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
   min-width: 74px;
-  box-shadow: var(--shadow);
+}
+
+.stat-tile + .stat-tile {
+  border-left: 1px solid var(--border);
 }
 
 .ring-tile {
@@ -539,7 +539,6 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .empty-state {
@@ -553,12 +552,12 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--habit-color, var(--border));
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+  padding: 12px 4px;
+  border-left: 3px solid var(--habit-color, transparent);
+}
+
+.habit-row + .habit-row {
+  border-top: 1px solid var(--border);
 }
 
 .habit-row input[type="checkbox"] {
@@ -810,15 +809,15 @@ body {
 }
 
 .news-column {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  box-shadow: var(--shadow);
+}
+
+.news-column + .news-column {
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
 }
 
 .news-col-title {
@@ -1017,22 +1016,22 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .goal-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  box-shadow: var(--shadow);
+  padding: 12px 4px;
+  border-left: 3px solid transparent;
+}
+
+.goal-row + .goal-row {
+  border-top: 1px solid var(--border);
 }
 
 .goal-row.complete {
-  border-color: var(--accent);
+  border-left-color: var(--accent);
 }
 
 .goal-top {
@@ -1190,28 +1189,26 @@ body {
   align-items: center;
   gap: 5px;
   padding: 9px 3px 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 9px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--border);
   cursor: pointer;
   font-family: inherit;
   min-width: 0;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .day-chip.rest {
-  background: none;
-  border-style: dashed;
+  border-bottom-style: dashed;
 }
 
 .day-chip.is-today {
-  border-color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .day-chip.selected {
-  background: var(--accent-soft);
-  border-style: solid;
-  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+  border-bottom-width: 3px;
 }
 
 .day-chip-label {
@@ -1312,18 +1309,17 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
 .exercise-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  box-shadow: var(--shadow);
+  padding: 11px 4px;
+}
+
+.exercise-row + .exercise-row {
+  border-top: 1px solid var(--border);
 }
 
 .exercise-row input[type="checkbox"] {
