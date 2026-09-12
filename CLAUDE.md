@@ -64,7 +64,12 @@ row before it re-renders. `budget-number` and the water total tween to
 their new value instead of jumping (`animateNumber()` in script.js,
 reusable, handles decimals). Everything respects `prefers-reduced-motion`.
 
-Sections:
+Sections (Overview is now the sidebar's default landing page, not Habits):
+- Overview — new landing page. Hero 'X/4 banked' ring (how many of
+  Habits/Water/Food/Training-this-week are on target right now), a status
+  line naming what's open, a hairline standards list, two quick actions
+  (+250ml water, jump to Jarvis). Lives in overview.js, hooks into the same
+  window.renderX() chain the dead renderGlance() used so it stays live.
 - Habits — streaks, ten-day history, monthly calendar, hero completion
   ring/count as the section's primary number. No per-habit emoji/color
   anymore (removed for looking unprofessional) — checkbox/history/calendar
