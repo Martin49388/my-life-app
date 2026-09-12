@@ -54,6 +54,7 @@
       <button type="button" class="section-btn" data-section="goals">Goals</button>
       <button type="button" class="section-btn" data-section="fitness">Fitness</button>
       <button type="button" class="section-btn" data-section="food">Food</button>
+      <button type="button" class="section-btn" data-section="jarvis">Jarvis</button>
     </nav>
 
     <section id="habits-section">
@@ -378,6 +379,27 @@
 
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
+
+    <section id="jarvis-section" hidden>
+      <header class="app-header">
+        <p class="eyebrow">check-in</p>
+      </header>
+
+      <div class="jarvis-log" id="jarvis-log">
+        <p class="jarvis-empty">Ask how your week's going, or anything else — Jarvis reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>
+      </div>
+
+      <div class="jarvis-quick">
+        <button type="button" id="jarvis-checkin-btn">How's my week going?</button>
+      </div>
+
+      <form id="jarvis-form">
+        <input type="text" id="jarvis-input" placeholder="Ask Jarvis…" required />
+        <button type="submit">Send</button>
+      </form>
+
+      <p class="sync-note">Uses the Gemini API &middot; key lives in config.js, not committed</p>
+    </section>
   </main>
 
   <script src="config.js"></script>
@@ -388,5 +410,6 @@
   <script src="fitness.js"></script>
   <script src="food.js"></script>
   <script src="water.js"></script>
+  <script src="jarvis.js"></script>
 </body>
 </html>
