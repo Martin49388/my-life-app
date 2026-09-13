@@ -1,33 +1,49 @@
-// Cross-device sync via Supabase. Deliberately simple: every other file
-// in this app keeps reading and writing localStorage exactly as before —
-// nothing about habits.js/food.js/etc changes. This file just monkey-
-// patches localStorage.setItem so any write, from any module, gets
-// mirrored (debounced) to one JSON blob per signed-in user in Supabase.
-// Signing in on a second device pulls that same blob down and reloads.
+// Cross-device sync via Supabase — no login. Instead of email/password
+// accounts (which kept breaking: unconfirmed emails, password resets
+// pointing at localhost, "invalid credentials" typos across devices),
+// every device just pastes the same three values into Settings: your
+// Supabase project's URL, its anon/publishable key, and a shared "Sync
+// ID" you generate once and copy to every other device. All devices
+// using that Sync ID read and write the same row.
 //
-// This trades away real conflict resolution for simplicity — last write
-// wins, same tradeoff already made for client-side API keys elsewhere in
-// this app (see decisions log). Fine for one person using two devices;
-// not fine for two people editing at once.
+// See SUPABASE.md for the one-time project setup (the app_state table
+// and its policies).
 //
-// Requires a Supabase table (see the SQL Martin was given separately):
-//   app_state(user_id uuid primary key, data jsonb, updated_at timestamptz)
-// with row-level security limiting each user to their own row.
+// Security tradeoff, on purpose: there's no real per-user auth here —
+// anyone who has your anon key AND happens to know your Sync ID could
+// read or write that row. Fine for one person's own devices, same class
+// of tradeoff already accepted for the app's other client-side API keys
+// (see decisions log). Don't publish your Sync ID anywhere public.
 
-const SUPA_URL = window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL;
-const SUPA_KEY = window.APP_CONFIG && window.APP_CONFIG.SUPABASE_ANON_KEY;
+const SYNC_CONFIG_KEY = "batcave-sync-config";
 
-const supa = SUPA_URL && SUPA_KEY && window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null;
+function loadSyncConfig() {
+  try {
+    return JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
 
-let syncUser = null;
+function saveSyncConfig(cfg) {
+  localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(cfg));
+}
+
+let config = loadSyncConfig();
+let supa = null;
 let pushTimer = null;
 let applyingRemote = false; // guards against re-pushing what we just pulled
-let isRecovering = false; // true while handling a password-recovery link
+
+function buildClient() {
+  supa = config.url && config.key && window.supabase ? window.supabase.createClient(config.url, config.key) : null;
+}
+buildClient();
 
 function dumpLocalStorage() {
   const obj = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
+    if (key === SYNC_CONFIG_KEY) continue; // never sync this device's own connection settings
     obj[key] = localStorage.getItem(key);
   }
   return obj;
@@ -39,35 +55,32 @@ function setSyncStatus(text) {
 }
 
 function schedulePush() {
-  if (!supa || !syncUser || applyingRemote) return;
+  if (!supa || !config.id || applyingRemote) return;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushToSupabase, 1500);
 }
 
 async function pushToSupabase() {
-  if (!supa || !syncUser) return;
+  if (!supa || !config.id) return;
   setSyncStatus("Syncing…");
   const { error } = await supa
     .from("app_state")
-    .upsert({ user_id: syncUser.id, data: dumpLocalStorage(), updated_at: new Date().toISOString() });
+    .upsert({ sync_id: config.id, data: dumpLocalStorage(), updated_at: new Date().toISOString() });
   setSyncStatus(error ? `Sync failed: ${error.message}` : `Synced ${new Date().toLocaleTimeString()}`);
 }
 
 async function pullFromSupabase() {
-  if (!supa || !syncUser) return;
+  if (!supa || !config.id) return;
   setSyncStatus("Checking for updates…");
-  const { data: row, error } = await supa
-    .from("app_state")
-    .select("data")
-    .eq("user_id", syncUser.id)
-    .maybeSingle();
+  const { data: row, error } = await supa.from("app_state").select("data").eq("sync_id", config.id).maybeSingle();
 
   if (error) {
     setSyncStatus(`Sync failed: ${error.message}`);
     return;
   }
   if (!row || !row.data) {
-    setSyncStatus("No synced data yet — this device's data will upload on the next change.");
+    setSyncStatus("No synced data yet under this Sync ID — this device's data will upload shortly.");
+    schedulePush();
     return;
   }
 
@@ -79,9 +92,12 @@ async function pullFromSupabase() {
   }
 
   // Different device, or this one's behind — take the remote copy and
-  // reload so every module re-reads fresh state from localStorage.
+  // reload so every module re-reads fresh state from localStorage. This
+  // device's own connection config survives the wipe.
   applyingRemote = true;
+  const keepConfig = config;
   localStorage.clear();
+  localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(keepConfig));
   for (const [key, value] of Object.entries(row.data)) {
     localStorage.setItem(key, value);
   }
@@ -95,100 +111,55 @@ async function pullFromSupabase() {
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key, value) {
   _origSetItem(key, value);
-  schedulePush();
+  if (key !== SYNC_CONFIG_KEY) schedulePush();
 };
 
-function renderAccountUI() {
-  const signedOut = document.getElementById("account-signed-out");
-  const signedIn = document.getElementById("account-signed-in");
-  const recovery = document.getElementById("account-recovery");
-  if (!signedOut || !signedIn || !recovery) return;
-  recovery.hidden = !isRecovering;
-  signedOut.hidden = !!syncUser || isRecovering;
-  signedIn.hidden = !syncUser || isRecovering;
-  if (syncUser) document.getElementById("account-email-display").textContent = syncUser.email;
+function renderSyncForm() {
+  const urlEl = document.getElementById("sync-url");
+  const keyEl = document.getElementById("sync-key");
+  const idEl = document.getElementById("sync-id");
+  if (!urlEl) return;
+  urlEl.value = config.url || "";
+  keyEl.value = config.key || "";
+  idEl.value = config.id || "";
 }
 
-function setAccountStatus(text) {
-  const el = document.getElementById("account-status");
-  if (el) el.textContent = text;
-}
+function initSync() {
+  renderSyncForm();
 
-async function initSync() {
-  if (!supa) {
-    setAccountStatus("Sync isn't configured (missing Supabase keys in config.js).");
-    return;
+  if (!window.supabase) {
+    setSyncStatus("Supabase library failed to load — check your connection.");
+  } else if (config.url && config.key && config.id) {
+    setSyncStatus("Connecting…");
+    pullFromSupabase();
+  } else {
+    setSyncStatus("Not connected yet — paste your Supabase project's URL, key, and a Sync ID below.");
   }
 
-  const {
-    data: { session },
-  } = await supa.auth.getSession();
-  syncUser = session ? session.user : null;
-  renderAccountUI();
-  if (syncUser) await pullFromSupabase();
+  const form = document.getElementById("sync-config-form");
+  const generateBtn = document.getElementById("sync-generate-btn");
+  if (!form || !generateBtn) return;
 
-  supa.auth.onAuthStateChange(async (event, session) => {
-    syncUser = session ? session.user : null;
-    // A password-reset email link lands here with a temporary "recovery"
-    // session already active — jump to Settings and show the "set a new
-    // password" form instead of treating this like a normal sign-in
-    // (which would otherwise silently pull/overwrite local data).
-    if (event === "PASSWORD_RECOVERY") {
-      isRecovering = true;
-      renderAccountUI();
-      if (window.switchSection) window.switchSection("settings");
-      return;
-    }
-    renderAccountUI();
-    if (syncUser) await pullFromSupabase();
+  generateBtn.addEventListener("click", () => {
+    document.getElementById("sync-id").value = `bc-${crypto.randomUUID()}`;
   });
 
-  const form = document.getElementById("account-signin-form");
-  const signupBtn = document.getElementById("account-signup-btn");
-  const signoutBtn = document.getElementById("account-signout-btn");
-
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const email = document.getElementById("account-email").value.trim();
-    const password = document.getElementById("account-password").value;
-    setAccountStatus("Signing in…");
-    const { error } = await supa.auth.signInWithPassword({ email, password });
-    setAccountStatus(error ? error.message : "");
-  });
-
-  signupBtn.addEventListener("click", async () => {
-    const email = document.getElementById("account-email").value.trim();
-    const password = document.getElementById("account-password").value;
-    if (!email || !password) {
-      setAccountStatus("Enter an email and password first.");
+    const next = {
+      url: document.getElementById("sync-url").value.trim(),
+      key: document.getElementById("sync-key").value.trim(),
+      id: document.getElementById("sync-id").value.trim(),
+    };
+    if (!next.url || !next.key || !next.id) {
+      setSyncStatus("Fill in all three fields (use Generate for the Sync ID on the first device).");
       return;
     }
-    setAccountStatus("Creating account…");
-    const { error } = await supa.auth.signUp({ email, password });
-    setAccountStatus(error ? error.message : "Check your email to confirm, then sign in.");
-  });
-
-  signoutBtn.addEventListener("click", async () => {
-    await supa.auth.signOut();
-  });
-
-  const recoveryForm = document.getElementById("account-recovery-form");
-  recoveryForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const newPassword = document.getElementById("account-recovery-password").value;
-    const statusEl = document.getElementById("account-recovery-status");
-    statusEl.textContent = "Updating…";
-    const { error } = await supa.auth.updateUser({ password: newPassword });
-    if (error) {
-      statusEl.textContent = error.message;
-      return;
-    }
-    isRecovering = false;
-    statusEl.textContent = "";
-    recoveryForm.reset();
-    setAccountStatus("Password updated — you're signed in.");
-    renderAccountUI();
-    await pullFromSupabase();
+    config = next;
+    saveSyncConfig(config);
+    buildClient();
+    setSyncStatus("Connecting…");
+    pullFromSupabase();
   });
 
   if (sessionStorage.getItem("just-synced")) {

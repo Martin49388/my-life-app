@@ -575,37 +575,25 @@
       </header>
 
       <div class="settings-block">
-        <p class="settings-title">Account</p>
-        <p class="section-hint">Sign in to sync this device with others (Supabase).</p>
+        <p class="settings-title">Cross-device sync</p>
+        <p class="section-hint">
+          Everything — habits, goals, fitness, food, journals, the week plan —
+          through your own free Supabase project. Paste the same three
+          values on every device. Setup is in SUPABASE.md in the repo.
+        </p>
 
-        <div id="account-signed-out">
-          <form id="account-signin-form">
-            <input type="email" id="account-email" placeholder="Email" required autocomplete="email" />
-            <input type="password" id="account-password" placeholder="Password" required autocomplete="current-password" />
-            <div class="account-actions">
-              <button type="submit" id="account-signin-btn">Sign in</button>
-              <button type="button" id="account-signup-btn">Sign up</button>
-            </div>
-          </form>
-          <p class="account-status" id="account-status"></p>
-        </div>
-
-        <div id="account-signed-in" hidden>
-          <p class="account-status">Signed in as <strong id="account-email-display"></strong></p>
-          <p class="account-status" id="sync-status">Not synced yet</p>
-          <button type="button" class="quick-chip" id="account-signout-btn">Sign out</button>
-        </div>
-
-        <div id="account-recovery" hidden>
-          <p class="account-status">Set a new password for your account.</p>
-          <form id="account-recovery-form">
-            <input type="password" id="account-recovery-password" placeholder="New password" required autocomplete="new-password" />
-            <div class="account-actions">
-              <button type="submit" id="account-recovery-btn">Set new password</button>
-            </div>
-          </form>
-          <p class="account-status" id="account-recovery-status"></p>
-        </div>
+        <form id="sync-config-form" class="settings-form">
+          <input type="url" id="sync-url" placeholder="Supabase project URL" autocomplete="off" />
+          <input type="password" id="sync-key" placeholder="Supabase anon/publishable key" autocomplete="off" />
+          <div class="sync-id-row">
+            <input type="text" id="sync-id" placeholder="Sync ID (same on every device)" autocomplete="off" />
+            <button type="button" id="sync-generate-btn">Generate</button>
+          </div>
+          <div class="account-actions">
+            <button type="submit" id="sync-save-btn">Sync now</button>
+          </div>
+        </form>
+        <p class="account-status" id="sync-status">Not connected yet</p>
 
         <div class="settings-divider"></div>
 

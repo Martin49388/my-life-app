@@ -124,18 +124,24 @@ proxy server.
 - Confirm Food lookup actually works in the browser (Alfred is now
   confirmed working, see above) — check the browser console for the
   exact error if it fails
-- Sync (sync.js) — DONE, differently than originally planned: instead of
-  rewriting every module's localStorage calls, sync.js monkey-patches
-  localStorage.setItem itself, so every write from any file mirrors
-  (debounced) to one JSON blob per signed-in user in Supabase. Email/
-  password auth via a new Account panel in Settings. Last-write-wins,
-  no real conflict resolution — fine for one person on two devices.
-  STILL NEEDS: Martin has to run the SQL (given to him separately) in
-  his Supabase project's SQL editor to create the app_state table with
-  RLS before sync actually persists anything — confirmed via a live
-  'table not found' error that the client/keys/connection are all
-  correct, just waiting on that one step. Also untested past that:
-  actual sign-up/sign-in and a real two-device sync round-trip.
+- Sync (sync.js) — rebuilt a second time, dropping auth entirely. The
+  original email/password version (via Supabase Auth) kept hitting real
+  friction: unconfirmed-email accounts, "invalid login credentials" from
+  password typos across devices, and password-reset emails linking to
+  Supabase's default localhost:3000 Site URL instead of the live app
+  (dashboard-only setting, never fixed). Current version: no accounts at
+  all. Settings -> "Cross-device sync" has three fields — Supabase
+  project URL, anon/publishable key, and a random "Sync ID" (generate
+  once, paste the same one into every other device). All devices with
+  the same three values read/write one shared row in `app_state`, keyed
+  by `sync_id` instead of an authenticated `user_id`. Still the same
+  localStorage.setItem monkey-patch + debounced push/pull underneath;
+  see SUPABASE.md for the schema/policies and pairing steps. Same
+  accepted tradeoff as before, now explicit: no real per-row security,
+  just an unguessable Sync ID — fine for one person's own devices.
+  STILL NEEDS: Martin has to run SUPABASE.md's SQL (replaces the old
+  user_id-based table) and actually pair two real devices — untested
+  past confirming the code loads without errors.
 - Dead CSS cleanup — grown across passes, still deferred: the removed
   color-picker's swatch/intensity selectors; `.glance-tile`/`.glance-label`
   etc. (glance.js's target `#sidebar-content` was removed from the HTML in
