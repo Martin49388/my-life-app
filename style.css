@@ -174,14 +174,15 @@ body {
 .sidebar-brand-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .sidebar-brand-mark {
-  width: 20px;
-  height: auto;
+  /* Height pinned close to the 17px title text (.sidebar-brand-name)
+     so it reads as part of the wordmark, not a big logo bolted on. */
+  height: 14px;
+  width: auto;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
 }
 
 .sidebar-brand-name {
