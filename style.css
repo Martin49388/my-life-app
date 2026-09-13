@@ -171,6 +171,19 @@ body {
   gap: 2px;
 }
 
+.sidebar-brand-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-brand-mark {
+  width: 20px;
+  height: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+}
+
 .sidebar-brand-name {
   font-family: "Manrope", sans-serif;
   font-size: 17px;
