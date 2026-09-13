@@ -22,6 +22,7 @@ const supa = SUPA_URL && SUPA_KEY && window.supabase ? window.supabase.createCli
 let syncUser = null;
 let pushTimer = null;
 let applyingRemote = false; // guards against re-pushing what we just pulled
+let isRecovering = false; // true while handling a password-recovery link
 
 function dumpLocalStorage() {
   const obj = {};
@@ -100,9 +101,11 @@ localStorage.setItem = function (key, value) {
 function renderAccountUI() {
   const signedOut = document.getElementById("account-signed-out");
   const signedIn = document.getElementById("account-signed-in");
-  if (!signedOut || !signedIn) return;
-  signedOut.hidden = !!syncUser;
-  signedIn.hidden = !syncUser;
+  const recovery = document.getElementById("account-recovery");
+  if (!signedOut || !signedIn || !recovery) return;
+  recovery.hidden = !isRecovering;
+  signedOut.hidden = !!syncUser || isRecovering;
+  signedIn.hidden = !syncUser || isRecovering;
   if (syncUser) document.getElementById("account-email-display").textContent = syncUser.email;
 }
 
@@ -124,8 +127,18 @@ async function initSync() {
   renderAccountUI();
   if (syncUser) await pullFromSupabase();
 
-  supa.auth.onAuthStateChange(async (_event, session) => {
+  supa.auth.onAuthStateChange(async (event, session) => {
     syncUser = session ? session.user : null;
+    // A password-reset email link lands here with a temporary "recovery"
+    // session already active — jump to Settings and show the "set a new
+    // password" form instead of treating this like a normal sign-in
+    // (which would otherwise silently pull/overwrite local data).
+    if (event === "PASSWORD_RECOVERY") {
+      isRecovering = true;
+      renderAccountUI();
+      if (window.switchSection) window.switchSection("settings");
+      return;
+    }
     renderAccountUI();
     if (syncUser) await pullFromSupabase();
   });
@@ -157,6 +170,25 @@ async function initSync() {
 
   signoutBtn.addEventListener("click", async () => {
     await supa.auth.signOut();
+  });
+
+  const recoveryForm = document.getElementById("account-recovery-form");
+  recoveryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newPassword = document.getElementById("account-recovery-password").value;
+    const statusEl = document.getElementById("account-recovery-status");
+    statusEl.textContent = "Updating…";
+    const { error } = await supa.auth.updateUser({ password: newPassword });
+    if (error) {
+      statusEl.textContent = error.message;
+      return;
+    }
+    isRecovering = false;
+    statusEl.textContent = "";
+    recoveryForm.reset();
+    setAccountStatus("Password updated — you're signed in.");
+    renderAccountUI();
+    await pullFromSupabase();
   });
 
   if (sessionStorage.getItem("just-synced")) {

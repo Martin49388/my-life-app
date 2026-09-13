@@ -596,6 +596,17 @@
           <button type="button" class="quick-chip" id="account-signout-btn">Sign out</button>
         </div>
 
+        <div id="account-recovery" hidden>
+          <p class="account-status">Set a new password for your account.</p>
+          <form id="account-recovery-form">
+            <input type="password" id="account-recovery-password" placeholder="New password" required autocomplete="new-password" />
+            <div class="account-actions">
+              <button type="submit" id="account-recovery-btn">Set new password</button>
+            </div>
+          </form>
+          <p class="account-status" id="account-recovery-status"></p>
+        </div>
+
         <div class="settings-divider"></div>
 
         <p class="settings-version">BatCave &middot; Prototype 1</p>
