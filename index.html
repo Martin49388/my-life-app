@@ -52,35 +52,9 @@
           <button type="button" class="nav-link section-btn" data-section="news">News</button>
           <button type="button" class="nav-link section-btn" data-section="markets">Markets</button>
           <button type="button" class="nav-link section-btn" data-section="notes">Notes</button>
-          <button type="button" class="nav-link" id="settings-nav-btn" aria-expanded="false">Settings</button>
+          <button type="button" class="nav-link section-btn" data-section="settings" id="settings-nav-btn">Settings</button>
         </nav>
 
-        <div class="settings-panel" id="settings-panel" hidden>
-          <p class="settings-title">Account</p>
-          <p class="section-hint">Sign in to sync this device with others (Supabase).</p>
-
-          <div id="account-signed-out">
-            <form id="account-signin-form">
-              <input type="email" id="account-email" placeholder="Email" required autocomplete="email" />
-              <input type="password" id="account-password" placeholder="Password" required autocomplete="current-password" />
-              <div class="account-actions">
-                <button type="submit" id="account-signin-btn">Sign in</button>
-                <button type="button" id="account-signup-btn">Sign up</button>
-              </div>
-            </form>
-            <p class="account-status" id="account-status"></p>
-          </div>
-
-          <div id="account-signed-in" hidden>
-            <p class="account-status">Signed in as <strong id="account-email-display"></strong></p>
-            <p class="account-status" id="sync-status">Not synced yet</p>
-            <button type="button" class="quick-chip" id="account-signout-btn">Sign out</button>
-          </div>
-
-          <div class="settings-divider"></div>
-
-          <p class="settings-version">BatCave &middot; Prototype 1</p>
-        </div>
       </aside>
 
       <div class="content">
@@ -591,6 +565,40 @@
       <ul class="journal-list" id="notes-journal-list"></ul>
     </section>
 
+    <section id="settings-section" hidden>
+      <header class="section-header-simple">
+        <p class="eyebrow">settings</p>
+        <p class="section-hint">Account &amp; sync</p>
+      </header>
+
+      <div class="settings-block">
+        <p class="settings-title">Account</p>
+        <p class="section-hint">Sign in to sync this device with others (Supabase).</p>
+
+        <div id="account-signed-out">
+          <form id="account-signin-form">
+            <input type="email" id="account-email" placeholder="Email" required autocomplete="email" />
+            <input type="password" id="account-password" placeholder="Password" required autocomplete="current-password" />
+            <div class="account-actions">
+              <button type="submit" id="account-signin-btn">Sign in</button>
+              <button type="button" id="account-signup-btn">Sign up</button>
+            </div>
+          </form>
+          <p class="account-status" id="account-status"></p>
+        </div>
+
+        <div id="account-signed-in" hidden>
+          <p class="account-status">Signed in as <strong id="account-email-display"></strong></p>
+          <p class="account-status" id="sync-status">Not synced yet</p>
+          <button type="button" class="quick-chip" id="account-signout-btn">Sign out</button>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <p class="settings-version">BatCave &middot; Prototype 1</p>
+      </div>
+    </section>
+
       </div>
     </div>
   </main>
@@ -603,7 +611,6 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="sync.js"></script>
-  <script src="settings.js"></script>
   <script src="script.js"></script>
   <script src="news.js"></script>
   <script src="goals.js"></script>

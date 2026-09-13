@@ -270,12 +270,6 @@ body {
     padding: 6px 10px;
   }
 
-  .settings-panel {
-    position: absolute;
-    right: 16px;
-    left: 16px;
-    top: auto;
-  }
 }
 
 .app-header {
@@ -332,24 +326,18 @@ body {
   border-color: var(--border);
 }
 
-/* Lives inline in the sidebar now, not absolutely positioned off a header
-   that no longer exists — it just expands the sidebar's own flow when
-   toggled open (see settings.js). */
-.settings-panel {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.settings-panel[hidden] {
-  display: none;
+/* Settings is now a full content section like Habits or Fitness (see
+   #settings-section in index.html) rather than a small dropdown pinned to
+   the sidebar. .settings-block just wraps each settings group so multiple
+   groups can sit in the section with consistent spacing/width. */
+.settings-block {
+  max-width: 420px;
 }
 
 .settings-divider {
   height: 1px;
   background: var(--border);
-  margin: 14px 0;
+  margin: 20px 0;
 }
 
 .settings-title {

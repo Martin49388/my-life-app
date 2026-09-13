@@ -364,6 +364,7 @@ const ALL_SECTIONS = [
   "fitness", "food", "recovery",
   "mindset", "reading",
   "news", "markets", "notes",
+  "settings",
 ];
 
 function switchSection(requested) {

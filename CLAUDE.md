@@ -8,13 +8,23 @@ intentional; the real experience is local with config.js). Martin needs to
 `git push origin main` and wait for GitHub Pages to rebuild before this
 session's commits show up there.
 
+Settings is now a full content section (`#settings-section`), same
+scale as Habits/Fitness/etc., not a small dropdown pinned inside the
+240px sidebar column. `#settings-nav-btn` is a real `.section-btn` with
+`data-section="settings"` now, so it's driven entirely by `switchSection()`
+like every other nav item — the old settings.js (which owned open/close
+toggle state, outside-click, and Escape handling for the dropdown) was
+deleted outright since none of that applies anymore. The Account panel
+(sign-in form, signed-in state, sync status) lives inside it unchanged.
+
 Just finished the "FINAL STRUCTURAL REBUILD" brief — all 4 ordered steps
 done, each its own commit:
 
 1. **Sidebar restructure + kill top tabs** — the old top tab bar and
    `.brand-header` (logo/gear icon) are gone. All navigation and branding
    now live in one place: `.sidebar` (pure nav — brand name/tag, grouped
-   links, inline settings panel). Under 640px the sidebar becomes a
+   links). Settings is a normal nav item now, opening a full section
+   like any other, not an inline panel. Under 640px the sidebar becomes a
    horizontal scrollable bar instead of disappearing, since it's the only
    nav now.
 2. **Typography pass** — font weights across the app dropped from a flat
@@ -53,7 +63,8 @@ strip at the top, content full-width below it.
 
 Sidebar now has 13 sections in 4 groups: Habits/Goals/Alfred/Blueprint/
 Review, Body (Fitness/Food/Water/Recovery), Mind (Mindset/Reading),
-System (News/Markets/Notes/Settings). The 7 new ones (Blueprint, Review,
+System (News/Markets/Notes/Settings — Settings opens a full section).
+   The 7 new ones (Blueprint, Review,
 Recovery, Mindset, Reading, Markets, Notes) are all the same simple
 pattern for now — a one-line note form + timestamped log, own localStorage
 key each (journal.js) — since none of them have real tracked structure
