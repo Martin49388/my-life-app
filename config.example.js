@@ -9,4 +9,8 @@ window.APP_CONFIG = {
   // Free tier at finnhub.io — used for Markets' stock search + portfolio
   // price lookup.
   FINNHUB_API_KEY: "",
+  // Free tier at twelvedata.com — used for Markets' price chart. Both of
+  // these are just local-dev fallbacks; the app itself reads them from
+  // Settings -> "Markets stock lookup" (per-device localStorage) instead.
+  TWELVEDATA_API_KEY: "",
 };
