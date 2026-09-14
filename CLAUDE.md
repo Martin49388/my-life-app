@@ -128,13 +128,21 @@ days just don't get an entry, not backfilled). Shows as a clickable card on
 Overview; every quote ever generated is kept permanently and listed in
 Mindset, newest first; clicking either opens the same modal (`#quote-modal-
 overlay`, new generic component, first modal in the app) with the full
-quote/author/info. Verified end-to-end (generation, both click paths, modal
-open/close, no re-generation on reload) via direct DOM/localStorage checks
-in a local static-server tab — the Browser pane's screenshot tool was
-serving a stale cached frame all session (showed an empty modal box that
-didn't match live DOM state, confirmed via `element.hidden` checks), so
-screenshots weren't trustworthy for this session and DOM inspection was
-used instead.
+quote/author/info. Shipped with a real bug, caught by Martin right after: the modal was stuck
+open (empty, blocking every click) on first load. Root cause — CSS
+specificity, not a rendering fluke: `.modal-overlay { display: flex }` in
+style.css always wins over the browser's built-in `[hidden]{display:none}`
+(author styles beat the UA stylesheet regardless of the `hidden` attribute
+being set), so the overlay was full-screen and click-blocking from the very
+first page load, permanently, since toggling `.hidden` in JS never actually
+changed its computed style. Fixed with an explicit `.modal-overlay[hidden]
+{ display: none; }` override. Lesson for next time: checking
+`element.hidden` (the DOM property) is not enough to verify a hide/show
+bug — check `getComputedStyle(el).display` and, for anything that's
+supposed to block/unblock clicks, verify with real hit-testing
+(`document.elementFromPoint`) rather than synthetic `element.click()`, which
+bypasses hit-testing entirely and will falsely "pass" even when a real tap
+would've hit an invisible overlay instead.
 
 Client-side API keys (config.js, gitignored) are a deliberate tradeoff —
 no backend exists, personal non-public use case, accepted over adding a

@@ -2657,6 +2657,13 @@ body {
   z-index: 50;
 }
 
+/* Author styles always beat the browser's built-in [hidden]{display:none},
+   so without this the overlay's own `display: flex` above wins even while
+   hidden — leaving a full-screen invisible layer eating every click. */
+.modal-overlay[hidden] {
+  display: none;
+}
+
 .modal-card {
   position: relative;
   width: min(440px, 100%);
