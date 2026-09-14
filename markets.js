@@ -1,9 +1,10 @@
 // Markets: stock search (Finnhub, free tier — see config.js) plus a
-// persistent "portfolio" watchlist. Searching looks up matching symbols
-// and their live price right there in the results; adding one just saves
-// its symbol/name (the portfolio list re-fetches live prices on its own,
-// so there's nothing here to go stale). Each row links out to Yahoo
-// Finance for the full picture — this app only ever shows a quick glance.
+// persistent "portfolio" watchlist. Searching resolves the query to a
+// stock and drops it straight into the portfolio below — no separate
+// pick-a-result step. Portfolio only ever stores symbol/name; live price
+// is re-fetched fresh every render, so there's nothing here to go stale.
+// Each row links out to Yahoo Finance for the full picture — this app
+// only ever shows a quick glance.
 
 const PORTFOLIO_KEY = "markets-portfolio";
 
@@ -45,63 +46,50 @@ function formatQuote(q) {
 
 const searchInput = document.getElementById("stock-search-input");
 const searchBtn = document.getElementById("stock-search-btn");
-const searchResults = document.getElementById("stock-search-results");
+const searchStatus = document.getElementById("stock-search-status");
 
+function setSearchStatus(text) {
+  searchStatus.textContent = text;
+  searchStatus.hidden = !text;
+}
+
+// Resolves the query to a single stock via Finnhub's search endpoint (its
+// top match is reliably the right one for a plain ticker or company name —
+// see e.g. searching "GM" or "general motors") and adds it straight to the
+// portfolio. A query that mixes both, like "GM general motors", finds
+// nothing on Finnhub's end either — that's reported explicitly instead of
+// failing silently.
 async function searchStocks(query) {
   const key = finnhubKey();
   if (!key) {
-    searchResults.innerHTML = `<li class="stock-search-empty">No Finnhub key set in config.js — add FINNHUB_API_KEY there first.</li>`;
-    searchResults.hidden = false;
+    setSearchStatus("No Finnhub key set in config.js — add FINNHUB_API_KEY there first.");
     return;
   }
 
-  searchResults.innerHTML = `<li class="stock-search-empty">Searching…</li>`;
-  searchResults.hidden = false;
+  setSearchStatus("Searching…");
 
   try {
     const url = `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${encodeURIComponent(key)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const matches = (data.result || []).filter((m) => m.type === "Common Stock").slice(0, 5);
+    const match = (data.result || []).find((m) => m.type === "Common Stock");
 
-    if (matches.length === 0) {
-      searchResults.innerHTML = `<li class="stock-search-empty">No matches.</li>`;
+    if (!match) {
+      setSearchStatus(`No match found for "${query}" — try just the ticker or company name.`);
       return;
     }
 
-    searchResults.innerHTML = matches
-      .map(
-        (m) => `
-        <li class="stock-search-item" data-symbol="${m.symbol}">
-          <div class="stock-search-item-body">
-            <p class="stock-search-name"></p>
-            <p class="stock-search-price">Loading…</p>
-          </div>
-          <button type="button" class="stock-add-btn" data-symbol="${m.symbol}" data-name="${m.description}">+ Add</button>
-        </li>`
-      )
-      .join("");
+    if (portfolio.some((p) => p.symbol === match.symbol)) {
+      setSearchStatus(`${match.symbol} is already in your portfolio.`);
+      return;
+    }
 
-    searchResults.querySelectorAll(".stock-search-item").forEach((li, i) => {
-      const m = matches[i];
-      li.querySelector(".stock-search-name").textContent = `${m.symbol} — ${m.description}`;
-    });
-
-    matches.forEach((m, i) => {
-      const priceEl = searchResults.querySelectorAll(".stock-search-price")[i];
-      fetchQuote(m.symbol)
-        .then((q) => {
-          const { price, change, down } = formatQuote(q);
-          priceEl.textContent = `${price} ${change}`;
-          priceEl.classList.toggle("stock-down", down);
-        })
-        .catch(() => {
-          priceEl.textContent = "Price unavailable";
-        });
-    });
+    addToPortfolio(match.symbol, match.description);
+    setSearchStatus(`Added ${match.symbol} — ${match.description} to your portfolio.`);
+    searchInput.value = "";
   } catch (err) {
-    searchResults.innerHTML = `<li class="stock-search-empty">Search failed — try again.</li>`;
+    setSearchStatus("Search failed — try again.");
   }
 }
 
@@ -116,12 +104,6 @@ searchInput.addEventListener("keydown", (e) => {
     const query = searchInput.value.trim();
     if (query) searchStocks(query);
   }
-});
-
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".stock-add-btn");
-  if (!btn) return;
-  addToPortfolio(btn.dataset.symbol, btn.dataset.name);
 });
 
 function addToPortfolio(symbol, name) {

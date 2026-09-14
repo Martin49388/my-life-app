@@ -109,20 +109,29 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   Uses gemini-3.6-flash — gemini-2.0-flash was retired by Google and
   404ing on every request; swapped to the model Google's own error
   named as the replacement. FoodData Central lookup is still untested.
-- Markets (markets.js, new 2026-09-14) — still has its free-text journal
-  underneath, plus: a "Open Yahoo Finance ↗" link in the header; a stock
-  search (Finnhub free tier, `FINNHUB_API_KEY` in config.js — Martin still
-  needs to sign up at finnhub.io and paste one in, same "no key configured"
-  fallback pattern as Food/Alfred until then) that shows each match's live
-  price right in the results, not just the name; and a "Portfolio"
-  watchlist below it — add a searched stock once, it's saved permanently
-  (just symbol+name in localStorage, `markets-portfolio`), and its live
-  price is re-fetched fresh every time the section renders rather than
-  cached, so it never goes stale. Each portfolio row's symbol links out to
-  its Yahoo Finance page. Verified end-to-end (search, add, persist,
-  remove, no-key fallback) in a local static-server tab with fetch mocked
-  to fake Finnhub responses, since there's no real key yet to test against
-  live — worth a real smoke test once Martin adds one.
+- Markets (markets.js) — still has its free-text journal underneath, plus:
+  a "Open Yahoo Finance ↗" link in the header; a stock search (Finnhub
+  free tier, `FINNHUB_API_KEY` in config.js — Martin has a real key set
+  locally now); and a "Portfolio" watchlist below it, just symbol+name in
+  localStorage (`markets-portfolio`), with live price always re-fetched
+  fresh on render (never cached, never stale) and each row linking out to
+  its own Yahoo Finance page.
+  Search auto-adds straight to the portfolio, no separate pick-a-result
+  step — went through one redesign after Martin tried it live: the first
+  version showed a list of matches with individual "+ Add" buttons, and
+  separately searching "GM general motors" (ticker + name combined)
+  silently did nothing. Root cause on that one was upstream, not a bug in
+  this app — confirmed by curling Finnhub's `/search` directly: it
+  genuinely returns zero results for a combined ticker+name query, even
+  though "GM" alone or "general motors" alone each resolve correctly to
+  the same stock. Fixed by taking Finnhub's top match automatically
+  (reliable for either a plain ticker or a plain company name) and always
+  showing an explicit status line — "Added X", "X is already in your
+  portfolio", or "No match found for '...' — try just the ticker or
+  company name" — instead of ever going quiet. Verified live against the
+  real Finnhub API (not mocked) for all of: a plain ticker, the exact
+  failing combined query, and a repeat search to confirm no duplicate
+  entries.
 
 Overview additionally shows Food's protein next to kcal, and a
 'Logged today' feed merging every timestamped entry from every
