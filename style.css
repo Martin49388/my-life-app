@@ -2761,6 +2761,12 @@ body {
   color: var(--text-dim);
 }
 
+.stock-search-status-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .stock-down {
   color: var(--danger);
 }

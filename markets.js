@@ -1,12 +1,23 @@
-// Markets: stock search (Finnhub, free tier — see config.js) plus a
-// persistent "portfolio" watchlist. Searching resolves the query to a
-// stock and drops it straight into the portfolio below — no separate
-// pick-a-result step. Portfolio only ever stores symbol/name; live price
-// is re-fetched fresh every render, so there's nothing here to go stale.
-// Each row links out to Yahoo Finance for the full picture — this app
-// only ever shows a quick glance.
+// Markets: stock search (Finnhub, free tier) plus a persistent "portfolio"
+// watchlist. Searching resolves the query to a stock and drops it straight
+// into the portfolio below — no separate pick-a-result step. Portfolio
+// only ever stores symbol/name; live price is re-fetched fresh every
+// render, so there's nothing here to go stale. Each row links out to
+// Yahoo Finance for the full picture — this app only ever shows a quick
+// glance.
+//
+// The Finnhub key lives in Settings -> "Markets stock lookup", stored per
+// device in localStorage (same pattern as Cross-device sync's fields) —
+// NOT in config.js. config.js is gitignored, so it only ever exists on
+// whichever machine someone happens to edit it on; a key that only lives
+// there is invisible on every other device (a phone opening the live
+// GitHub Pages link, for instance), which is why an earlier version of
+// this feature "didn't work" for Martin even after adding a real key.
+// config.js is still checked as a fallback, purely for local dev
+// convenience.
 
 const PORTFOLIO_KEY = "markets-portfolio";
+const FINNHUB_KEY_STORAGE = "finnhub-api-key";
 
 function loadPortfolio() {
   const raw = localStorage.getItem(PORTFOLIO_KEY);
@@ -20,7 +31,7 @@ function savePortfolio(list) {
 let portfolio = loadPortfolio();
 
 function finnhubKey() {
-  return window.APP_CONFIG && window.APP_CONFIG.FINNHUB_API_KEY;
+  return localStorage.getItem(FINNHUB_KEY_STORAGE) || (window.APP_CONFIG && window.APP_CONFIG.FINNHUB_API_KEY) || "";
 }
 
 function yahooUrl(symbol) {
@@ -48,9 +59,11 @@ const searchInput = document.getElementById("stock-search-input");
 const searchBtn = document.getElementById("stock-search-btn");
 const searchStatus = document.getElementById("stock-search-status");
 
-function setSearchStatus(text) {
+function setSearchStatus(text, { gotoSettings = false } = {}) {
   searchStatus.textContent = text;
   searchStatus.hidden = !text;
+  searchStatus.classList.toggle("stock-search-status-link", gotoSettings);
+  searchStatus.onclick = gotoSettings ? () => window.switchSection && window.switchSection("settings") : null;
 }
 
 // Resolves the query to a single stock via Finnhub's search endpoint (its
@@ -62,7 +75,7 @@ function setSearchStatus(text) {
 async function searchStocks(query) {
   const key = finnhubKey();
   if (!key) {
-    setSearchStatus("No Finnhub key set in config.js — add FINNHUB_API_KEY there first.");
+    setSearchStatus("No Finnhub key set — tap here to add one in Settings.", { gotoSettings: true });
     return;
   }
 
@@ -168,6 +181,31 @@ function renderPortfolio() {
         priceEl.textContent = "Price unavailable";
       });
   });
+}
+
+const finnhubForm = document.getElementById("finnhub-config-form");
+const finnhubInput = document.getElementById("finnhub-key-input");
+const finnhubKeyStatus = document.getElementById("finnhub-key-status");
+
+function renderFinnhubKeyStatus() {
+  const key = localStorage.getItem(FINNHUB_KEY_STORAGE);
+  finnhubInput.value = key || "";
+  finnhubKeyStatus.textContent = key ? "Key saved on this device." : "Not set on this device";
+}
+
+if (finnhubForm) {
+  finnhubForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = finnhubInput.value.trim();
+    if (value) {
+      localStorage.setItem(FINNHUB_KEY_STORAGE, value);
+    } else {
+      localStorage.removeItem(FINNHUB_KEY_STORAGE);
+    }
+    renderFinnhubKeyStatus();
+    renderPortfolio(); // prices were showing "no key" — refresh now that one's set
+  });
+  renderFinnhubKeyStatus();
 }
 
 renderPortfolio();

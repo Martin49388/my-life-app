@@ -624,6 +624,23 @@
           </div>
         </form>
         <p class="account-status" id="sync-status">Not connected yet</p>
+      </div>
+
+      <div class="settings-block">
+        <p class="settings-title">Markets stock lookup</p>
+        <p class="section-hint">
+          Free API key from finnhub.io, for the stock search and portfolio
+          in Markets. Stored on this device only — paste it again on any
+          other device you use (like your phone).
+        </p>
+
+        <form id="finnhub-config-form" class="settings-form">
+          <input type="password" id="finnhub-key-input" placeholder="Finnhub API key" autocomplete="off" />
+          <div class="account-actions">
+            <button type="submit" id="finnhub-save-btn">Save</button>
+          </div>
+        </form>
+        <p class="account-status" id="finnhub-key-status">Not set on this device</p>
 
         <div class="settings-divider"></div>
 

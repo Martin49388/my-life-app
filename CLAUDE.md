@@ -111,27 +111,37 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   named as the replacement. FoodData Central lookup is still untested.
 - Markets (markets.js) — still has its free-text journal underneath, plus:
   a "Open Yahoo Finance ↗" link in the header; a stock search (Finnhub
-  free tier, `FINNHUB_API_KEY` in config.js — Martin has a real key set
-  locally now); and a "Portfolio" watchlist below it, just symbol+name in
-  localStorage (`markets-portfolio`), with live price always re-fetched
-  fresh on render (never cached, never stale) and each row linking out to
-  its own Yahoo Finance page.
-  Search auto-adds straight to the portfolio, no separate pick-a-result
-  step — went through one redesign after Martin tried it live: the first
-  version showed a list of matches with individual "+ Add" buttons, and
-  separately searching "GM general motors" (ticker + name combined)
-  silently did nothing. Root cause on that one was upstream, not a bug in
-  this app — confirmed by curling Finnhub's `/search` directly: it
-  genuinely returns zero results for a combined ticker+name query, even
-  though "GM" alone or "general motors" alone each resolve correctly to
-  the same stock. Fixed by taking Finnhub's top match automatically
-  (reliable for either a plain ticker or a plain company name) and always
-  showing an explicit status line — "Added X", "X is already in your
-  portfolio", or "No match found for '...' — try just the ticker or
-  company name" — instead of ever going quiet. Verified live against the
-  real Finnhub API (not mocked) for all of: a plain ticker, the exact
-  failing combined query, and a repeat search to confirm no duplicate
-  entries.
+  free tier) that auto-adds straight to a "Portfolio" watchlist below it
+  (no pick-a-result step — searching "GM" just adds it); and that
+  portfolio, just symbol+name in localStorage (`markets-portfolio`), with
+  live price always re-fetched fresh on render (never cached, never
+  stale) and each row linking out to its own Yahoo Finance page.
+  Went through two real bugs after Martin tried it live, both worth
+  remembering:
+  1. Searching "GM general motors" (ticker + name combined) silently did
+     nothing. Root cause was upstream, not this app — confirmed by
+     curling Finnhub's `/search` directly: it genuinely returns zero
+     results for a combined query, even though "GM" alone or "general
+     motors" alone each resolve fine. Fixed by taking Finnhub's top match
+     automatically and always showing an explicit status line either way
+     ("Added X", "X already in your portfolio", or "No match found —
+     try just the ticker or company name") instead of ever going quiet.
+  2. Bigger one: the Finnhub key lived in `config.js` — gitignored, so it
+     only ever existed on whichever machine someone last edited it on.
+     Martin's phone opens the live GitHub Pages link, which never had
+     that file, so the feature could never have worked there no matter
+     how many times the code got fixed. Moved the key to Settings ->
+     "Markets stock lookup", stored per-device in localStorage exactly
+     like Cross-device sync's fields already were — `config.js` is only
+     a fallback now, for local dev convenience. This is the second time
+     a client-side-key feature (see Sync's own history above) has needed
+     rearchitecting away from a gitignored file for this exact reason;
+     worth defaulting new API-key features straight to a Settings field
+     instead of config.js from now on.
+  Verified end-to-end with config.js's key deliberately removed (i.e.
+  simulating the live-site case exactly) — no key -> clickable "add one
+  in Settings" message that jumps there -> save a key -> search works ->
+  survives a full page reload with zero dependency on config.js.
 
 Overview additionally shows Food's protein next to kcal, and a
 'Logged today' feed merging every timestamped entry from every
@@ -167,9 +177,16 @@ supposed to block/unblock clicks, verify with real hit-testing
 bypasses hit-testing entirely and will falsely "pass" even when a real tap
 would've hit an invisible overlay instead.
 
-Client-side API keys (config.js, gitignored) are a deliberate tradeoff —
-no backend exists, personal non-public use case, accepted over adding a
-proxy server.
+Client-side API keys are a deliberate tradeoff — no backend exists,
+personal non-public use case, accepted over adding a proxy server. WHERE
+they live matters though (see Markets' history below): config.js is
+gitignored, so a key pasted there only exists on whichever single machine
+someone edited it on — invisible to any other device, including the live
+GitHub Pages link Martin's phone actually opens. Markets' Finnhub key was
+moved to Settings/localStorage for exactly this reason. FOODDATA_API_KEY
+and GEMINI_API_KEY are still config.js-only as of this writing, so Food's
+lookup and Alfred likely have this same latent gap on Martin's phone —
+untested, flagged here rather than assumed fixed.
 
 ## Next steps
 
