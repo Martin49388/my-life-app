@@ -629,13 +629,14 @@
       <div class="settings-block">
         <p class="settings-title">Markets stock lookup</p>
         <p class="section-hint">
-          Free API key from finnhub.io, for the stock search and portfolio
-          in Markets. Stored on this device only — paste it again on any
-          other device you use (like your phone).
+          Free API keys, for the stock search/portfolio and the price chart
+          in Markets. Both stored on this device only — paste them again on
+          any other device you use (like your phone).
         </p>
 
         <form id="finnhub-config-form" class="settings-form">
-          <input type="password" id="finnhub-key-input" placeholder="Finnhub API key" autocomplete="off" />
+          <input type="password" id="finnhub-key-input" placeholder="Finnhub API key (finnhub.io) — search + prices" autocomplete="off" />
+          <input type="password" id="twelvedata-key-input" placeholder="Twelve Data API key (twelvedata.com) — price chart" autocomplete="off" />
           <div class="account-actions">
             <button type="submit" id="finnhub-save-btn">Save</button>
           </div>
@@ -663,6 +664,17 @@
       <p class="modal-quote-text" id="quote-modal-text"></p>
       <p class="modal-quote-author" id="quote-modal-author"></p>
       <p class="modal-quote-info" id="quote-modal-info"></p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="stock-modal-overlay" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="stock-modal-title">
+      <button type="button" class="modal-close" id="stock-modal-close" aria-label="Close">&#10005;</button>
+      <p class="stock-modal-title" id="stock-modal-title"></p>
+      <p class="stock-modal-price" id="stock-modal-price">Loading…</p>
+      <div class="stock-modal-chart" id="stock-modal-chart"></div>
+      <ul class="stock-modal-info" id="stock-modal-info"></ul>
+      <a class="external-link" id="stock-modal-yahoo-link" href="#" target="_blank" rel="noopener noreferrer">Open on Yahoo Finance &#8599;</a>
     </div>
   </div>
 

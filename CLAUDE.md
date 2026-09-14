@@ -142,6 +142,25 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   simulating the live-site case exactly) — no key -> clickable "add one
   in Settings" message that jumps there -> save a key -> search works ->
   survives a full page reload with zero dependency on config.js.
+  Tapping a portfolio row now opens a modal with price, basic info
+  (exchange/industry/market cap), and a 30-day price chart — Martin
+  wanted this without being sent to Yahoo Finance, so that link moved
+  from the row itself into an optional line inside the modal instead of
+  being the row's default action. Needed a second free API key: Finnhub's
+  free tier covers profile info but flat-out 403s on historical candles
+  (confirmed directly, not assumed) — no chart possible from Finnhub
+  alone. Twelve Data fills that gap; also confirmed directly that it
+  serves `access-control-allow-origin: *`, i.e. actually usable from a
+  browser with no proxy, unlike most providers (Yahoo's own unofficial
+  chart endpoint returns real data too but zero CORS headers, so it's
+  curl-only, not fetch()-from-a-page-able). Same Settings-field pattern as
+  Finnhub's key, same graceful "no key yet, tap to fix in Settings"
+  fallback, and an unsupported symbol (confirmed against Twelve Data's
+  shared "demo" key, which only serves a few symbols) just shows "Chart
+  unavailable" rather than breaking the rest of the modal. Martin still
+  needs his own real Twelve Data key (twelvedata.com, free) — only tested
+  against their shared demo key so far, which won't work for arbitrary
+  symbols.
 
 Overview additionally shows Food's protein next to kcal, and a
 'Logged today' feed merging every timestamped entry from every
