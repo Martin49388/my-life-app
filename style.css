@@ -2608,3 +2608,101 @@ body {
   margin: 8px 0 0;
   line-height: 1.4;
 }
+
+/* Quote of the day (Overview) and the growing quote log (Mindset) —
+   see quotes.js. Both open the same modal (below) on click/tap. */
+.quote-of-day {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  padding: 12px 2px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.quote-of-day-text {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text);
+}
+
+.quote-of-day-author {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.quote-row {
+  cursor: pointer;
+}
+
+.quote-row:hover .journal-text,
+.quote-of-day:hover .quote-of-day-text {
+  color: var(--accent);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modal-card {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 24px 24px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-quote-text {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.modal-quote-author {
+  margin: 0 0 18px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.modal-quote-info {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}

@@ -87,6 +87,14 @@
       <p class="overview-status" id="overview-status"></p>
 
       <div>
+        <p class="eyebrow">Quote of the day</p>
+        <button type="button" class="quote-of-day" id="overview-quote-btn">
+          <p class="quote-of-day-text" id="overview-quote-text">Loading…</p>
+          <p class="quote-of-day-author" id="overview-quote-author"></p>
+        </button>
+      </div>
+
+      <div>
         <p class="eyebrow">Standards</p>
         <ul class="journal-list" id="overview-standards"></ul>
       </div>
@@ -518,6 +526,12 @@
         <p class="section-hint">Headspace, focus, mood — short notes on how you're thinking.</p>
       </header>
 
+      <div>
+        <p class="eyebrow">Quotes</p>
+        <p class="section-hint">One new quote appears here automatically every day — tap any of them for more on it.</p>
+        <ul class="journal-list" id="mindset-quotes-list"></ul>
+      </div>
+
       <form class="journal-form" data-journal="mindset">
         <input type="text" class="journal-input" placeholder="Add a note…" required />
         <button type="submit">Add</button>
@@ -610,6 +624,15 @@
     <button type="submit">Send</button>
   </form>
 
+  <div class="modal-overlay" id="quote-modal-overlay" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="quote-modal-text">
+      <button type="button" class="modal-close" id="quote-modal-close" aria-label="Close">&#10005;</button>
+      <p class="modal-quote-text" id="quote-modal-text"></p>
+      <p class="modal-quote-author" id="quote-modal-author"></p>
+      <p class="modal-quote-info" id="quote-modal-info"></p>
+    </div>
+  </div>
+
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="sync.js"></script>
@@ -622,6 +645,7 @@
   <script src="blueprint.js"></script>
   <script src="alfred.js"></script>
   <script src="journal.js"></script>
+  <script src="quotes.js"></script>
   <script src="overview.js"></script>
   <script src="glance.js"></script>
   <script src="global-bar.js"></script>

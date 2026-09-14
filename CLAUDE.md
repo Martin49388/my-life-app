@@ -115,6 +115,27 @@ Overview additionally shows Food's protein next to kcal, and a
 journal-backed section (Blueprint/Review/Recovery/Mindset/Reading/
 Markets/Notes) plus Alfred check-ins, filtered to today.
 
+Quote of the day (quotes.js, new 2026-09-14): Martin originally asked for
+286 pre-written quotes+authors seeded in up front; talked him out of that
+(hand-curating 286 real quotes from memory risks misattribution at that
+scale, and it's a dead end once day 287 arrives) in favor of generating one
+real quote a day automatically, no button — same Gemini call pattern as
+Alfred (config.js key, gemini-3.6-flash), asked for a real quote+author+a
+short context blurb as strict JSON, told not to repeat anything in the
+existing log. Runs once per day the app is opened (checks localStorage
+`quotes-log` for today's date key first, no-ops if already there — skipped
+days just don't get an entry, not backfilled). Shows as a clickable card on
+Overview; every quote ever generated is kept permanently and listed in
+Mindset, newest first; clicking either opens the same modal (`#quote-modal-
+overlay`, new generic component, first modal in the app) with the full
+quote/author/info. Verified end-to-end (generation, both click paths, modal
+open/close, no re-generation on reload) via direct DOM/localStorage checks
+in a local static-server tab — the Browser pane's screenshot tool was
+serving a stale cached frame all session (showed an empty modal box that
+didn't match live DOM state, confirmed via `element.hidden` checks), so
+screenshots weren't trustworthy for this session and DOM inspection was
+used instead.
+
 Client-side API keys (config.js, gitignored) are a deliberate tradeoff —
 no backend exists, personal non-public use case, accepted over adding a
 proxy server.
