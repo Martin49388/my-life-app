@@ -558,7 +558,23 @@
       <header class="section-header-simple">
         <p class="eyebrow">markets</p>
         <p class="section-hint">Watchlist notes, trade ideas, things to revisit.</p>
+        <a class="external-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer">Open Yahoo Finance &#8599;</a>
       </header>
+
+      <div>
+        <p class="eyebrow">Look up a stock</p>
+        <div class="stock-search-row">
+          <input type="text" id="stock-search-input" placeholder="Symbol or company, e.g. AAPL" />
+          <button type="button" id="stock-search-btn">Search</button>
+        </div>
+        <ul class="stock-search-results" id="stock-search-results" hidden></ul>
+      </div>
+
+      <div>
+        <p class="eyebrow">Portfolio</p>
+        <p class="section-hint">Stocks you're watching — add them from the search above.</p>
+        <ul class="journal-list" id="portfolio-list"></ul>
+      </div>
 
       <form class="journal-form" data-journal="markets">
         <input type="text" class="journal-input" placeholder="Add a note…" required />
@@ -639,6 +655,7 @@
   <script src="script.js"></script>
   <script src="news.js"></script>
   <script src="goals.js"></script>
+  <script src="markets.js"></script>
   <script src="fitness.js"></script>
   <script src="food.js"></script>
   <script src="water.js"></script>

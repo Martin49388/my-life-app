@@ -6,4 +6,7 @@
 window.APP_CONFIG = {
   FOODDATA_API_KEY: "",
   GEMINI_API_KEY: "",
+  // Free tier at finnhub.io — used for Markets' stock search + portfolio
+  // price lookup.
+  FINNHUB_API_KEY: "",
 };
