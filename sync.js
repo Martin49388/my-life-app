@@ -54,6 +54,16 @@ function setSyncStatus(text) {
   if (el) el.textContent = text;
 }
 
+// Postgres's jsonb column type does not preserve object key order (it
+// decomposes into its own canonical binary form), so a plain
+// JSON.stringify() comparison between what we pushed and what comes back
+// almost never matches even when the data is identical — that false
+// mismatch was wiping localStorage and reloading on every single open.
+// Sorting keys before comparing makes the check order-independent.
+function stableStringify(obj) {
+  return JSON.stringify(Object.keys(obj).sort().map((key) => [key, obj[key]]));
+}
+
 function schedulePush() {
   if (!supa || !config.id || applyingRemote) return;
   clearTimeout(pushTimer);
@@ -84,8 +94,8 @@ async function pullFromSupabase() {
     return;
   }
 
-  const remote = JSON.stringify(row.data);
-  const local = JSON.stringify(dumpLocalStorage());
+  const remote = stableStringify(row.data);
+  const local = stableStringify(dumpLocalStorage());
   if (remote === local) {
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
     return;

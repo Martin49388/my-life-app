@@ -121,6 +121,21 @@ proxy server.
 
 ## Next steps
 
+- Fixed a real bug found via a screen recording Martin sent (2026-09-13):
+  the app looked "glitchy" and unclickable every time it opened on his
+  phone. Root cause was in `pullFromSupabase()` (sync.js) — it compared
+  local vs. remote state with plain `JSON.stringify()`, but the remote
+  side comes from a Postgres `jsonb` column, and jsonb does not preserve
+  object key order (documented Postgres behavior — it decomposes into its
+  own canonical binary form). So the comparison almost never matched even
+  when the data was identical, which made every app open take the
+  "different device" branch: wipe `localStorage`, restore it, and
+  `location.reload()` — and since that reload re-triggers the same check
+  immediately, the page never settled. Fixed by sorting keys before
+  comparing (`stableStringify()` in sync.js). Confirms sync must have
+  already been configured with real credentials on Martin's phone even
+  though this file previously said pairing was still untested — worth
+  confirming with him.
 - Confirm Food lookup actually works in the browser (Alfred is now
   confirmed working, see above) — check the browser console for the
   exact error if it fails
