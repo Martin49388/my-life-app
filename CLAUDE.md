@@ -181,6 +181,51 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   desktop + 390px widths, light + dark, empty and no-key states; not
   yet seen against the real APIs.
 
+OVERVIEW / BLUEPRINT / NEWS REDESIGN (2026-09-15, same visual language as
+Markets; Martin said he'll spend most of his time on Overview). Shared
+pieces live in style.css under "Shared dashboard pieces": .live-pill
+(data-state live/next/loading/error/idle), .dash-hero, .dash-stats,
+.dash-block, the day timeline (.day-track) and plan rows (.plan-block).
+Green (--gain) is still Markets-only; these three are monochrome.
+- Overview (overview.js, rewritten): greeting + live now/next pill (from
+  the week plan), a segmented ring (one arc per standard, fills with
+  progress, solid when banked), four standard tiles updated in place so
+  bars animate (water tile has its own +250 ml button, training shows
+  this week's day dots), today's plan (timeline + check-off rows),
+  logged today, quote, a briefing (window.marketsSummary() +
+  window.newsSnapshot()) and goals in motion. Two columns above 980px.
+  Navigation is data-goto delegation on the section. The mini-overview
+  bar on other sections also shows the now/next pill (not on
+  Blueprint, which has its own). Re-renders once a minute. Food's "met"
+  rule (0 < kcal <= target) is unchanged, even though the target is a
+  3500 kcal surplus goal — worth revisiting with Martin.
+- Blueprint (blueprint.js, rewritten): plan helpers are shared globals
+  (planMinutes, planEntryEnd, planDayStatus, planStatusText,
+  buildDayTrack, planBlockRowHtml, setLivePill...). loadPlanDone /
+  togglePlanDone / PLAN_DONE_PREFIX MOVED here from overview.js.
+  Hero = total planned time this week; week strip of 7 tiles (tint =
+  load, each with a mini timeline) replaces the old day tabs; selected
+  day gets a timeline + rows with live Now/Up next/Done states. Blocks
+  with no end time count as 0 duration (planMinutes("") must be null,
+  not 0 — that bug briefly made them run to midnight). Its week strip
+  function is renderPlanWeekStrip — fitness.js already owns a global
+  renderWeekStrip and a same-named function would silently replace it.
+- News (news.js, rewritten): one merged timeline instead of four
+  columns — lead story with image, stats, 24h activity bars, region
+  filter chips with counts, rows with thumbnails grouped by day, "new
+  since your last visit" (news-last-seen in localStorage, advanced by
+  window.openNews() when the section opens; Overview's background
+  loadNews() doesn't advance it). FIXED a real bug: rss2json pubDate is
+  UTC without a zone marker (verified against BBC's raw GMT pubDate);
+  `new Date()` read it as local time (every story looked 2h older in
+  Prague) and older Safari can't parse that format at all —
+  parseNewsDate() now parses it as UTC. Images: BBC `thumbnail`,
+  ORF/iRozhlas `enclosure.link`, tagesschau has none (placeholder tile).
+  Feed text is decoded to plain text and always escaped.
+Verified in headless Chromium (Europe/Prague timezone, mocked feeds and
+quotes, seeded data) at desktop + 390px, light + dark, empty state;
+Habits and Fitness re-checked for regressions.
+
 Overview additionally shows Food's protein next to kcal, and a
 'Logged today' feed merging every timestamped entry from every
 journal-backed section (Blueprint/Review/Recovery/Mindset/Reading/

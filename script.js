@@ -378,7 +378,8 @@ function switchSection(requested) {
     const el = document.getElementById(`${s}-section`);
     if (el) el.hidden = s !== section;
   });
-  if (section === "news" && window.loadNews) window.loadNews();
+  if (section === "news" && window.openNews) window.openNews();
+  if (section === "blueprint" && window.renderBlueprint) window.renderBlueprint();
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
   if (section === "food" && window.renderFood) window.renderFood();

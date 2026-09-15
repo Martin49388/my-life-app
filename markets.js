@@ -678,7 +678,30 @@ async function refreshQuotes() {
   if (anySucceeded) mktLastUpdated = new Date();
   renderHero();
   renderUpdatedLabel();
+  if (window.renderBriefing) window.renderBriefing();
 }
+
+// Read-only summary for Overview's briefing card (overview.js).
+window.marketsSummary = function marketsSummary() {
+  const moves = portfolio
+    .map((p) => ({ symbol: p.symbol, dp: mktQuotes.get(p.symbol)?.dp }))
+    .filter((m) => Number.isFinite(m.dp))
+    .sort((a, b) => b.dp - a.dp);
+  const avg = moves.length ? moves.reduce((sum, m) => sum + m.dp, 0) / moves.length : null;
+  return {
+    watching: portfolio.length,
+    priced: moves.length,
+    avg,
+    up: moves.filter((m) => m.dp > 0).length,
+    down: moves.filter((m) => m.dp < 0).length,
+    best: moves[0] || null,
+    worst: moves.length > 1 ? moves[moves.length - 1] : null,
+    session: marketSession(),
+    hasKey: Boolean(finnhubKey()),
+    signed: mktSigned,
+    tone: mktTone,
+  };
+};
 
 // Live refresh: once a minute, only while Markets is actually on screen,
 // the tab is visible, and US trading (incl. pre/after hours) is happening.

@@ -65,54 +65,99 @@
     <div class="mini-overview" id="mini-overview" hidden></div>
 
     <section id="overview-section">
-      <header class="app-header">
-        <p class="eyebrow" id="overview-date">Overview</p>
-        <div class="stat-tiles">
-          <div class="stat-tile ring-tile">
-            <svg class="ring" viewBox="0 0 40 40" id="overview-ring">
-              <circle class="ring-track" cx="20" cy="20" r="17"></circle>
-              <circle class="ring-fill" cx="20" cy="20" r="17"></circle>
-            </svg>
-            <div class="ring-label">
-              <span class="stat-label">Banked</span>
-              <span class="stat-value stat-value-primary" id="overview-banked">0/0</span>
+      <header class="ov-header">
+        <div class="dash-topline">
+          <p class="eyebrow" id="overview-date">Overview</p>
+          <div class="dash-topline-actions">
+            <button type="button" class="live-pill" id="overview-pill" data-state="idle" data-goto="blueprint">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="overview-pill-label">Nothing planned today</span>
+              <span class="live-pill-detail" id="overview-pill-detail"></span>
+            </button>
+            <button type="button" class="quick-chip" data-overview-action="alfred">Ask Alfred</button>
+          </div>
+        </div>
+
+        <div class="ov-hero">
+          <div class="ov-ring-wrap">
+            <svg class="ov-ring" id="overview-ring" viewBox="0 0 120 120" aria-hidden="true"></svg>
+            <div class="ov-ring-center">
+              <span class="ov-ring-number" id="overview-banked">0/4</span>
+              <span class="stat-label">banked</span>
             </div>
           </div>
-          <div class="stat-tile stat-tile-muted">
-            <span class="stat-label">Best streak</span>
-            <span class="stat-value" id="overview-best-streak">0d</span>
+          <div class="ov-hero-text">
+            <h1 class="ov-greeting" id="overview-greeting">Hello.</h1>
+            <p class="overview-status" id="overview-status"></p>
+            <div class="dash-stats">
+              <div class="dash-stat">
+                <span class="stat-label">Best streak</span>
+                <span class="dash-stat-value" id="overview-best-streak">0d</span>
+              </div>
+              <div class="dash-stat">
+                <span class="stat-label">Perfect days</span>
+                <span class="dash-stat-value" id="overview-perfect">0</span>
+              </div>
+              <div class="dash-stat">
+                <span class="stat-label">Logged today</span>
+                <span class="dash-stat-value" id="overview-logged-count">0</span>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <p class="overview-status" id="overview-status"></p>
+      <div class="ov-tiles" id="overview-standards"></div>
 
-      <div>
-        <p class="eyebrow">Quote of the day</p>
-        <button type="button" class="quote-of-day" id="overview-quote-btn">
-          <p class="quote-of-day-text" id="overview-quote-text">Loading…</p>
-          <p class="quote-of-day-author" id="overview-quote-author"></p>
-        </button>
-      </div>
+      <div class="ov-grid">
+        <div class="ov-col">
+          <div class="dash-block">
+            <div class="dash-block-head">
+              <p class="eyebrow">Today's plan</p>
+              <button type="button" class="dash-link" data-goto="blueprint">Edit in Blueprint &rarr;</button>
+            </div>
+            <p class="dash-block-summary" id="overview-plan-summary"></p>
+            <div id="overview-plan-track"></div>
+            <ul class="plan-list" id="overview-plan"></ul>
+          </div>
 
-      <div>
-        <p class="eyebrow">Standards</p>
-        <ul class="journal-list" id="overview-standards"></ul>
-      </div>
+          <div class="dash-block">
+            <div class="dash-block-head">
+              <p class="eyebrow">Logged today</p>
+            </div>
+            <ul class="ov-log" id="overview-today-log"></ul>
+          </div>
+        </div>
 
-      <div class="overview-actions">
-        <button type="button" class="quick-chip" data-overview-action="water">+250ml water</button>
-        <button type="button" class="quick-chip" data-overview-action="alfred">Ask Alfred</button>
-      </div>
+        <div class="ov-col">
+          <div class="dash-block">
+            <div class="dash-block-head">
+              <p class="eyebrow">Quote of the day</p>
+            </div>
+            <button type="button" class="quote-of-day" id="overview-quote-btn">
+              <p class="quote-of-day-text" id="overview-quote-text">Loading…</p>
+              <p class="quote-of-day-author" id="overview-quote-author"></p>
+            </button>
+          </div>
 
-      <div>
-        <p class="eyebrow">Today's plan</p>
-        <ul class="journal-list" id="overview-plan"></ul>
-      </div>
+          <div class="dash-block">
+            <div class="dash-block-head">
+              <p class="eyebrow">Briefing</p>
+            </div>
+            <div class="ov-brief">
+              <button type="button" class="ov-brief-card" id="overview-brief-markets" data-goto="markets"></button>
+              <button type="button" class="ov-brief-card" id="overview-brief-news" data-goto="news"></button>
+            </div>
+          </div>
 
-      <div>
-        <p class="eyebrow">Logged today</p>
-        <ul class="journal-list" id="overview-today-log"></ul>
+          <div class="dash-block">
+            <div class="dash-block-head">
+              <p class="eyebrow">Goals in motion</p>
+              <button type="button" class="dash-link" data-goto="goals">All goals &rarr;</button>
+            </div>
+            <ul class="ov-goals" id="overview-goals"></ul>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -172,28 +217,48 @@
     </section>
 
     <section id="news-section" hidden>
-      <header class="app-header">
-        <p class="eyebrow">headlines, last 48h</p>
-        <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
+      <header class="dash-header">
+        <div class="dash-topline">
+          <p class="eyebrow">news</p>
+          <div class="dash-topline-actions">
+            <span class="live-pill" id="news-pill" data-state="idle">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="news-pill-label">Not loaded</span>
+              <span class="live-pill-detail" id="news-pill-detail"></span>
+            </span>
+            <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
+          </div>
+        </div>
+
+        <a class="news-lead" id="news-lead" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <span class="stat-label">Last 24h</span>
+            <span class="dash-stat-value" id="news-stat-24h">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">New since visit</span>
+            <span class="dash-stat-value" id="news-stat-new">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">Newest</span>
+            <span class="dash-stat-value" id="news-stat-newest">—</span>
+          </div>
+        </div>
       </header>
 
-      <div class="news-grid">
-        <div class="news-column">
-          <h2 class="news-col-title">World</h2>
-          <ul class="news-list" id="news-world"></ul>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Last 24 hours</p>
+          <span class="journal-time" id="news-pulse-caption"></span>
         </div>
-        <div class="news-column">
-          <h2 class="news-col-title">Germany</h2>
-          <ul class="news-list" id="news-germany"></ul>
-        </div>
-        <div class="news-column">
-          <h2 class="news-col-title">Austria</h2>
-          <ul class="news-list" id="news-austria"></ul>
-        </div>
-        <div class="news-column">
-          <h2 class="news-col-title">Czechia</h2>
-          <ul class="news-list" id="news-czechia"></ul>
-        </div>
+        <div class="news-pulse" id="news-pulse"></div>
+      </div>
+
+      <div class="dash-block">
+        <div class="news-filters" id="news-filters"></div>
+        <ul class="news-list" id="news-list"></ul>
       </div>
     </section>
 
@@ -461,34 +526,67 @@
     </section>
 
     <section id="blueprint-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">blueprint</p>
-        <p class="section-hint">Sketch the plan — outline, structure, direction. Short entries, most recent first.</p>
+      <header class="dash-header">
+        <div class="dash-topline">
+          <p class="eyebrow">blueprint</p>
+          <button type="button" class="live-pill" id="blueprint-pill" data-state="idle">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="live-pill-label" id="blueprint-pill-label">Nothing planned today</span>
+            <span class="live-pill-detail" id="blueprint-pill-detail"></span>
+          </button>
+        </div>
+
+        <div class="dash-hero">
+          <div>
+            <p class="dash-hero-number" id="blueprint-hero-number">—</p>
+            <p class="dash-hero-caption" id="blueprint-hero-caption"></p>
+          </div>
+          <div class="dash-stats">
+            <div class="dash-stat">
+              <span class="stat-label">Today</span>
+              <span class="dash-stat-value" id="blueprint-stat-today">—</span>
+            </div>
+            <div class="dash-stat">
+              <span class="stat-label">Done today</span>
+              <span class="dash-stat-value" id="blueprint-stat-done">—</span>
+            </div>
+            <div class="dash-stat">
+              <span class="stat-label">Busiest</span>
+              <span class="dash-stat-value" id="blueprint-stat-busiest">—</span>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <div class="week-plan">
-        <p class="eyebrow">Week plan</p>
-        <p class="section-hint">One schedule per weekday — Overview shows today's automatically.</p>
+      <div class="week-strip" id="week-plan-days"></div>
 
-        <div class="week-plan-days" id="week-plan-days"></div>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow" id="plan-day-title">Today</p>
+          <span class="journal-time" id="plan-day-summary"></span>
+        </div>
+        <div id="plan-day-track"></div>
+        <ul class="plan-list" id="week-plan-list"></ul>
 
         <form id="plan-entry-form">
-          <input type="time" id="plan-start" required />
-          <input type="time" id="plan-end" />
+          <input type="time" id="plan-start" aria-label="Start time" required />
+          <span class="plan-form-dash" aria-hidden="true">–</span>
+          <input type="time" id="plan-end" aria-label="End time (optional)" />
           <input type="text" id="plan-title" placeholder="What happens…" required />
-          <button type="submit">Add</button>
+          <button type="submit" id="plan-add-btn">Add</button>
         </form>
-
-        <ul class="journal-list" id="week-plan-list"></ul>
+        <p class="section-hint">One schedule per weekday — Overview follows today's automatically.</p>
       </div>
 
-      <div>
-        <p class="eyebrow">Notes</p>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Notes</p>
+        </div>
+        <p class="section-hint">Sketch the plan — outline, structure, direction. Short entries, most recent first.</p>
         <form class="journal-form" data-journal="blueprint">
           <input type="text" class="journal-input" placeholder="Add a note…" required />
           <button type="submit">Add</button>
         </form>
-
         <ul class="journal-list" id="blueprint-journal-list"></ul>
       </div>
     </section>
