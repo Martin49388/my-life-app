@@ -44,10 +44,10 @@ async function generateTodayQuote() {
   generatingQuote = true;
   renderQuoteOfDay();
 
-  const key = window.APP_CONFIG && window.APP_CONFIG.GEMINI_API_KEY;
+  const key = geminiKey(); // defined in alfred.js, which loads before this file
   if (!key) {
     generatingQuote = false;
-    renderQuoteOfDay("No Gemini key set in config.js — add GEMINI_API_KEY there first.");
+    renderQuoteOfDay("No Gemini key set — add one in Settings under Alfred (AI).");
     return;
   }
 

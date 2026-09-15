@@ -198,14 +198,20 @@ would've hit an invisible overlay instead.
 
 Client-side API keys are a deliberate tradeoff — no backend exists,
 personal non-public use case, accepted over adding a proxy server. WHERE
-they live matters though (see Markets' history below): config.js is
+they live matters though (see Markets' history above): config.js is
 gitignored, so a key pasted there only exists on whichever single machine
 someone edited it on — invisible to any other device, including the live
-GitHub Pages link Martin's phone actually opens. Markets' Finnhub key was
-moved to Settings/localStorage for exactly this reason. FOODDATA_API_KEY
-and GEMINI_API_KEY are still config.js-only as of this writing, so Food's
-lookup and Alfred likely have this same latent gap on Martin's phone —
-untested, flagged here rather than assumed fixed.
+GitHub Pages link Martin's phone actually opens. Markets' Finnhub/Twelve
+Data keys were the first to move to Settings/localStorage for exactly
+this reason; GEMINI_API_KEY (Settings -> "Alfred (AI)", shared by Alfred
+and quotes.js's daily quote — see `geminiKey()` in alfred.js) and
+FOODDATA_API_KEY (Settings -> "Food lookup", see `foodDataKey()` in
+food.js) followed the same pattern once Martin asked for it directly.
+Every client-side key in the app now lives in Settings/localStorage, not
+config.js — config.js is only ever a local-dev fallback at this point,
+never the primary path for any of them. Verified each of Alfred and Food
+lookup working end-to-end from a Settings-saved key alone, config.js
+values deliberately cleared first to simulate the live-site case.
 
 ## Next steps
 

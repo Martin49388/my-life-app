@@ -1,3 +1,15 @@
+// The FoodData Central key lives in Settings -> "Food lookup", stored per
+// device in localStorage — NOT config.js. config.js is gitignored, so a
+// key pasted there only ever exists on whichever single machine someone
+// edited it on, invisible to any other device (a phone opening the live
+// GitHub Pages link, for instance). Same reasoning, same fix, as Markets'
+// and Alfred's keys — see CLAUDE.md for the fuller story.
+const FOODDATA_KEY_STORAGE = "fooddata-api-key";
+
+function foodDataKey() {
+  return localStorage.getItem(FOODDATA_KEY_STORAGE) || (window.APP_CONFIG && window.APP_CONFIG.FOODDATA_API_KEY) || "";
+}
+
 const FOOD_KEY = "food";
 const MEALS = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 const MAX_QUICK_ADD = 8;
@@ -334,13 +346,13 @@ const foodForm = document.getElementById("add-food-form");
 const foodLookupBtn = document.getElementById("food-lookup-btn");
 const foodLookupResults = document.getElementById("food-lookup-results");
 
-// FoodData Central (USDA) — free-tier nutrition lookup. Client-side key,
-// see config.js/config.example.js for why (no backend in this app).
+// FoodData Central (USDA) — free-tier nutrition lookup. Client-side key
+// (no backend in this app) — see foodDataKey() above for where it lives.
 async function lookupFood(query) {
-  const key = window.APP_CONFIG && window.APP_CONFIG.FOODDATA_API_KEY;
+  const key = foodDataKey();
   foodLookupResults.innerHTML = "";
   if (!key) {
-    foodLookupResults.innerHTML = `<li class="food-lookup-empty">No FoodData Central key set in config.js.</li>`;
+    foodLookupResults.innerHTML = `<li class="food-lookup-empty">No FoodData Central key set — add one in Settings under Food lookup.</li>`;
     foodLookupResults.hidden = false;
     return;
   }
@@ -420,3 +432,24 @@ foodForm.addEventListener("submit", (e) => {
   foodForm.hidden = true;
   foodToggleBtn.hidden = false;
 });
+
+const foodDataForm = document.getElementById("fooddata-config-form");
+const foodDataInput = document.getElementById("fooddata-key-input");
+const foodDataKeyStatus = document.getElementById("fooddata-key-status");
+
+function renderFoodDataKeyStatus() {
+  const key = localStorage.getItem(FOODDATA_KEY_STORAGE);
+  foodDataInput.value = key || "";
+  foodDataKeyStatus.textContent = key ? "Key saved on this device." : "Not set on this device";
+}
+
+if (foodDataForm) {
+  foodDataForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = foodDataInput.value.trim();
+    if (value) localStorage.setItem(FOODDATA_KEY_STORAGE, value);
+    else localStorage.removeItem(FOODDATA_KEY_STORAGE);
+    renderFoodDataKeyStatus();
+  });
+  renderFoodDataKeyStatus();
+}

@@ -627,6 +627,40 @@
       </div>
 
       <div class="settings-block">
+        <p class="settings-title">Alfred (AI)</p>
+        <p class="section-hint">
+          Free API key from Google AI Studio, for Alfred and the daily
+          Quote of the day. Stored on this device only — paste it again on
+          any other device you use (like your phone).
+        </p>
+
+        <form id="gemini-config-form" class="settings-form">
+          <input type="password" id="gemini-key-input" placeholder="Gemini API key" autocomplete="off" />
+          <div class="account-actions">
+            <button type="submit" id="gemini-save-btn">Save</button>
+          </div>
+        </form>
+        <p class="account-status" id="gemini-key-status">Not set on this device</p>
+      </div>
+
+      <div class="settings-block">
+        <p class="settings-title">Food lookup</p>
+        <p class="section-hint">
+          Free API key from FoodData Central (USDA), for the nutrition
+          lookup in Food. Stored on this device only — paste it again on
+          any other device you use (like your phone).
+        </p>
+
+        <form id="fooddata-config-form" class="settings-form">
+          <input type="password" id="fooddata-key-input" placeholder="FoodData Central API key" autocomplete="off" />
+          <div class="account-actions">
+            <button type="submit" id="fooddata-save-btn">Save</button>
+          </div>
+        </form>
+        <p class="account-status" id="fooddata-key-status">Not set on this device</p>
+      </div>
+
+      <div class="settings-block">
         <p class="settings-title">Markets stock lookup</p>
         <p class="section-hint">
           Free API keys, for the stock search/portfolio and the price chart
@@ -642,9 +676,10 @@
           </div>
         </form>
         <p class="account-status" id="finnhub-key-status">Not set on this device</p>
+      </div>
 
+      <div class="settings-block">
         <div class="settings-divider"></div>
-
         <p class="settings-version">BatCave &middot; Prototype 1</p>
       </div>
     </section>

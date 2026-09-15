@@ -1,8 +1,21 @@
 // Alfred: reads today's real data across the app and answers via the
 // Gemini API. Blunt tone (Martin's choice) — state what did/didn't
 // happen, don't cushion it. Client-side key, see config.js for why.
+//
+// The Gemini key lives in Settings -> "Alfred (AI)", stored per device in
+// localStorage — NOT config.js. config.js is gitignored, so a key pasted
+// there only ever exists on whichever single machine someone edited it
+// on, invisible to any other device (a phone opening the live GitHub
+// Pages link, for instance). Same reasoning, same fix, as Markets' keys —
+// see CLAUDE.md for the fuller story. quotes.js reads GEMINI_API_KEY the
+// same way, via geminiKey() below (this file loads first).
 
 const ALFRED_LOG_KEY = "alfred-log";
+const GEMINI_KEY_STORAGE = "gemini-api-key";
+
+function geminiKey() {
+  return localStorage.getItem(GEMINI_KEY_STORAGE) || (window.APP_CONFIG && window.APP_CONFIG.GEMINI_API_KEY) || "";
+}
 
 function loadAlfredLog() {
   const raw = localStorage.getItem(ALFRED_LOG_KEY);
@@ -55,9 +68,9 @@ function buildDailyContext() {
 }
 
 async function askAlfred(question) {
-  const key = window.APP_CONFIG && window.APP_CONFIG.GEMINI_API_KEY;
+  const key = geminiKey();
   if (!key) {
-    return "No Gemini key set in config.js — add GEMINI_API_KEY there first.";
+    return "No Gemini key set — add one in Settings under Alfred (AI).";
   }
 
   const systemInstruction =
@@ -142,3 +155,24 @@ document.getElementById("alfred-form").addEventListener("submit", (e) => {
 });
 
 renderAlfredLog();
+
+const geminiForm = document.getElementById("gemini-config-form");
+const geminiInput = document.getElementById("gemini-key-input");
+const geminiKeyStatus = document.getElementById("gemini-key-status");
+
+function renderGeminiKeyStatus() {
+  const key = localStorage.getItem(GEMINI_KEY_STORAGE);
+  geminiInput.value = key || "";
+  geminiKeyStatus.textContent = key ? "Key saved on this device." : "Not set on this device";
+}
+
+if (geminiForm) {
+  geminiForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = geminiInput.value.trim();
+    if (value) localStorage.setItem(GEMINI_KEY_STORAGE, value);
+    else localStorage.removeItem(GEMINI_KEY_STORAGE);
+    renderGeminiKeyStatus();
+  });
+  renderGeminiKeyStatus();
+}
