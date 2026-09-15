@@ -2664,6 +2664,16 @@ body {
   display: none;
 }
 
+/* Same class of bug as above: .settings-form sets display:flex, which as
+   an author rule beats the browser's built-in [hidden]{display:none} UA
+   rule at equal specificity. Without this, sync's three step blocks
+   (email/code/signed-in) all show at once regardless of showStep(). */
+#sync-email-form[hidden],
+#sync-code-form[hidden],
+#sync-account-block[hidden] {
+  display: none;
+}
+
 .modal-card {
   position: relative;
   width: min(440px, 100%);
