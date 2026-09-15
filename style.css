@@ -2674,9 +2674,15 @@ body {
   display: none;
 }
 
+#settings-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .sync-badge {
   display: inline-block;
-  margin-top: 8px;
   padding: 5px 12px;
   border-radius: 999px;
   background: var(--accent);
