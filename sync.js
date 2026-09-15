@@ -85,6 +85,11 @@ function setSyncStatus(text) {
   if (el) el.textContent = text;
 }
 
+function setSynced(isSynced) {
+  const badge = document.getElementById("sync-badge");
+  if (badge) badge.hidden = !isSynced;
+}
+
 // Postgres's jsonb column type does not preserve object key order (it
 // decomposes into its own canonical binary form), so a plain
 // JSON.stringify() comparison between what we pushed and what comes back
@@ -103,15 +108,18 @@ function schedulePush() {
 async function pushToSupabase() {
   if (!supa || !session) return;
   setSyncStatus("Syncing…");
+  setSynced(false);
   const { error } = await supa
     .from("app_state")
     .upsert({ user_id: session.user.id, data: dumpLocalStorage(), updated_at: new Date().toISOString() });
   setSyncStatus(error ? `Sync failed: ${error.message}` : `Synced ${new Date().toLocaleTimeString()}`);
+  setSynced(!error);
 }
 
 async function pullFromSupabase() {
   if (!supa || !session) return;
   setSyncStatus("Checking for updates…");
+  setSynced(false);
   const { data: row, error } = await supa
     .from("app_state")
     .select("data")
@@ -134,6 +142,7 @@ async function pullFromSupabase() {
   if (remote === local) {
     syncReady = true;
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
+    setSynced(true);
     return;
   }
 
@@ -274,6 +283,7 @@ async function initSync() {
   } else {
     showStep("email");
     setSyncStatus("Not signed in");
+    setSynced(false);
   }
 
   supa.auth.onAuthStateChange((event, newSession) => {
@@ -285,6 +295,7 @@ async function initSync() {
     } else if (event === "SIGNED_OUT") {
       showStep("email");
       setSyncStatus("Not signed in");
+      setSynced(false);
     }
   });
 
