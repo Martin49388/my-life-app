@@ -45,6 +45,19 @@ let session = null;
 let pushTimer = null;
 let applyingRemote = false; // guards against re-pushing what we just pulled
 
+// A brand-new sign-in kicks off an async pull (a network round trip) to
+// fetch whatever's already synced. Until that first pull actually
+// resolves, this device's own localStorage may still hold its own
+// pre-merge state (its previous local-only data, or defaults other
+// modules write in on page load) — not yet reconciled with the server.
+// If a push were allowed to fire during that window (it only takes the
+// 1.5s debounce below, often faster than the pull's round trip), it
+// would upload that unmerged state and silently clobber whatever the
+// other device had already synced. This gate blocks every push until
+// the first pull after sign-in has completed and confirmed the local
+// and remote copies actually agree (or seeded the remote row itself).
+let syncReady = false;
+
 function dumpLocalStorage() {
   const obj = {};
   for (let i = 0; i < localStorage.length; i++) {
@@ -70,7 +83,7 @@ function stableStringify(obj) {
 }
 
 function schedulePush() {
-  if (!supa || !session || applyingRemote) return;
+  if (!supa || !session || applyingRemote || !syncReady) return;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushToSupabase, 1500);
 }
@@ -99,6 +112,7 @@ async function pullFromSupabase() {
   }
   if (!row || !row.data) {
     setSyncStatus("No synced data yet for this account — this device's data will upload shortly.");
+    syncReady = true;
     schedulePush();
     return;
   }
@@ -106,6 +120,7 @@ async function pullFromSupabase() {
   const remote = stableStringify(row.data);
   const local = stableStringify(dumpLocalStorage());
   if (remote === local) {
+    syncReady = true;
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
     return;
   }
