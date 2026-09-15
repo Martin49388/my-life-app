@@ -389,11 +389,19 @@ function switchSection(requested) {
   if (miniBar) miniBar.hidden = section === "overview";
   playTabEnter(document.getElementById(`${section}-section`));
 
+  const changed = window.currentSection !== requested;
+  window.currentSection = requested;
   if (requested === "water") {
     document.querySelector(".water-widget")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  } else if (changed) {
+    // A new section starts at its top, not wherever the last one was scrolled to.
+    window.scrollTo(0, 0);
   }
+  // Lets the phone navigation (mobile-nav.js) follow along.
+  if (window.onSectionChange) window.onSectionChange(requested);
 }
 window.switchSection = switchSection;
+window.currentSection = "overview";
 
 document.querySelectorAll(".section-btn").forEach((btn) => {
   btn.addEventListener("click", () => switchSection(btn.dataset.section));

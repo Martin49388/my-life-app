@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>BatCave</title>
 
   <link rel="manifest" href="manifest.json" />
@@ -23,6 +23,15 @@
 </head>
 <body>
   <main class="app">
+    <!-- Phone only (<=640px): slim app header. Desktop uses the sidebar. -->
+    <header class="m-header" id="m-header">
+      <button type="button" class="m-header-title" id="m-header-title" aria-label="Scroll to top">
+        <img src="icons/brand-mark.png" alt="" class="m-header-mark" />
+        <span id="m-header-label">Overview</span>
+      </button>
+      <button type="button" class="sync-badge m-sync-badge" data-nav-goto="settings" hidden>Synced</button>
+    </header>
+
     <div class="layout">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -830,10 +839,37 @@
     </div>
   </main>
 
+  <!-- On desktop this is the persistent bottom bar. On the phone it's the
+       "Ask" sheet opened from the tab bar's center button (mobile-nav.js). -->
   <form id="global-bar" autocomplete="off">
-    <input type="text" id="global-bar-input" placeholder="Log, ask, or restructure…" required />
-    <button type="submit">Send</button>
+    <div class="sheet-handle global-bar-handle" aria-hidden="true"><span></span></div>
+    <div class="global-bar-head">
+      <p class="global-bar-title">Ask Alfred</p>
+      <p class="global-bar-hint">Log something, ask anything — Alfred reads today's data.</p>
+    </div>
+    <div class="global-bar-row">
+      <input type="text" id="global-bar-input" placeholder="Log, ask, or restructure…" enterkeyhint="send" required />
+      <button type="submit">Send</button>
+    </div>
+    <div class="global-bar-prompts">
+      <button type="button" class="global-bar-prompt">How's today looking?</button>
+      <button type="button" class="global-bar-prompt">What should I focus on next?</button>
+      <button type="button" class="global-bar-prompt">How did my week go?</button>
+    </div>
   </form>
+
+  <!-- Phone only: bottom tab bar + "More" sheet (mobile-nav.js). -->
+  <nav class="m-tabbar" id="m-tabbar" aria-label="Sections"></nav>
+  <div class="m-scrim" id="m-scrim" hidden></div>
+  <section class="m-sheet" id="m-more-sheet" role="dialog" aria-modal="true" aria-labelledby="m-more-title" inert>
+    <div class="sheet-handle" aria-hidden="true"><span></span></div>
+    <div class="m-sheet-head">
+      <p class="m-sheet-title" id="m-more-title">All sections</p>
+      <button type="button" class="m-sheet-edit" id="m-more-edit">Edit tabs</button>
+    </div>
+    <p class="m-sheet-hint" id="m-more-hint" hidden>Tap the two sections you want in the tab bar.</p>
+    <div class="m-sheet-body" id="m-more-body"></div>
+  </section>
 
   <div class="modal-overlay" id="quote-modal-overlay" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="quote-modal-text">
@@ -899,5 +935,6 @@
   <script src="overview.js"></script>
   <script src="glance.js"></script>
   <script src="global-bar.js"></script>
+  <script src="mobile-nav.js"></script>
 </body>
 </html>

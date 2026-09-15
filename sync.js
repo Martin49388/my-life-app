@@ -85,9 +85,11 @@ function setSyncStatus(text) {
   if (el) el.textContent = text;
 }
 
+// Every .sync-badge: the sidebar's (desktop) and the phone header's.
 function setSynced(isSynced) {
-  const badge = document.getElementById("sync-badge");
-  if (badge) badge.hidden = !isSynced;
+  document.querySelectorAll(".sync-badge").forEach((badge) => {
+    badge.hidden = !isSynced;
+  });
 }
 
 // Postgres's jsonb column type does not preserve object key order (it

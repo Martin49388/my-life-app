@@ -24,9 +24,8 @@ done, each its own commit:
    `.brand-header` (logo/gear icon) are gone. All navigation and branding
    now live in one place: `.sidebar` (pure nav — brand name/tag, grouped
    links). Settings is a normal nav item now, opening a full section
-   like any other, not an inline panel. Under 640px the sidebar becomes a
-   horizontal scrollable bar instead of disappearing, since it's the only
-   nav now.
+   like any other, not an inline panel. (Under 640px the sidebar is
+   now hidden in favor of a bottom tab bar — see Layout below.)
 2. **Typography pass** — font weights across the app dropped from a flat
    600-800 to mostly 400-500, with a few intentional exceptions
    (`.nav-link.active`, `.news-col-title`, `.horizon-node.active
@@ -58,8 +57,25 @@ similar app (his friend's). No more centered max-width card with gutters
 on either side. Above 640px: a full-height sidebar (260px, sticky, its own
 scroll) flush against the left edge, divided from content by a single
 right-hand hairline; content fills the rest of the width with its own
-padding. Under 640px: sidebar collapses to a horizontal scrollable nav
-strip at the top, content full-width below it.
+padding. Under 640px (phone, REDESIGNED 2026-09-15 — Martin disliked the old
+sideways-scrolling top nav strip): the sidebar is hidden and mobile-nav.js
+takes over with an iOS-style shell — a sticky header (section name + sync
+badge; tap to scroll up), a fixed bottom tab bar (Home, two sections
+Martin picks, a raised center "Ask Alfred" button, More), a "More" bottom
+sheet with every section as a tile + live one-line status (and an "Edit
+tabs" mode; choice stored in localStorage `nav-tabs`), and the desktop's
+#global-bar form restyled as an "Ask" bottom sheet with prompt chips,
+lifted above the iOS keyboard via visualViewport (`--kb` CSS var).
+Sheets close on scrim tap, Escape, or swipe-down on the handle.
+viewport-fit=cover is on, so header/tab bar pad with env(safe-area-*).
+Inputs are forced to 16px on phones so iOS doesn't zoom on focus.
+switchSection() now scrolls to top on a real section change, records
+window.currentSection, and calls window.onSectionChange (the nav hook).
+setSynced() in sync.js updates every .sync-badge (sidebar + header).
+Desktop is unchanged — all of this is display:none above 640px.
+Verified in headless Chromium at 390px (touch) and 1280px, light/dark,
+including resizing across the breakpoint; not yet tried on a real iPhone
+(keyboard lift and safe areas are the parts most worth checking).
 
 Sidebar now has 13 sections in 4 groups: Habits/Goals/Alfred/Blueprint/
 Review, Body (Fitness/Food/Water/Recovery), Mind (Mindset/Reading),
