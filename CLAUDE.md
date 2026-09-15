@@ -233,24 +233,33 @@ values deliberately cleared first to simulate the live-site case.
 - Confirm Food lookup actually works in the browser (Alfred is now
   confirmed working, see above) — check the browser console for the
   exact error if it fails
-- Sync (sync.js) — rebuilt a second time, dropping auth entirely. The
-  original email/password version (via Supabase Auth) kept hitting real
-  friction: unconfirmed-email accounts, "invalid login credentials" from
-  password typos across devices, and password-reset emails linking to
-  Supabase's default localhost:3000 Site URL instead of the live app
-  (dashboard-only setting, never fixed). Current version: no accounts at
-  all. Settings -> "Cross-device sync" has three fields — Supabase
-  project URL, anon/publishable key, and a random "Sync ID" (generate
-  once, paste the same one into every other device). All devices with
-  the same three values read/write one shared row in `app_state`, keyed
-  by `sync_id` instead of an authenticated `user_id`. Still the same
-  localStorage.setItem monkey-patch + debounced push/pull underneath;
-  see SUPABASE.md for the schema/policies and pairing steps. Same
-  accepted tradeoff as before, now explicit: no real per-row security,
-  just an unguessable Sync ID — fine for one person's own devices.
-  STILL NEEDS: Martin has to run SUPABASE.md's SQL (replaces the old
-  user_id-based table) and actually pair two real devices — untested
-  past confirming the code loads without errors.
+- Sync (sync.js) — rebuilt a third time (2026-09-15), back to Supabase
+  Auth, but email-only this time: no password field exists anywhere in
+  the app, so the password-typo and password-reset failure modes from
+  attempt #1 can't recur. Settings -> "Cross-device sync" just asks for
+  an email; Supabase emails a 6-digit code (`{{ .Token }}` added to the
+  Magic Link template — see SUPABASE.md step 3) and `verifyOtp()` takes
+  it straight from what the user types, so there's no clickable link and
+  no Site-URL/redirect setting to misconfigure either — that was attempt
+  #1's other failure mode. `app_state` is now keyed by `user_id`
+  (references `auth.users`, RLS restricted to `auth.uid() = user_id`),
+  a real improvement over attempt #2's Sync-ID scheme, which had no
+  per-user access control at all. Supabase project URL + anon key are
+  now hardcoded constants at the top of sync.js (committed, not
+  config.js) rather than typed into Settings per device — same fix as
+  the Finnhub/TwelveData key issue above (a gitignored/per-device value
+  silently never reaches the phone's GitHub Pages copy), and safe to
+  commit since the anon key was never the actual access control, RLS is.
+  Same localStorage.setItem monkey-patch + debounced push/pull
+  underneath, careful this time to never sync or wipe the `sb-*`
+  keys Supabase's own client uses to persist the session (attempt #2's
+  pull-and-reload logic would otherwise sign every device back out on
+  its first sync). STILL NEEDS: Martin has to (1) create/reuse a
+  Supabase project and paste its URL + anon key into sync.js, (2) run
+  SUPABASE.md's SQL, (3) add `{{ .Token }}` to the Magic Link email
+  template, (4) commit + push + wait for Pages to rebuild, (5) sign in
+  with the same email on both real devices — untested past confirming
+  the code loads without errors.
 - Dead CSS cleanup — grown across passes, still deferred: the removed
   color-picker's swatch/intensity selectors; `.glance-tile`/`.glance-label`
   etc. (glance.js's target `#sidebar-content` was removed from the HTML in

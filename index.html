@@ -607,23 +607,35 @@
       <div class="settings-block">
         <p class="settings-title">Cross-device sync</p>
         <p class="section-hint">
-          Everything — habits, goals, fitness, food, journals, the week plan —
-          through your own free Supabase project. Paste the same three
-          values on every device. Setup is in SUPABASE.md in the repo.
+          Sign in with your email to sync everything — habits, goals,
+          fitness, food, journals, the week plan — across every device.
+          No password: a one-time code goes to your inbox, you type it
+          in, done. Setup is in SUPABASE.md in the repo.
         </p>
 
-        <form id="sync-config-form" class="settings-form">
-          <input type="url" id="sync-url" placeholder="Supabase project URL" autocomplete="off" />
-          <input type="password" id="sync-key" placeholder="Supabase anon/publishable key" autocomplete="off" />
-          <div class="sync-id-row">
-            <input type="text" id="sync-id" placeholder="Sync ID (same on every device)" autocomplete="off" />
-            <button type="button" id="sync-generate-btn">Generate</button>
-          </div>
+        <form id="sync-email-form" class="settings-form">
+          <input type="email" id="sync-email" placeholder="you@example.com" autocomplete="email" />
           <div class="account-actions">
-            <button type="submit" id="sync-save-btn">Sync now</button>
+            <button type="submit" id="sync-email-btn">Send code</button>
           </div>
         </form>
-        <p class="account-status" id="sync-status">Not connected yet</p>
+
+        <form id="sync-code-form" class="settings-form" hidden>
+          <input type="text" id="sync-code" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" />
+          <div class="account-actions">
+            <button type="submit" id="sync-code-btn">Verify</button>
+            <button type="button" id="sync-code-cancel-btn">Use a different email</button>
+          </div>
+        </form>
+
+        <div id="sync-account-block" class="settings-form" hidden>
+          <p class="account-status" id="sync-account-email"></p>
+          <div class="account-actions">
+            <button type="button" id="sync-signout-btn">Sign out</button>
+          </div>
+        </div>
+
+        <p class="account-status" id="sync-status">Not signed in</p>
       </div>
 
       <div class="settings-block">
