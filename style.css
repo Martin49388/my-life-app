@@ -11,6 +11,7 @@
   --accent-ink: #f4f4f4;
   --track: #d8d8d8;
   --danger: #b8402f;
+  --gain: #25784a;
   --shadow: none;
 }
 
@@ -28,6 +29,7 @@
     --accent-ink: #0a0a0a;
     --track: #1c1c1c;
     --danger: #e0685a;
+    --gain: #4fbf7f;
     --shadow: none;
   }
 }
@@ -44,6 +46,7 @@
   --accent-ink: #0a0a0a;
   --track: #1c1c1c;
   --danger: #e0685a;
+  --gain: #4fbf7f;
   --shadow: none;
 }
 
@@ -2747,7 +2750,31 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* Markets: stock search + portfolio watchlist — see markets.js. */
+/* ------------------------------------------------------------------------
+   Markets — live watchlist dashboard, see markets.js.
+   Markets is the one section that uses a green "gain" color (--gain), since
+   up vs. down is the whole point here; red reuses --danger like everywhere
+   else. Still flat: tints via color-mix, no shadows or gradients.
+   ------------------------------------------------------------------------ */
+
+#markets-section:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Every element below that JS toggles with `hidden` sets its own display,
+   and author display rules beat the browser's [hidden]{display:none} (see
+   .modal-overlay[hidden] above) — so hide them explicitly. */
+.stock-chip[hidden],
+.stock-chart-head[hidden],
+.stock-range[hidden],
+.chart-cursor[hidden],
+.chart-dot[hidden],
+.chart-tip[hidden] {
+  display: none;
+}
+
 .external-link {
   font-size: 12px;
   color: var(--text-dim);
@@ -2761,6 +2788,245 @@ body {
   border-bottom-color: var(--text);
 }
 
+/* Header ------------------------------------------------------------- */
+
+.markets-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.markets-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.market-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.market-status-label {
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.market-status-detail {
+  color: var(--text-faint);
+}
+
+.market-status-detail:empty {
+  display: none;
+}
+
+.market-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.market-status[data-state="open"] .market-dot {
+  background: var(--gain);
+}
+
+.market-status[data-state="pre"] .market-dot,
+.market-status[data-state="post"] .market-dot {
+  background: var(--gain);
+  opacity: 0.5;
+}
+
+.market-status[data-state="open"] .market-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gain);
+  opacity: 0;
+  animation: marketPulse 2.2s ease-out infinite;
+}
+
+@keyframes marketPulse {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.markets-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  flex-wrap: wrap;
+}
+
+.markets-hero-number {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.markets-hero-caption {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.markets-hero-stats {
+  display: flex;
+}
+
+.markets-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 18px;
+}
+
+.markets-stat:first-child {
+  padding-left: 0;
+}
+
+.markets-stat + .markets-stat {
+  border-left: 1px solid var(--border);
+}
+
+.markets-stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Heatmap ------------------------------------------------------------ */
+
+.markets-heatmap:not([hidden]) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 6px;
+}
+
+.heat-tile {
+  --heat: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 8px;
+  outline: 1.5px solid transparent;
+  outline-offset: 1px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.5s ease, transform 0.15s ease;
+}
+
+.heat-tile.heat-up {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--gain) calc(14% + var(--heat) * 46%), var(--surface-2));
+}
+
+.heat-tile.heat-down {
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--danger) calc(14% + var(--heat) * 46%), var(--surface-2));
+}
+
+.heat-tile:hover {
+  transform: translateY(-1px);
+}
+
+.heat-tile:active {
+  transform: scale(0.98);
+}
+
+.heat-tile:focus-visible {
+  outline-color: var(--accent);
+}
+
+.heat-ticker {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.heat-change {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+@keyframes tileFlashUp {
+  from {
+    outline-color: var(--gain);
+  }
+  to {
+    outline-color: transparent;
+  }
+}
+
+@keyframes tileFlashDown {
+  from {
+    outline-color: var(--danger);
+  }
+  to {
+    outline-color: transparent;
+  }
+}
+
+.heat-tile.flash-up {
+  animation: tileFlashUp 1.2s ease-out;
+}
+
+.heat-tile.flash-down {
+  animation: tileFlashDown 1.2s ease-out;
+}
+
+/* Watchlist + notes blocks ------------------------------------------- */
+
+.markets-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.markets-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .stock-search-row {
   display: flex;
   gap: 8px;
@@ -2768,28 +3034,40 @@ body {
 
 .stock-search-row input {
   flex: 1;
-  padding: 10px 12px;
-  font-size: 14px;
-  font-family: inherit;
+  min-width: 0;
+  padding: 8px 2px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
   color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.stock-search-row input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.stock-search-row input::placeholder {
+  color: var(--text-faint);
 }
 
 #stock-search-btn {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface-2);
-  color: var(--text);
+  padding: 0 16px;
+  border: none;
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .stock-search-status {
-  margin: 8px 0 0;
+  margin: 0;
   font-size: 13px;
   color: var(--text-dim);
 }
@@ -2800,65 +3078,516 @@ body {
   text-underline-offset: 2px;
 }
 
-.stock-down {
-  color: var(--danger);
-}
-
-.portfolio-symbol {
+.stock-list {
+  list-style: none;
   margin: 0;
   padding: 0;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stock-row + .stock-row {
+  border-top: 1px solid var(--border);
+}
+
+.stock-row-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) clamp(120px, 16vw, 180px) minmax(96px, auto);
+  align-items: center;
+  gap: 16px;
+  padding: 12px 8px;
   background: none;
   border: none;
+  border-radius: 8px;
+  color: inherit;
+  font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
-.portfolio-symbol:hover {
-  color: var(--accent);
-  text-decoration: underline;
+.stock-row-main:hover {
+  background: var(--surface-2);
 }
 
-.portfolio-price {
+.stock-row-main:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+@keyframes stockRowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stock-row-enter {
+  animation: stockRowEnter 0.4s ease-out;
+}
+
+.stock-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Company logos are mostly drawn for a light backdrop. */
+.stock-logo.has-logo {
+  background: #ffffff;
+}
+
+.stock-logo img {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  object-fit: contain;
+  display: block;
+}
+
+.stock-monogram {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.stock-logo-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.stock-logo-lg .stock-monogram {
+  font-size: 18px;
+}
+
+.stock-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stock-ticker {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.stock-name {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stock-spark {
+  display: block;
+  height: 36px;
+}
+
+.row-sparkline {
+  width: 100%;
+  height: 36px;
+  display: block;
+}
+
+.stock-quote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  border-radius: 6px;
+}
+
+.stock-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
   white-space: nowrap;
 }
 
-/* Stock detail modal (tap a portfolio row) — see markets.js. */
+.stock-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stock-chip.tone-up {
+  background: color-mix(in srgb, var(--gain) 15%, transparent);
+}
+
+.stock-chip.tone-down {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+@keyframes quoteFlashUp {
+  from {
+    background-color: color-mix(in srgb, var(--gain) 28%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes quoteFlashDown {
+  from {
+    background-color: color-mix(in srgb, var(--danger) 28%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.stock-quote.flash-up {
+  animation: quoteFlashUp 1.2s ease-out;
+}
+
+.stock-quote.flash-down {
+  animation: quoteFlashDown 1.2s ease-out;
+}
+
+/* Sparklines (rows + modal) ------------------------------------------ */
+
+.spark-up {
+  color: var(--gain);
+}
+
+.spark-down {
+  color: var(--danger);
+}
+
+.spark-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.spark-area {
+  fill: currentColor;
+  fill-opacity: 0.1;
+  stroke: none;
+}
+
+/* Detail modal ------------------------------------------------------- */
+
+.stock-modal {
+  width: min(480px, 100%);
+  max-height: 86vh;
+}
+
+.stock-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 28px 20px 0;
+}
+
+.stock-modal-id {
+  min-width: 0;
+}
+
 .stock-modal-title {
-  margin: 0 0 4px;
-  font-size: 17px;
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--text);
 }
 
-.stock-modal-price {
-  margin: 0 0 16px;
-  font-family: "IBM Plex Mono", monospace;
+.stock-modal-name {
+  margin: 2px 0 0;
   font-size: 13px;
   color: var(--text-dim);
 }
 
+.stock-modal-quote {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 22px;
+}
+
+.stock-modal-price {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.stock-chart-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 22px;
+  margin: 0 0 8px;
+}
+
+.stock-chart-change {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.stock-chart-extremes {
+  margin-left: auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
 .stock-modal-chart {
-  margin: 0 0 16px;
+  position: relative;
+  margin: 0 0 22px;
+  touch-action: pan-y;
 }
 
 .stock-sparkline {
   width: 100%;
-  height: 100px;
+  height: 140px;
   display: block;
+  cursor: crosshair;
+}
+
+.chart-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-faint);
+  pointer-events: none;
+}
+
+.chart-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--text);
+  pointer-events: none;
+}
+
+.chart-tip {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, calc(-100% - 6px));
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .stock-modal-chart-status {
   margin: 0;
+  padding: 36px 0;
+  text-align: center;
   font-size: 13px;
   color: var(--text-dim);
 }
 
-.stock-modal-info {
-  list-style: none;
-  margin: 0 0 16px;
-  padding: 0;
+.stock-range {
+  margin: 0 0 22px;
+}
+
+.stock-range-labels {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 9px;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.stock-range-track {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.stock-range-marker {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  transform: translate(-50%, -50%);
+  transition: left 0.4s ease;
+}
+
+.stock-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 22px;
+  margin: 0 0 20px;
+}
+
+.stock-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 0;
+  border-top: 1px solid var(--border);
+}
+
+.stock-stat dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.stock-stat dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Up / down / flat text color — last, so it wins over each component's
+   own default color at equal specificity. */
+.tone-up {
+  color: var(--gain);
+}
+
+.tone-down {
+  color: var(--danger);
+}
+
+.tone-flat {
+  color: var(--text-dim);
+}
+
+@media (max-width: 640px) {
+  #markets-section:not([hidden]) {
+    gap: 26px;
+  }
+
+  .markets-hero-number {
+    font-size: 52px;
+  }
+
+  .markets-hero-stats {
+    width: 100%;
+  }
+
+  .markets-stat {
+    flex: 1 1 0;
+    padding: 2px 10px;
+  }
+
+  .markets-stat-value {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .markets-heatmap:not([hidden]) {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
+
+  .stock-row-main {
+    grid-template-columns: 32px minmax(0, 1fr) 60px auto;
+    gap: 10px;
+    padding: 11px 4px;
+  }
+
+  .stock-row .stock-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .stock-modal-price {
+    font-size: 34px;
+  }
+
+  .stock-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-status[data-state="open"] .market-dot::after,
+  .heat-tile.flash-up,
+  .heat-tile.flash-down,
+  .stock-quote.flash-up,
+  .stock-quote.flash-down,
+  .stock-row-enter {
+    animation: none !important;
+  }
+
+  .heat-tile,
+  .stock-row-main,
+  .stock-range-marker,
+  .markets-hero-number {
+    transition: none;
+  }
+
+  .heat-tile:hover,
+  .heat-tile:active {
+    transform: none;
+  }
 }

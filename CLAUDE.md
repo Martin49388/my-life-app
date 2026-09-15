@@ -161,6 +161,25 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   needs his own real Twelve Data key (twelvedata.com, free) — only tested
   against their shared demo key so far, which won't work for arbitrary
   symbols.
+  REDESIGNED 2026-09-15 (Martin: "just lines of text", wanted richer and
+  livelier). Now a dashboard: US market session pill (open/pre/after/
+  closed, computed from New York time locally, no holidays), hero number
+  = average day move across the watchlist (+ breadth / top mover /
+  laggard), a heatmap of tiles tinted by each stock's move, rows with
+  company logo (Finnhub profile2 `logo`), 30-day sparkline, price and a
+  change pill, and a richer modal (scrubbable 30-day chart, day-range
+  bar, stats grid). Quotes auto-refresh every 60s only while Markets is
+  visible, the tab is visible and the market is in session; prices tween
+  and flash on a tick. Introduced `--gain` (green) — used ONLY in
+  Markets; the rest of the app stays black/grey. Twelve Data calls go
+  through `tdThrottle()` (8/min free-tier cap) and profiles/series are
+  cached in sessionStorage — deliberately not localStorage, since
+  sync.js would push every localStorage key to Supabase. New top-level
+  names in markets.js are `mkt`-prefixed because classic scripts share
+  one global scope (script.js already owns `prefersReducedMotion`).
+  Verified in headless Chromium with mocked Finnhub/Twelve Data at
+  desktop + 390px widths, light + dark, empty and no-key states; not
+  yet seen against the real APIs.
 
 Overview additionally shows Food's protein next to kcal, and a
 'Logged today' feed merging every timestamped entry from every

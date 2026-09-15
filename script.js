@@ -382,6 +382,7 @@ function switchSection(requested) {
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
   if (section === "food" && window.renderFood) window.renderFood();
+  if (section === "markets" && window.refreshMarkets) window.refreshMarkets();
   if (window.renderOverview) window.renderOverview();
   const miniBar = document.getElementById("mini-overview");
   if (miniBar) miniBar.hidden = section === "overview";

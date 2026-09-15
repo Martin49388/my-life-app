@@ -556,33 +556,64 @@
     </section>
 
     <section id="markets-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">markets</p>
-        <p class="section-hint">Watchlist notes, trade ideas, things to revisit.</p>
-        <a class="external-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer">Open Yahoo Finance &#8599;</a>
+      <header class="markets-header">
+        <div class="markets-topline">
+          <p class="eyebrow">markets</p>
+          <span class="market-status" id="market-status" data-state="closed">
+            <span class="market-dot" aria-hidden="true"></span>
+            <span class="market-status-label" id="market-status-label">Market closed</span>
+            <span class="market-status-detail" id="market-status-detail"></span>
+          </span>
+        </div>
+
+        <div class="markets-hero">
+          <div class="markets-hero-main">
+            <p class="markets-hero-number" id="markets-hero-number">—</p>
+            <p class="markets-hero-caption" id="markets-hero-caption">Watchlist today</p>
+          </div>
+          <div class="markets-hero-stats">
+            <div class="markets-stat">
+              <span class="stat-label">Breadth</span>
+              <span class="markets-stat-value" id="markets-breadth">—</span>
+            </div>
+            <div class="markets-stat">
+              <span class="stat-label">Top mover</span>
+              <span class="markets-stat-value" id="markets-best">—</span>
+            </div>
+            <div class="markets-stat">
+              <span class="stat-label">Laggard</span>
+              <span class="markets-stat-value" id="markets-worst">—</span>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <div>
-        <p class="eyebrow">Search a stock</p>
+      <div class="markets-heatmap" id="markets-heatmap" hidden></div>
+
+      <div class="markets-block">
+        <div class="markets-block-head">
+          <p class="eyebrow">Watchlist</p>
+          <span class="journal-time" id="markets-updated"></span>
+        </div>
         <div class="stock-search-row">
-          <input type="text" id="stock-search-input" placeholder="Ticker or company, e.g. GM" />
-          <button type="button" id="stock-search-btn">Search</button>
+          <input type="text" id="stock-search-input" placeholder="Add a ticker or company, e.g. NVDA" autocomplete="off" />
+          <button type="button" id="stock-search-btn">Add</button>
         </div>
         <p class="stock-search-status" id="stock-search-status" hidden></p>
+        <ul class="stock-list" id="portfolio-list"></ul>
       </div>
 
-      <div>
-        <p class="eyebrow">Portfolio</p>
-        <p class="section-hint">Every stock you search gets added here automatically.</p>
-        <ul class="journal-list" id="portfolio-list"></ul>
+      <div class="markets-block">
+        <div class="markets-block-head">
+          <p class="eyebrow">Notes</p>
+          <a class="external-link" href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer">Yahoo Finance &#8599;</a>
+        </div>
+        <form class="journal-form" data-journal="markets">
+          <input type="text" class="journal-input" placeholder="Trade idea, thesis, something to revisit…" required />
+          <button type="submit">Add</button>
+        </form>
+        <ul class="journal-list" id="markets-journal-list"></ul>
       </div>
-
-      <form class="journal-form" data-journal="markets">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
-
-      <ul class="journal-list" id="markets-journal-list"></ul>
     </section>
 
     <section id="notes-section" hidden>
@@ -716,12 +747,39 @@
   </div>
 
   <div class="modal-overlay" id="stock-modal-overlay" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="stock-modal-title">
+    <div class="modal-card stock-modal" role="dialog" aria-modal="true" aria-labelledby="stock-modal-title">
       <button type="button" class="modal-close" id="stock-modal-close" aria-label="Close">&#10005;</button>
-      <p class="stock-modal-title" id="stock-modal-title"></p>
-      <p class="stock-modal-price" id="stock-modal-price">Loading…</p>
+
+      <div class="stock-modal-head">
+        <span class="stock-logo stock-logo-lg" id="stock-modal-logo" aria-hidden="true"></span>
+        <div class="stock-modal-id">
+          <p class="stock-modal-title" id="stock-modal-title"></p>
+          <p class="stock-modal-name" id="stock-modal-name"></p>
+        </div>
+      </div>
+
+      <div class="stock-modal-quote">
+        <p class="stock-modal-price" id="stock-modal-price">—</p>
+        <span class="stock-chip" id="stock-modal-change" hidden></span>
+      </div>
+
+      <div class="stock-chart-head" id="stock-modal-chart-head" hidden>
+        <span class="stat-label" id="stock-chart-period"></span>
+        <span class="stock-chart-change" id="stock-chart-change"></span>
+        <span class="stock-chart-extremes" id="stock-chart-extremes"></span>
+      </div>
       <div class="stock-modal-chart" id="stock-modal-chart"></div>
-      <ul class="stock-modal-info" id="stock-modal-info"></ul>
+
+      <div class="stock-range" id="stock-modal-range" hidden>
+        <div class="stock-range-labels">
+          <span><span class="stat-label">Day low</span> <span id="stock-range-low"></span></span>
+          <span><span class="stat-label">Day high</span> <span id="stock-range-high"></span></span>
+        </div>
+        <div class="stock-range-track"><span class="stock-range-marker" id="stock-range-marker"></span></div>
+      </div>
+
+      <dl class="stock-stats" id="stock-modal-info"></dl>
+
       <a class="external-link" id="stock-modal-yahoo-link" href="#" target="_blank" rel="noopener noreferrer">Open on Yahoo Finance &#8599;</a>
     </div>
   </div>
