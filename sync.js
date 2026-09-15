@@ -152,7 +152,14 @@ async function pullFromSupabase() {
     localStorage.setItem(key, value);
   }
   sessionStorage.setItem("just-synced", "1");
-  location.reload();
+  // A bare, immediate location.reload() risks iOS Safari/WKWebView
+  // tearing the page down before these localStorage writes — including
+  // the Supabase session key we just restored above — are actually
+  // flushed to disk, not just written to the in-memory store. That's a
+  // known iOS quirk and a plausible cause of a device getting signed out
+  // after a sync-triggered reload. A short delay first gives it a moment
+  // to flush before the page goes away.
+  setTimeout(() => location.reload(), 150);
 }
 
 // Every other file's localStorage.setItem calls (habits.js's saveHabits,
