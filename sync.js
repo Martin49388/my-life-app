@@ -38,7 +38,19 @@ function isSupabaseInternalKey(key) {
 
 let supa = null;
 if (window.supabase && !SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("YOUR-ANON")) {
-  supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Explicit rather than relying on the library's defaults (which are the
+  // same values) — this only rules out ambiguity about where the session
+  // lives, it does not change iOS's own decisions about when it evicts a
+  // home-screen web app's storage, which is the actual cause of getting
+  // signed out on iOS after fully closing the app.
+  supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      storage: window.localStorage,
+    },
+  });
 }
 
 let session = null;
