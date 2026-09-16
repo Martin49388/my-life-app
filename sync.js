@@ -70,14 +70,6 @@ let applyingRemote = false; // guards against re-pushing what we just pulled
 // and remote copies actually agree (or seeded the remote row itself).
 let syncReady = false;
 
-// See the circuit breaker in pullFromSupabase: caps how many times in a
-// row this tab will restore a remote copy and reload before giving up and
-// just leaving local storage alone. Kept in sessionStorage (not a plain
-// variable) specifically because it has to survive the very
-// location.reload() calls it's counting.
-const SYNC_RESTORE_COUNT_KEY = "sync-restore-count";
-const SYNC_RESTORE_LIMIT = 3;
-
 function dumpLocalStorage() {
   const obj = {};
   for (let i = 0; i < localStorage.length; i++) {
@@ -150,35 +142,39 @@ async function pullFromSupabase() {
   const remote = stableStringify(row.data);
   const local = stableStringify(dumpLocalStorage());
   if (remote === local) {
-    sessionStorage.removeItem(SYNC_RESTORE_COUNT_KEY);
     syncReady = true;
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
     setSynced(true);
     return;
   }
 
-  // Circuit breaker: each restore-and-reload below is supposed to end with
-  // this device matching remote on the very next pull. If that hasn't
-  // happened after a few tries in a row, something is rewriting local
-  // storage into a state that never settles right after we restore it —
-  // on a slower or backgrounded device that's more likely to lose the
-  // race described below. Reloading again would just repeat the same
-  // cycle forever and read as the app being permanently broken, so stop
-  // digging: keep whatever is on this device right now, stop auto-pulling
-  // until next sign-in, and say plainly that something didn't settle
-  // instead of silently flapping between two states.
-  const restoreCount = Number(sessionStorage.getItem(SYNC_RESTORE_COUNT_KEY) || "0");
-  if (restoreCount >= SYNC_RESTORE_LIMIT) {
-    syncReady = true;
-    setSyncStatus("Couldn't finish syncing after several tries — kept this device's data as-is. Try reopening the app in a bit.");
-    setSynced(false);
-    return;
-  }
-  sessionStorage.setItem(SYNC_RESTORE_COUNT_KEY, String(restoreCount + 1));
-
-  // Different device, or this one's behind — take the remote copy and
-  // reload so every module re-reads fresh state from localStorage. This
-  // device's own Supabase session survives the wipe.
+  // Different device, or this one's behind — take the remote copy.
+  //
+  // Earlier versions of this function reacted to a mismatch by clearing
+  // localStorage, writing the remote copy in, and calling
+  // location.reload() so every module would re-read fresh state. On
+  // paper that reload should always land back here with local now
+  // matching remote and nothing left to do. In practice, on Martin's
+  // phone specifically, it never did -- something kept rewriting local
+  // storage into a state that read as "different" all over again right
+  // after each reload, so the page reloaded, and reloaded, and reloaded,
+  // which is the "bugging" this whole file exists to fix. Two earlier
+  // attempts closed off specific ways that could happen (a stray write
+  // from another module landing mid-restore; a hard cap via a
+  // sessionStorage counter) and neither one actually stopped it on that
+  // device, which means something about the reload itself -- not just
+  // what leads up to it -- doesn't behave the way it does everywhere
+  // else this was tested. Rather than find and fix that blind, the
+  // reload is removed entirely: nothing here can loop if nothing here
+  // ever reloads the page.
+  //
+  // So: apply the remote copy to localStorage and stop. this device's
+  // in-memory state (habits, goals, and friends, all read from
+  // localStorage once at page load, before this ran) is now stale
+  // relative to what's on disk until the next natural full reopen of
+  // the app -- but stale is a vastly better failure mode than an
+  // infinite reload loop, and the next time the app is opened fresh it
+  // reads the correct, already-merged data straight off disk.
   applyingRemote = true;
   const keepEntries = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -191,26 +187,16 @@ async function pullFromSupabase() {
   // news.js, markets.js, ...) can still have an async write in flight from
   // before this pull started, working off its own now-stale in-memory
   // copy of the data. If one of those lands on the wrapped setItem while
-  // we're mid-restore, it silently clobbers the remote copy we're about to
-  // reload with, and since the reload just re-reads whatever is currently
-  // in localStorage, that stale write becomes the new "local" state --
-  // which then reads as different from remote all over again, restarting
-  // this exact process. That's the infinite reload loop ("bugging") this
-  // guards against: it only ever showed up signed in, because signed-out
-  // devices never take this restore-then-reload path at all.
+  // we're mid-restore, it would silently clobber the remote copy with
+  // stale data.
   for (const [key, value] of keepEntries) _origSetItem(key, value);
   for (const [key, value] of Object.entries(row.data)) {
     _origSetItem(key, value);
   }
-  sessionStorage.setItem("just-synced", "1");
-  // A bare, immediate location.reload() risks iOS Safari/WKWebView
-  // tearing the page down before these localStorage writes — including
-  // the Supabase session key we just restored above — are actually
-  // flushed to disk, not just written to the in-memory store. That's a
-  // known iOS quirk and a plausible cause of a device getting signed out
-  // after a sync-triggered reload. A short delay first gives it a moment
-  // to flush before the page goes away.
-  setTimeout(() => location.reload(), 150);
+  applyingRemote = false;
+  syncReady = true;
+  setSyncStatus("Synced from another device — reopen the app to see the latest (this screen may be a step behind until then).");
+  setSynced(true);
 }
 
 // Every other file's localStorage.setItem calls (habits.js's saveHabits,
@@ -218,12 +204,11 @@ async function pullFromSupabase() {
 // since this is the same global localStorage object everyone shares.
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key, value) {
-  // A remote copy is being written in and a reload is already scheduled
-  // (see pullFromSupabase) -- drop any write that isn't that restore
-  // itself (which bypasses this wrapper via _origSetItem). Anything else
-  // reaching here during that window is necessarily based on
-  // pre-restore state and would otherwise overwrite the freshly-applied
-  // remote data before the reload picks it up. Supabase's own session
+  // A remote copy is being written in right now (see pullFromSupabase) --
+  // drop any write that isn't that restore itself (which bypasses this
+  // wrapper via _origSetItem). Anything else reaching here during that
+  // window is necessarily based on pre-restore state and would otherwise
+  // overwrite the freshly-applied remote data. Supabase's own session
   // keys still pass through so an in-flight token refresh isn't dropped.
   if (applyingRemote && !isSupabaseInternalKey(key)) return;
   _origSetItem(key, value);
@@ -343,17 +328,11 @@ async function initSync() {
       setSyncStatus("Connecting…");
       pullFromSupabase();
     } else if (event === "SIGNED_OUT") {
-      sessionStorage.removeItem(SYNC_RESTORE_COUNT_KEY);
       showStep("email");
       setSyncStatus("Not signed in");
       setSynced(false);
     }
   });
-
-  if (sessionStorage.getItem("just-synced")) {
-    sessionStorage.removeItem("just-synced");
-    setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
-  }
 }
 
 initSync();
