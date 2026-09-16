@@ -70,6 +70,14 @@ let applyingRemote = false; // guards against re-pushing what we just pulled
 // and remote copies actually agree (or seeded the remote row itself).
 let syncReady = false;
 
+// See the circuit breaker in pullFromSupabase: caps how many times in a
+// row this tab will restore a remote copy and reload before giving up and
+// just leaving local storage alone. Kept in sessionStorage (not a plain
+// variable) specifically because it has to survive the very
+// location.reload() calls it's counting.
+const SYNC_RESTORE_COUNT_KEY = "sync-restore-count";
+const SYNC_RESTORE_LIMIT = 3;
+
 function dumpLocalStorage() {
   const obj = {};
   for (let i = 0; i < localStorage.length; i++) {
@@ -142,11 +150,31 @@ async function pullFromSupabase() {
   const remote = stableStringify(row.data);
   const local = stableStringify(dumpLocalStorage());
   if (remote === local) {
+    sessionStorage.removeItem(SYNC_RESTORE_COUNT_KEY);
     syncReady = true;
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
     setSynced(true);
     return;
   }
+
+  // Circuit breaker: each restore-and-reload below is supposed to end with
+  // this device matching remote on the very next pull. If that hasn't
+  // happened after a few tries in a row, something is rewriting local
+  // storage into a state that never settles right after we restore it —
+  // on a slower or backgrounded device that's more likely to lose the
+  // race described below. Reloading again would just repeat the same
+  // cycle forever and read as the app being permanently broken, so stop
+  // digging: keep whatever is on this device right now, stop auto-pulling
+  // until next sign-in, and say plainly that something didn't settle
+  // instead of silently flapping between two states.
+  const restoreCount = Number(sessionStorage.getItem(SYNC_RESTORE_COUNT_KEY) || "0");
+  if (restoreCount >= SYNC_RESTORE_LIMIT) {
+    syncReady = true;
+    setSyncStatus("Couldn't finish syncing after several tries — kept this device's data as-is. Try reopening the app in a bit.");
+    setSynced(false);
+    return;
+  }
+  sessionStorage.setItem(SYNC_RESTORE_COUNT_KEY, String(restoreCount + 1));
 
   // Different device, or this one's behind — take the remote copy and
   // reload so every module re-reads fresh state from localStorage. This
@@ -315,6 +343,7 @@ async function initSync() {
       setSyncStatus("Connecting…");
       pullFromSupabase();
     } else if (event === "SIGNED_OUT") {
+      sessionStorage.removeItem(SYNC_RESTORE_COUNT_KEY);
       showStep("email");
       setSyncStatus("Not signed in");
       setSynced(false);
