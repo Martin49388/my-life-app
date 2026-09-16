@@ -180,6 +180,7 @@
     text = text
       .split(/\n-{3,}|\n\s*\[\d+\]:/)[0]
       .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/\*{1,2}([^*\n]+)\*{1,2}/g, "$1")
       .replace(/\(\[source\]\[\d+\]\)/gi, "")
       .replace(/\r/g, "")
       .replace(/\n{3,}/g, "\n\n")
