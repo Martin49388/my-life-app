@@ -14,7 +14,8 @@ Built so far:
 - **News** — live headlines from BBC World, Tagesschau, ORF and iROZHLAS, each in its own language
 - **Goals** — short- and long-term horizons on a swipeable rail, with targets and deadlines
 - **Fitness** — a weekly training split, per-day sessions, completion logged against today
-- **Food** — a daily calorie budget broken down by meal, with a maintenance estimator
+- **Fuel** — food and water on one page: a daily calorie budget broken down by meal, a maintenance estimator, and a glass-by-glass water tracker
+- **Reading** — a log of books read, in progress and wanted, with covers and details from Open Library, ratings, notes and AI key ideas; add one at a time or paste a whole list
 - **Settings** — accent colour, background tint, and tint intensity
 
-Data is stored in the browser on each device. Syncing across devices (Supabase) is not built yet, so the Mac and the phone keep separate data for now.
+Data is stored in the browser on each device and synced across devices through Supabase once you sign in (Settings → Cross-device sync).

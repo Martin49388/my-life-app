@@ -121,6 +121,8 @@ function renderBudget() {
   else budgetEl.textContent = Math.abs(remaining).toLocaleString();
   document.getElementById("budget-caption").textContent = over ? "kcal over" : "kcal left";
   document.getElementById("budget-number").classList.toggle("over", over);
+  const eatenEl = document.getElementById("fuel-eaten-caption");
+  if (eatenEl) eatenEl.textContent = ` · ${consumed.toLocaleString()} of ${target.toLocaleString()} eaten`;
 
   document.getElementById("protein-total").textContent =
     `${entries.reduce((sum, e) => sum + (e.protein || 0), 0)}g`;
@@ -286,6 +288,8 @@ window.renderFood = function renderFood() {
   renderBudget();
   renderQuickAdd();
   renderMeals();
+  // Water shares Fuel's day switcher, so it follows the same day.
+  if (window.renderWater) window.renderWater();
   if (window.renderGlance) window.renderGlance();
   if (window.renderOverview) window.renderOverview();
 };
@@ -331,6 +335,12 @@ document.getElementById("use-estimate-btn").addEventListener("click", () => {
 
 document.getElementById("food-prev-day").addEventListener("click", () => shiftDay(-1));
 document.getElementById("food-next-day").addEventListener("click", () => shiftDay(1));
+// Tapping the date itself jumps back to today.
+document.getElementById("food-date-label").addEventListener("click", () => {
+  if (viewedDate === todayKey()) return;
+  viewedDate = todayKey();
+  window.renderFood();
+});
 
 document.getElementById("kcal-target-input").addEventListener("change", (e) => {
   const value = parseInt(e.target.value, 10);

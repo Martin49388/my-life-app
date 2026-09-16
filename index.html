@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260916-3" />
+  <link rel="stylesheet" href="style.css?v=20260916-4" />
 </head>
 <body>
   <main class="app">
@@ -52,8 +52,7 @@
 
           <p class="nav-group-label">Body</p>
           <button type="button" class="nav-link section-btn" data-section="fitness">Fitness</button>
-          <button type="button" class="nav-link section-btn" data-section="food">Food</button>
-          <button type="button" class="nav-link section-btn" data-section="water">Water</button>
+          <button type="button" class="nav-link section-btn" data-section="fuel">Fuel</button>
           <button type="button" class="nav-link section-btn" data-section="recovery">Recovery</button>
 
           <p class="nav-group-label">Mind</p>
@@ -368,39 +367,104 @@
 
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
-    <section id="food-section" hidden>
-      <header class="app-header">
-        <p class="eyebrow">daily intake</p>
-        <div class="stat-tiles">
-          <div class="stat-tile">
-            <span class="stat-label">Target</span>
-            <input type="number" id="kcal-target-input" class="target-input" min="500" max="10000" step="50" />
+    <!-- Fuel: food + water on one page (they always shared it — the old
+         separate "Water" nav entry just scrolled down this same page).
+         food.js and water.js still own their data under the same "food"
+         and "water" localStorage keys, so nothing logged or synced moves. -->
+    <section id="fuel-section" hidden>
+      <header class="fuel-header">
+        <div class="fuel-topline">
+          <p class="eyebrow">fuel</p>
+          <div class="fuel-day" role="group" aria-label="Day shown">
+            <button type="button" id="food-prev-day" class="fuel-day-btn" aria-label="Previous day">&lsaquo;</button>
+            <button type="button" id="food-date-label" class="fuel-day-label" title="Back to today"></button>
+            <button type="button" id="food-next-day" class="fuel-day-btn" aria-label="Next day">&rsaquo;</button>
           </div>
-          <div class="stat-tile">
-            <span class="stat-label">Protein</span>
-            <span class="stat-value" id="protein-total">0g</span>
+        </div>
+
+        <div class="fuel-hero">
+          <div class="fuel-hero-main">
+            <p class="fuel-hero-number" id="budget-number">0</p>
+            <p class="fuel-hero-caption"><span id="budget-caption">kcal left</span><span id="fuel-eaten-caption"></span></p>
           </div>
+          <div class="fuel-hero-stats">
+            <label class="fuel-stat">
+              <span class="stat-label">Target</span>
+              <input type="number" id="kcal-target-input" class="target-input fuel-target-input" min="500" max="10000" step="50" inputmode="numeric" />
+            </label>
+            <div class="fuel-stat">
+              <span class="stat-label">Protein</span>
+              <span class="fuel-stat-value" id="protein-total">0g</span>
+            </div>
+            <div class="fuel-stat">
+              <span class="stat-label">Water</span>
+              <span class="fuel-stat-value" id="fuel-water-stat">0.00L</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="budget">
+          <div class="budget-bar-wrap">
+            <div class="budget-bar" id="budget-bar"></div>
+            <div class="budget-stop budget-stop-maintain" id="budget-stop-maintain" hidden>
+              <span class="stop-cap"></span>
+              <span class="stop-label">Maintain</span>
+            </div>
+            <div class="budget-stop budget-stop-target" id="budget-stop-target">
+              <span class="stop-cap"></span>
+              <span class="stop-label">Target</span>
+            </div>
+          </div>
+          <div class="budget-legend" id="budget-legend"></div>
         </div>
       </header>
 
-      <div class="water-widget">
-        <div class="water-headline">
-          <span class="water-total" id="water-total">0.00L</span>
-          <span class="water-target-label" id="water-target-label">of 4.0L</span>
+      <div class="fuel-block fuel-water" id="fuel-water">
+        <div class="fuel-block-head">
+          <p class="eyebrow">Water</p>
+          <p class="fuel-water-figure">
+            <span class="fuel-water-total" id="water-total">0.00L</span>
+            <span class="fuel-water-target" id="water-target-label">of 4.0L</span>
+          </p>
         </div>
-        <div class="water-bar-wrap">
-          <div class="water-bar" id="water-bar"></div>
-        </div>
+        <div class="fuel-glasses" id="water-glasses" aria-hidden="true"></div>
+        <p class="fuel-water-note" id="water-note"></p>
         <div class="water-actions">
-          <button type="button" id="water-remove-btn" aria-label="Remove 250ml">&minus; 250ml</button>
-          <button type="button" id="water-add-btn" aria-label="Add 250ml">+ 250ml</button>
+          <button type="button" id="water-remove-btn" aria-label="Remove 250 ml">&minus; 250 ml</button>
+          <button type="button" id="water-add-btn" aria-label="Add 250 ml">+ 250 ml</button>
         </div>
       </div>
 
-      <div class="estimator-row">
-        <button type="button" id="estimator-toggle-btn" aria-pressed="false">Maintenance estimate</button>
+      <div class="fuel-block">
+        <div class="fuel-block-head">
+          <p class="eyebrow">Meals</p>
+          <button type="button" id="add-food-toggle-btn" class="fuel-head-btn">+ Log food</button>
+        </div>
+        <form id="add-food-form" hidden>
+          <div class="food-lookup-row">
+            <input type="text" id="food-name-input" placeholder="Food, e.g. Porridge" required />
+            <button type="button" id="food-lookup-btn">Look up</button>
+          </div>
+          <ul class="food-lookup-results" id="food-lookup-results" hidden></ul>
+          <input type="number" id="food-kcal-input" placeholder="kcal" min="0" max="5000" required />
+          <input type="number" id="food-protein-input" placeholder="Protein g" min="0" max="500" />
+          <select id="food-meal-input">
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snacks">Snacks</option>
+          </select>
+          <button type="submit">Add</button>
+        </form>
+        <div class="quick-add" id="quick-add"></div>
+        <div id="meal-groups"></div>
       </div>
 
+      <div class="fuel-block">
+        <div class="fuel-block-head">
+          <p class="eyebrow">Maintenance</p>
+          <button type="button" id="estimator-toggle-btn" aria-pressed="false">Estimate</button>
+        </div>
       <div class="estimator" id="estimator" hidden>
         <div class="estimator-fields">
           <label class="field">
@@ -460,57 +524,7 @@
 
         <p class="estimator-note">Mifflin-St Jeor estimate — a starting point to adjust from, not an exact figure.</p>
       </div>
-
-      <div class="month-nav">
-        <button type="button" id="food-prev-day" aria-label="Previous day">‹</button>
-        <span id="food-date-label"></span>
-        <button type="button" id="food-next-day" aria-label="Next day">›</button>
       </div>
-
-      <div class="budget">
-        <p class="budget-headline">
-          <span class="budget-number" id="budget-number">0</span>
-          <span class="budget-caption" id="budget-caption">kcal left</span>
-        </p>
-        <div class="budget-bar-wrap">
-          <div class="budget-bar" id="budget-bar"></div>
-          <div class="budget-stop budget-stop-maintain" id="budget-stop-maintain" hidden>
-            <span class="stop-cap"></span>
-            <span class="stop-label">Maintain</span>
-          </div>
-          <div class="budget-stop budget-stop-target" id="budget-stop-target">
-            <span class="stop-cap"></span>
-            <span class="stop-label">Target</span>
-          </div>
-        </div>
-        <div class="budget-legend" id="budget-legend"></div>
-      </div>
-
-      <div class="quick-add" id="quick-add"></div>
-
-      <div id="meal-groups"></div>
-
-      <div class="add-habit-toggle">
-        <button type="button" id="add-food-toggle-btn">+ Log food</button>
-        <form id="add-food-form" hidden>
-          <div class="food-lookup-row">
-            <input type="text" id="food-name-input" placeholder="Food, e.g. Porridge" required />
-            <button type="button" id="food-lookup-btn">Look up</button>
-          </div>
-          <ul class="food-lookup-results" id="food-lookup-results" hidden></ul>
-          <input type="number" id="food-kcal-input" placeholder="kcal" min="0" max="5000" required />
-          <input type="number" id="food-protein-input" placeholder="Protein g" min="0" max="500" />
-          <select id="food-meal-input">
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-            <option value="Snacks">Snacks</option>
-          </select>
-          <button type="submit">Add</button>
-        </form>
-      </div>
-
-      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
 
     <section id="alfred-section" hidden>
@@ -648,18 +662,67 @@
       <ul class="journal-list" id="mindset-journal-list"></ul>
     </section>
 
+    <!-- Reading: book log (reading.js). The old free-text notes
+         (journal.js, "journal-reading") live on in the Notes block. -->
     <section id="reading-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">reading</p>
-        <p class="section-hint">What you're reading and what's sticking.</p>
+      <header class="read-header">
+        <div class="read-topline">
+          <p class="eyebrow">reading</p>
+          <button type="button" class="read-primary-btn" data-read-add="search">+ Add books</button>
+        </div>
+
+        <div class="read-hero">
+          <div class="read-hero-main">
+            <p class="read-hero-number" id="read-year-count">0</p>
+            <p class="read-hero-caption" id="read-year-caption">books finished this year</p>
+            <button type="button" class="read-goal" id="read-goal" data-nav-goto="goals" hidden></button>
+          </div>
+          <div class="read-year-strip" id="read-year-strip" aria-hidden="true"></div>
+        </div>
+        <div class="read-stats" id="read-stats"></div>
       </header>
 
-      <form class="journal-form" data-journal="reading">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
+      <div class="read-block" id="read-now-block" hidden>
+        <div class="read-block-head">
+          <p class="eyebrow">Reading now</p>
+        </div>
+        <ul class="read-now" id="read-now"></ul>
+      </div>
 
-      <ul class="journal-list" id="reading-journal-list"></ul>
+      <div class="read-block">
+        <div class="read-block-head read-shelf-head">
+          <div class="read-tabs" id="read-tabs" role="tablist" aria-label="Shelf"></div>
+          <div class="read-tools">
+            <select id="read-sort" class="read-sort" aria-label="Sort books">
+              <option value="recent">Recent</option>
+              <option value="rating">Rating</option>
+              <option value="title">Title</option>
+              <option value="author">Author</option>
+            </select>
+            <span class="read-view" role="group" aria-label="Layout">
+              <button type="button" class="read-view-btn" data-read-view="grid" aria-label="Covers">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+              </button>
+              <button type="button" class="read-view-btn" data-read-view="list" aria-label="List">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="3" height="4" rx="0.8"/><rect x="2" y="9.5" width="3" height="4" rx="0.8"/><path d="M7 4h7M7 11h7" stroke-linecap="round"/></svg>
+              </button>
+            </span>
+          </div>
+        </div>
+        <input type="search" id="read-filter" class="read-filter" placeholder="Filter by title, author or subject" autocomplete="off" hidden />
+        <ul class="read-shelf is-grid" id="read-shelf"></ul>
+      </div>
+
+      <div class="read-block">
+        <div class="read-block-head">
+          <p class="eyebrow">Notes</p>
+        </div>
+        <form class="journal-form" data-journal="reading">
+          <input type="text" class="journal-input" placeholder="A thought, a quote, a page number…" required />
+          <button type="submit">Add</button>
+        </form>
+        <ul class="journal-list" id="reading-journal-list"></ul>
+      </div>
     </section>
 
     <section id="markets-section" hidden>
@@ -871,6 +934,48 @@
     <div class="m-sheet-body" id="m-more-body"></div>
   </section>
 
+  <div class="modal-overlay book-overlay" id="book-modal-overlay" hidden>
+    <div class="modal-card book-sheet" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
+      <button type="button" class="modal-close" id="book-modal-close" aria-label="Close">&#10005;</button>
+      <div id="book-modal-body"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay book-overlay" id="book-add-overlay" hidden>
+    <div class="modal-card book-sheet book-add-sheet" role="dialog" aria-modal="true" aria-labelledby="book-add-title">
+      <button type="button" class="modal-close" id="book-add-close" aria-label="Close">&#10005;</button>
+      <p class="book-sheet-title" id="book-add-title">Add books</p>
+      <div id="book-add-mode"></div>
+
+      <div class="book-add-opts">
+        <div class="book-add-opt">
+          <span class="stat-label">Shelf</span>
+          <div id="book-add-status"></div>
+        </div>
+        <div class="book-add-opt" id="book-add-when-wrap">
+          <span class="stat-label">Finished</span>
+          <div id="book-add-when"></div>
+        </div>
+      </div>
+
+      <div id="book-add-search">
+        <form id="book-search-form" class="book-search-row">
+          <input type="search" id="book-search-input" placeholder="Title or author" enterkeyhint="search" autocomplete="off" />
+          <button type="submit">Search</button>
+        </form>
+        <p class="book-search-status" id="book-search-status"></p>
+        <ul class="book-results" id="book-results"></ul>
+      </div>
+
+      <div id="book-add-paste" hidden>
+        <p class="book-paste-hint">One book per line. Add the author after a dash when a title could be several books.</p>
+        <textarea id="book-paste-input" class="book-paste-input" rows="8" placeholder="Atomic Habits&#10;Can't Hurt Me - David Goggins&#10;Meditations - Marcus Aurelius&#10;Saturnin"></textarea>
+        <button type="button" class="read-primary-btn book-paste-go" id="book-paste-go" disabled>Add books</button>
+        <p class="book-search-status" id="book-paste-status"></p>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="quote-modal-overlay" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="quote-modal-text">
       <button type="button" class="modal-close" id="quote-modal-close" aria-label="Close">&#10005;</button>
@@ -918,23 +1023,24 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260916-3"></script>
+  <script src="config.js?v=20260916-4"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260916-3"></script>
-  <script src="script.js?v=20260916-3"></script>
-  <script src="news.js?v=20260916-3"></script>
-  <script src="goals.js?v=20260916-3"></script>
-  <script src="markets.js?v=20260916-3"></script>
-  <script src="fitness.js?v=20260916-3"></script>
-  <script src="food.js?v=20260916-3"></script>
-  <script src="water.js?v=20260916-3"></script>
-  <script src="blueprint.js?v=20260916-3"></script>
-  <script src="alfred.js?v=20260916-3"></script>
-  <script src="journal.js?v=20260916-3"></script>
-  <script src="quotes.js?v=20260916-3"></script>
-  <script src="overview.js?v=20260916-3"></script>
-  <script src="glance.js?v=20260916-3"></script>
-  <script src="global-bar.js?v=20260916-3"></script>
-  <script src="mobile-nav.js?v=20260916-3"></script>
+  <script src="sync.js?v=20260916-4"></script>
+  <script src="script.js?v=20260916-4"></script>
+  <script src="news.js?v=20260916-4"></script>
+  <script src="goals.js?v=20260916-4"></script>
+  <script src="markets.js?v=20260916-4"></script>
+  <script src="fitness.js?v=20260916-4"></script>
+  <script src="food.js?v=20260916-4"></script>
+  <script src="water.js?v=20260916-4"></script>
+  <script src="blueprint.js?v=20260916-4"></script>
+  <script src="alfred.js?v=20260916-4"></script>
+  <script src="journal.js?v=20260916-4"></script>
+  <script src="reading.js?v=20260916-4"></script>
+  <script src="quotes.js?v=20260916-4"></script>
+  <script src="overview.js?v=20260916-4"></script>
+  <script src="glance.js?v=20260916-4"></script>
+  <script src="global-bar.js?v=20260916-4"></script>
+  <script src="mobile-nav.js?v=20260916-4"></script>
 </body>
 </html>

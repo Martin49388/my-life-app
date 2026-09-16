@@ -361,19 +361,21 @@ addForm.addEventListener("submit", (e) => {
 const ALL_SECTIONS = [
   "overview",
   "habits", "goals", "alfred", "blueprint", "review",
-  "fitness", "food", "recovery",
+  "fitness", "fuel", "recovery",
   "mindset", "reading",
   "news", "markets", "notes",
   "settings",
 ];
 
-function switchSection(requested) {
-  // "Water" has no section of its own — it lives inside Food (see
-  // water.js/index.html) — so it activates Food and then scrolls the
-  // water widget into view instead of pretending it's a separate tab.
-  const section = requested === "water" ? "food" : requested;
+// Food and Water were merged into one "Fuel" section. The old ids still
+// work as aliases (Overview's tiles, anything saved from before the
+// merge) — "water" also scrolls to the water block.
+const SECTION_ALIASES = { food: "fuel", water: "fuel" };
 
-  document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b.dataset.section === requested));
+function switchSection(requested) {
+  const section = SECTION_ALIASES[requested] || requested;
+
+  document.querySelectorAll(".section-btn").forEach((b) => b.classList.toggle("active", b.dataset.section === section));
   ALL_SECTIONS.forEach((s) => {
     const el = document.getElementById(`${s}-section`);
     if (el) el.hidden = s !== section;
@@ -382,23 +384,24 @@ function switchSection(requested) {
   if (section === "blueprint" && window.renderBlueprint) window.renderBlueprint();
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
-  if (section === "food" && window.renderFood) window.renderFood();
+  if (section === "fuel" && window.renderFood) window.renderFood();
+  if (section === "reading" && window.renderReading) window.renderReading();
   if (section === "markets" && window.refreshMarkets) window.refreshMarkets();
   if (window.renderOverview) window.renderOverview();
   const miniBar = document.getElementById("mini-overview");
   if (miniBar) miniBar.hidden = section === "overview";
   playTabEnter(document.getElementById(`${section}-section`));
 
-  const changed = window.currentSection !== requested;
-  window.currentSection = requested;
+  const changed = window.currentSection !== section;
+  window.currentSection = section;
   if (requested === "water") {
-    document.querySelector(".water-widget")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    document.getElementById("fuel-water")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
   } else if (changed) {
     // A new section starts at its top, not wherever the last one was scrolled to.
     window.scrollTo(0, 0);
   }
   // Lets the phone navigation (mobile-nav.js) follow along.
-  if (window.onSectionChange) window.onSectionChange(requested);
+  if (window.onSectionChange) window.onSectionChange(section);
 }
 window.switchSection = switchSection;
 window.currentSection = "overview";

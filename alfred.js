@@ -55,6 +55,15 @@ function buildDailyContext() {
   const waterMl = waterToday();
   const waterLine = `Water today: ${(waterMl / 1000).toFixed(2)}L of ${(water.target / 1000).toFixed(1)}L target`;
 
+  const reading = window.readingSummary ? window.readingSummary() : null;
+  const readingLine = reading
+    ? `Reading: ${
+        reading.reading.length
+          ? reading.reading.map((b) => `"${b.title}"${b.pages ? ` (p. ${b.page}/${b.pages})` : ""}`).join(", ")
+          : "nothing in progress"
+      }; ${reading.finishedThisYear} books finished this year, ${reading.total} all time`
+    : null;
+
   return [
     `Today is ${today}.`,
     "Habits:",
@@ -64,6 +73,7 @@ function buildDailyContext() {
     `- ${fitnessLine}`,
     `- ${foodLine}`,
     `- ${waterLine}`,
+    ...(readingLine ? [`- ${readingLine}`] : []),
   ].join("\n");
 }
 

@@ -77,12 +77,14 @@ Verified in headless Chromium at 390px (touch) and 1280px, light/dark,
 including resizing across the breakpoint; not yet tried on a real iPhone
 (keyboard lift and safe areas are the parts most worth checking).
 
-Sidebar now has 13 sections in 4 groups: Habits/Goals/Alfred/Blueprint/
-Review, Body (Fitness/Food/Water/Recovery), Mind (Mindset/Reading),
+Sidebar now has 15 entries in 4 groups: Overview/Habits/Goals/Alfred/
+Blueprint/Review, Body (Fitness/Fuel/Recovery), Mind (Mindset/Reading),
 System (News/Markets/Notes/Settings — Settings opens a full section).
-   The 7 new ones (Blueprint, Review,
-Recovery, Mindset, Reading, Markets, Notes) are all the same simple
-pattern for now — a one-line note form + timestamped log, own localStorage
+(Food + Water were merged into Fuel and Reading became a real book log on
+2026-09-16 — see "Fuel and Reading" below.)
+   The journal-backed ones (Blueprint, Review,
+Recovery, Mindset, Markets, Notes; Reading originally) started as the same simple
+pattern — a one-line note form + timestamped log, own localStorage
 key each (journal.js) — since none of them have real tracked structure
 specified yet, unlike Fitness/Food/Goals.
 
@@ -292,6 +294,79 @@ config.js — config.js is only ever a local-dev fallback at this point,
 never the primary path for any of them. Verified each of Alfred and Food
 lookup working end-to-end from a Settings-saved key alone, config.js
 values deliberately cleared first to simulate the live-site case.
+
+## Fuel and Reading (2026-09-16)
+
+Martin asked to merge Food and Water ("the layout is the same anyway" —
+the old Water nav item only scrolled down the Food page) into one section
+called **Fuel**, and to make **Reading** a proper list of books he's read,
+with info on each, because it was a plain note log.
+
+Fuel (`#fuel-section`; food.js + water.js, no new file):
+- One nav entry, section id `fuel`. `switchSection()` keeps `food` and
+  `water` as aliases (`SECTION_ALIASES` in script.js; `water` also scrolls
+  to `#fuel-water`), so Overview's Water/Food tiles and anything old still
+  land there. `window.currentSection` is always the resolved id.
+- Storage is untouched: same `food` and `water` keys and shapes.
+- Layout in the Markets/Overview style: day switcher pill (tap the date to
+  jump back to today), big "kcal left" number, stats (Target input /
+  Protein / Water) with hairlines, the existing budget bar, a Water block
+  drawn as one glass per 250 ml, Meals (log form + "Again" chips + meal
+  groups), Maintenance estimator last. The stale "Saved on this device
+  only" note is gone (sync exists).
+- Water now follows the Fuel day switcher (`addWater(ml, date)` — date
+  defaults to today, which is what Overview's +250 ml uses), so a past
+  day can be back-filled. `renderFood()` calls `window.renderWater()`.
+- Phone nav: MNAV_SECTIONS has `fuel` (new fork+drop icon) instead of
+  food/water; `mnavLoadTabs()` maps pinned `food`/`water` to `fuel`
+  (MNAV_RENAMED) and tops the pair back up if both collapsed into one.
+
+Reading (`#reading-section`, new reading.js, loaded after journal.js):
+- localStorage key `books` (syncs like everything else) — array of
+  `{id, title, origTitle, author, year, pages, cover, olKey, subjects,
+  description, status: read|reading|want, rating 0-5, started, finished
+  ("YYYY-MM", or just "YYYY" when only the year is known, or ""), page,
+  notes, ai: {summary, ideas, forWho} | {unknown:true} | null, addedAt}`.
+  `reading-view` remembers grid vs list.
+- Metadata from Open Library (free, no key, CORS OK from github.io —
+  verified live): search.json with `editions.*` fields, so a Czech title
+  ("Malý princ", "Harry Potter a kámen mudrců") finds the work and is shown
+  under the typed title (`origTitle` keeps the original). Covers from
+  covers.openlibrary.org with `?default=false` (missing → 404 → the drawn
+  placeholder cover underneath stays). Work blurb fetched in the
+  background after adding (`enrichBook`).
+- "Key ideas": Gemini (same `geminiKey()` as Alfred/quotes,
+  gemini-3.6-flash) generates a 2-3 sentence summary + 3-5 takeaways +
+  who it's for, automatically the first time a book's detail sheet is
+  opened, cached on the book; "Redo" regenerates. Asked to answer
+  `{"unknown": true}` rather than guess for books it doesn't know.
+- UI: hero = books finished this year + a Jan–Dec bar strip, a link to a
+  goal whose name starts with "Read" (display only — it does NOT change
+  the goal), stats (all time / pages / avg rating); "Reading now" cards
+  with an editable page number and "Finished ✓" (marks read this month and
+  opens the sheet to rate); shelf tabs Read / Want to read, sort, grid of
+  covers or list rows, Read grouped by finish year; detail sheet (bottom
+  sheet on the phone) with editable title/author, stars, status, dates,
+  pages, key ideas, blurb, notes, two-tap remove. "+ Add books" sheet:
+  search (tap a result to add) or **paste a list** (one per line,
+  optional "- Author"; each line matched with a scored best-match —
+  exact title, author, derivative "summary/workbook/adaptation" editions
+  penalised, popularity as tie-breaker; misses are still added as typed).
+  Shelf + "Finished" choice (this month / this year / last year / earlier).
+- Old reading notes (`journal-reading`) are the Notes block at the bottom.
+- Whole file is one IIFE: every `<script>` shares the global scope and
+  names like `searchInput` already exist elsewhere (that collision broke
+  the first test run). Only `window.renderReading` and
+  `window.readingSummary` (used by the More sheet and Alfred's daily
+  context) are exported.
+
+Verified in headless Chromium (390px touch + 1360px, dark + light) with
+Open Library / Gemini stubbed: every section switch (incl. food/water
+aliases) error-free, day switching + water back-fill, nav-tab migration,
+search add, paste add (dedupe, no-match fallback), finish → rate flow,
+manual add + remove, AI summary render. Open Library matching was also
+checked against the live API from the github.io origin with a mixed
+English/Czech list. Not yet tried on the real iPhone.
 
 ## Next steps
 

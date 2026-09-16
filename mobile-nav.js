@@ -28,8 +28,7 @@ const MNAV_SECTIONS = [
   { id: "blueprint", label: "Blueprint", group: "Daily", icon: "blueprint" },
   { id: "review", label: "Review", group: "Daily", icon: "review" },
   { id: "fitness", label: "Fitness", group: "Body", icon: "fitness" },
-  { id: "food", label: "Food", group: "Body", icon: "food" },
-  { id: "water", label: "Water", group: "Body", icon: "water" },
+  { id: "fuel", label: "Fuel", group: "Body", icon: "fuel" },
   { id: "recovery", label: "Recovery", group: "Body", icon: "recovery" },
   { id: "mindset", label: "Mindset", group: "Mind", icon: "mindset" },
   { id: "reading", label: "Reading", group: "Mind", icon: "reading" },
@@ -48,8 +47,7 @@ const MNAV_ICONS = {
   blueprint: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/><rect x="7.5" y="13" width="5.5" height="3.2" rx="0.8"/>',
   review: '<path d="M4.6 12A7.4 7.4 0 1 0 6.8 6.8"/><path d="M4.4 4.2v3.4h3.4"/><path d="M12 8.4V12l2.6 1.6"/>',
   fitness: '<path d="M6.5 7.5v9M17.5 7.5v9M3.5 10v4M20.5 10v4M6.5 12h11"/>',
-  food: '<path d="M6.5 3.5v5.5a2.25 2.25 0 0 0 4.5 0V3.5M8.75 11.25v9.25M17 20.5V3.5c-2.1 1.3-3.2 3.9-3.2 7.5H17"/>',
-  water: '<path d="M12 3.8c3.1 3.7 5.6 6.8 5.6 10.1a5.6 5.6 0 0 1-11.2 0c0-3.3 2.5-6.4 5.6-10.1z"/><path d="M9.3 14.4a2.8 2.8 0 0 0 2.4 2.6"/>',
+  fuel: '<path d="M5 3.5v4.8a2 2 0 0 0 4 0V3.5M7 10.3v10.2"/><path d="M16.2 7.6c2.2 2.6 3.8 4.8 3.8 7.1a3.8 3.8 0 0 1-7.6 0c0-2.3 1.6-4.5 3.8-7.1z"/>',
   recovery: '<path d="M19.4 14.4A7.6 7.6 0 0 1 9.6 4.6a7.6 7.6 0 1 0 9.8 9.8z"/>',
   mindset: '<path d="M9.2 17.2h5.6M10.2 20.2h3.6"/><path d="M12 3.6a6 6 0 0 0-3.6 10.8c.6.5.9 1.1.9 1.8v1h5.4v-1c0-.7.3-1.3.9-1.8A6 6 0 0 0 12 3.6z"/>',
   reading: '<path d="M12 6.6C10 5.1 7.2 4.6 4 5.1v13c3.2-.5 6 0 8 1.5 2-1.5 4.8-2 8-1.5v-13c-3.2-.5-6 0-8 1.5zM12 6.6v13"/>',
@@ -75,11 +73,20 @@ function mnavSection(id) {
 // ---------------------------------------------------------------------------
 // Tab choices
 
+// Sections that were merged into another one — a tab pinned before the
+// merge follows it instead of silently resetting both tabs to defaults.
+const MNAV_RENAMED = { food: "fuel", water: "fuel" };
+
 function mnavLoadTabs() {
   try {
     const saved = JSON.parse(localStorage.getItem(MNAV_TABS_KEY));
     if (Array.isArray(saved)) {
-      const valid = saved.filter((id) => id !== "overview" && mnavSection(id));
+      const valid = [...new Set(saved.map((id) => MNAV_RENAMED[id] || id))].filter(
+        (id) => id !== "overview" && mnavSection(id)
+      );
+      // Pinning both Food and Water collapses to one Fuel tab — top the
+      // pair back up with a default that isn't already there.
+      if (valid.length === 1) valid.push(MNAV_DEFAULT_TABS.find((id) => id !== valid[0]));
       if (valid.length === 2 && valid[0] !== valid[1]) return valid;
     }
   } catch {
@@ -140,12 +147,16 @@ function mnavSubtitle(id) {
       }
       case "fitness":
         return { text: `${trainedThisWeek()}/${TRAIN_TARGET} this week` };
-      case "food": {
+      case "fuel": {
         const kcal = entriesFor(todayKey()).reduce((sum, e) => sum + e.kcal, 0);
         return { text: `${kcal.toLocaleString()} kcal` };
       }
-      case "water":
-        return { text: `${(waterToday() / 1000).toFixed(2)}L of ${(water.target / 1000).toFixed(1)}L` };
+      case "reading": {
+        const r = window.readingSummary && window.readingSummary();
+        if (!r) return { text: "" };
+        if (r.reading.length) return { text: r.reading[0].title };
+        return { text: r.total ? `${r.finishedThisYear} this year` : "Add your books" };
+      }
       case "news": {
         const n = window.newsSnapshot && window.newsSnapshot();
         if (!n || !n.items.length) return { text: "Headlines" };

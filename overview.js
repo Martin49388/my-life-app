@@ -79,7 +79,7 @@ function overviewStandards() {
     {
       id: "food",
       label: "Food",
-      section: "food",
+      section: "fuel",
       value: kcalToday.toLocaleString(),
       sub: `of ${kcalTarget.toLocaleString()} kcal · ${proteinToday}g protein`,
       progress: ratio(kcalToday, kcalTarget),
