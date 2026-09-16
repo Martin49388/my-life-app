@@ -158,9 +158,21 @@ async function pullFromSupabase() {
     if (isSupabaseInternalKey(key)) keepEntries.push([key, localStorage.getItem(key)]);
   }
   localStorage.clear();
-  for (const [key, value] of keepEntries) localStorage.setItem(key, value);
+  // Write straight through the original, unpatched setItem here — not the
+  // wrapped one below. Every other module (quotes.js's Gemini call,
+  // news.js, markets.js, ...) can still have an async write in flight from
+  // before this pull started, working off its own now-stale in-memory
+  // copy of the data. If one of those lands on the wrapped setItem while
+  // we're mid-restore, it silently clobbers the remote copy we're about to
+  // reload with, and since the reload just re-reads whatever is currently
+  // in localStorage, that stale write becomes the new "local" state --
+  // which then reads as different from remote all over again, restarting
+  // this exact process. That's the infinite reload loop ("bugging") this
+  // guards against: it only ever showed up signed in, because signed-out
+  // devices never take this restore-then-reload path at all.
+  for (const [key, value] of keepEntries) _origSetItem(key, value);
   for (const [key, value] of Object.entries(row.data)) {
-    localStorage.setItem(key, value);
+    _origSetItem(key, value);
   }
   sessionStorage.setItem("just-synced", "1");
   // A bare, immediate location.reload() risks iOS Safari/WKWebView
@@ -178,6 +190,14 @@ async function pullFromSupabase() {
 // since this is the same global localStorage object everyone shares.
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key, value) {
+  // A remote copy is being written in and a reload is already scheduled
+  // (see pullFromSupabase) -- drop any write that isn't that restore
+  // itself (which bypasses this wrapper via _origSetItem). Anything else
+  // reaching here during that window is necessarily based on
+  // pre-restore state and would otherwise overwrite the freshly-applied
+  // remote data before the reload picks it up. Supabase's own session
+  // keys still pass through so an in-flight token refresh isn't dropped.
+  if (applyingRemote && !isSupabaseInternalKey(key)) return;
   _origSetItem(key, value);
   if (!isSupabaseInternalKey(key)) schedulePush();
 };
