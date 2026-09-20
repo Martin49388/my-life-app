@@ -215,6 +215,19 @@ localStorage.setItem = function (key, value) {
   if (!isSupabaseInternalKey(key)) schedulePush();
 };
 
+// Flush a push immediately instead of waiting out the 1.5s debounce.
+// backup.js needs this: restoring a backup then reloading would
+// otherwise race the pull on the next load, which — seeing local and
+// remote disagree — would take the remote copy and undo the restore.
+// Resolves false when there's nothing to push to (not signed in, or
+// sync isn't configured), so the caller can carry on either way.
+window.syncPushNow = async function syncPushNow() {
+  if (!supa || !session) return false;
+  clearTimeout(pushTimer);
+  await pushToSupabase();
+  return true;
+};
+
 function showStep(step) {
   const emailForm = document.getElementById("sync-email-form");
   const codeForm = document.getElementById("sync-code-form");

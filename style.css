@@ -8465,3 +8465,127 @@ body.book-sheet-open {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------
+   App status pills (offline.js) — offline state and "update ready".
+
+   Fixed at the top centre because every other fixed thing in this app is
+   at the bottom: the global Ask bar on desktop, the tab bar on the phone.
+   z-index clears the highest in the file (60, the phone sheets) so a pill
+   is never buried under a sheet it's trying to explain.
+   --------------------------------------------------------------------- */
+.app-status {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  padding: 0 12px;
+  max-width: 100%;
+}
+
+.app-status-pill {
+  pointer-events: auto;
+  display: block;
+  max-width: 100%;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  text-align: center;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-dim);
+  animation: app-status-in 0.2s ease;
+}
+
+button.app-status-pill {
+  cursor: pointer;
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+
+button.app-status-pill:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+@keyframes app-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Backup (backup.js). The buttons reuse .account-actions from the other
+   Settings blocks; only the armed restore and the status tones are new.
+   --danger stays what it is everywhere else in this app: the colour of a
+   confirmation you could regret. */
+#backup-import-btn.is-armed {
+  background: var(--danger);
+  color: #ffffff;
+}
+
+/* Full-strength text rather than --danger: this line is read on every
+   visit to Settings, and something permanently red there is something
+   you stop seeing. --danger stays what it is everywhere else in this
+   app — the colour of a confirmation you could regret. */
+.account-status.is-warn {
+  color: var(--text);
+}
+
+.account-status.is-good {
+  color: var(--text-dim);
+}
+
+.backup-actions {
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  /* The phone has no empty gutter at the top — the date and the now/next
+     pill are already there, and a fixed pill lands straight on top of
+     them. Above the tab bar is the one strip of screen nothing else
+     claims. */
+  .app-status {
+    top: auto;
+    /* Clears the tab bar AND the raised centre "Ask Alfred" button,
+       which sticks up above it. */
+    bottom: calc(env(safe-area-inset-bottom) + 78px);
+    flex-direction: column-reverse;
+  }
+
+  .app-status-pill {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  /* Three buttons don't fit side by side at this width —
+     .account-actions is a flex row built for two. */
+  .backup-actions {
+    flex-wrap: wrap;
+  }
+
+  .backup-actions button {
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  .backup-actions #backup-import-btn {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-status-pill {
+    animation: none;
+  }
+}

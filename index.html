@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260920-1" />
+  <link rel="stylesheet" href="style.css?v=20260920-2" />
 </head>
 <body>
   <main class="app">
@@ -1055,6 +1055,26 @@
       </div>
 
       <div class="settings-block">
+        <p class="settings-title">Backup</p>
+        <p class="section-hint">
+          Everything you log lives in this browser's storage. Sync keeps
+          your devices in step, but it is not a backup &mdash; it makes
+          them agree, so a bad write or a wipe agrees everywhere too.
+          Download a copy you keep yourself. Your API keys and your
+          sign-in are deliberately left out, so the file is safe to mail
+          to yourself or leave in iCloud.
+        </p>
+
+        <div class="account-actions backup-actions">
+          <button type="button" id="backup-export-btn">Download backup</button>
+          <button type="button" id="backup-copy-btn">Copy to clipboard</button>
+          <button type="button" id="backup-import-btn">Restore backup</button>
+        </div>
+        <input type="file" id="backup-file" accept="application/json,.json" hidden />
+        <p class="account-status" id="backup-status"></p>
+      </div>
+
+      <div class="settings-block">
         <div class="settings-divider"></div>
         <p class="settings-version">BatCave &middot; Prototype 1</p>
       </div>
@@ -1185,27 +1205,32 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260920-1"></script>
+  <script src="config.js?v=20260920-2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260920-1"></script>
-  <script src="script.js?v=20260920-1"></script>
-  <script src="news.js?v=20260920-1"></script>
-  <script src="goals.js?v=20260920-1"></script>
-  <script src="markets.js?v=20260920-1"></script>
-  <script src="fitness.js?v=20260920-1"></script>
-  <script src="food.js?v=20260920-1"></script>
-  <script src="water.js?v=20260920-1"></script>
-  <script src="blueprint.js?v=20260920-1"></script>
-  <script src="alfred.js?v=20260920-1"></script>
-  <script src="journal.js?v=20260920-1"></script>
-  <script src="reading.js?v=20260920-1"></script>
-  <script src="recovery.js?v=20260920-1"></script>
-  <script src="review.js?v=20260920-1"></script>
-  <script src="notes.js?v=20260920-1"></script>
-  <script src="quotes.js?v=20260920-1"></script>
-  <script src="overview.js?v=20260920-1"></script>
-  <script src="glance.js?v=20260920-1"></script>
-  <script src="global-bar.js?v=20260920-1"></script>
-  <script src="mobile-nav.js?v=20260920-1"></script>
+  <script src="sync.js?v=20260920-2"></script>
+  <script src="script.js?v=20260920-2"></script>
+  <script src="news.js?v=20260920-2"></script>
+  <script src="goals.js?v=20260920-2"></script>
+  <script src="markets.js?v=20260920-2"></script>
+  <script src="fitness.js?v=20260920-2"></script>
+  <script src="food.js?v=20260920-2"></script>
+  <script src="water.js?v=20260920-2"></script>
+  <script src="blueprint.js?v=20260920-2"></script>
+  <script src="alfred.js?v=20260920-2"></script>
+  <script src="journal.js?v=20260920-2"></script>
+  <script src="reading.js?v=20260920-2"></script>
+  <script src="recovery.js?v=20260920-2"></script>
+  <script src="review.js?v=20260920-2"></script>
+  <script src="notes.js?v=20260920-2"></script>
+  <script src="quotes.js?v=20260920-2"></script>
+  <script src="overview.js?v=20260920-2"></script>
+  <script src="glance.js?v=20260920-2"></script>
+  <script src="global-bar.js?v=20260920-2"></script>
+  <script src="mobile-nav.js?v=20260920-2"></script>
+  <script src="backup.js?v=20260920-2"></script>
+  <!-- Last: registering the service worker is the only thing here that
+       can trigger a reload, so everything else is already wired up by
+       the time it can. -->
+  <script src="offline.js?v=20260920-2"></script>
 </body>
 </html>

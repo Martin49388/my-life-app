@@ -459,6 +459,86 @@ metric/range switches, week navigation, autosave, the carried-over focus,
 tag filtering, send-to, edit, delete, search, migration) plus zero
 console/page errors. Not yet tried on the real iPhone.
 
+## Offline and Backup (2026-09-20)
+
+Martin handed over the choice of what to do next ("you choose right now
+what to do and how to do it"). The pick was the foundation rather than a
+16th section: the app was feature-rich and proof-poor — every section
+designed, nothing yet proving it survives a real month — and two gaps
+were provable from the repo alone.
+
+**There was no backup, at all.** Every byte lived in localStorage.
+Supabase sync is a mirror, not a backup: its job is to make devices
+agree, so a bad write or a wipe agrees everywhere too. And on iOS,
+localStorage for a site not installed to the home screen is evicted
+after roughly a week unopened. Months of data, no second copy Martin
+controlled.
+
+**There was no service worker.** manifest.json + the apple meta tags
+made it installable, but installable is not offline — the home-screen
+icon opened a white page the moment the connection dropped. It's also
+the precondition for ever doing web push.
+
+**`sw.js`** — cache-first app shell, three rules in order: cross-origin
+requests bypass the worker entirely (Supabase, Gemini, Finnhub, Twelve
+Data, Open Library, rss2json, Google Fonts — a stale API response is
+worse than a failed one, and an opaque response can't be checked
+anyway); navigations are network-first with the cached index.html as
+fallback, so a deploy is picked up immediately but the app still opens
+with no network; other same-origin assets are stale-while-revalidate,
+exact-URL match first and `ignoreSearch` only as a fallback so an
+`ignoreSearch` hit can never serve a previous version's file. All paths
+are relative, so the same worker works at `/` locally and at
+`/my-life-app/` on Pages. A failed precache entry doesn't fail the
+install (config.js is gitignored and genuinely 404s on the live copy).
+**CACHE_VERSION must be bumped in the same commit as index.html's `?v=`
+strings** — the two together are what make a deploy actually land.
+
+**`offline.js`** — registers the worker and owns two pills (top-centre
+on desktop; above the tab bar on the phone, where the top is already
+occupied by the date and the now/next pill): "Offline — live data
+paused", and "Update ready — tap to reload". Also sets `data-offline` on
+`<html>` for any section that wants to explain itself. Caught a real bug
+in testing: `clients.claim()` fires `controllerchange` on a *first*
+install, so an unguarded reload-on-controllerchange meant every first
+visit silently reloaded itself. Now only a user-tapped update sets the
+flag that permits a reload — consistent with sync.js's standing rule in
+this repo that nothing reloads the page on its own.
+
+**`backup.js`** (Settings → Backup) — Download backup / Copy to
+clipboard / Restore backup.
+- The file is `{app, version, exportedAt, keyCount, data}` where `data`
+  is the same flat `{key: rawString}` map sync.js's `dumpLocalStorage()`
+  produces, so a Supabase `app_state.data` row pasted into a file
+  restores as-is (and the importer accepts a bare map for that reason).
+- Two key classes are excluded from the file *and* preserved across a
+  restore: `sb-*` (auth session) and `*-api-key` (Gemini, FoodData,
+  Finnhub, Twelve Data). So the file is safe to mail to yourself, and
+  restoring never signs you out or clears your keys.
+- Restore is the most destructive thing in the app: pick a file (parsed
+  and validated then, so the confirmation can name what's about to
+  replace what), then confirm on the button, which arms red and disarms
+  itself after 30s. It clears non-excluded keys first, so a restore is a
+  true snapshot rather than a merge leaving orphans.
+- Writes go through the normal sync-wrapped `setItem` (debounced: one
+  push, not one per key), then `window.syncPushNow()` — a new tiny
+  export in sync.js — flushes before the reload. Without that flush the
+  reload races the pull, which would read the restore as "this device is
+  behind" and hand the old copy straight back.
+- "Copy to clipboard" exists because a standalone iOS home-screen PWA
+  has no visible downloads folder and `<a download>` can dead-end there.
+
+Verified in headless Chromium: 36 assertions covering worker
+registration, precache contents, cross-origin requests staying
+*uncached*, a genuine offline reload rendering the app, section
+switching offline, the pills, export naming/contents/exclusions,
+the "last backup" line persisting, arm-then-confirm, this device's key
+surviving a restore, orphan keys being cleared, and four bad-input
+cases. Plus a regression sweep: 17 sections × (light/dark ×
+1400px/390px), zero console errors. Not yet tried on the real iPhone —
+the install-to-home-screen path and the download fallback are the parts
+most worth checking there.
+
 ## Next steps
 
 - Fixed a real bug found via a screen recording Martin sent (2026-09-13):
