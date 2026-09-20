@@ -64,6 +64,20 @@ function buildDailyContext() {
       }; ${reading.finishedThisYear} books finished this year, ${reading.total} all time`
     : null;
 
+  // Recovery's readiness check-in, the running week's review score and
+  // the notes inbox — each section exposes one summary line rather than
+  // this file reaching into their storage (see recovery.js/review.js/
+  // notes.js).
+  const extraLines = [window.recoverySummary, window.reviewSummary, window.notesSummary]
+    .map((fn) => {
+      try {
+        return fn ? fn().line : null;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+
   return [
     `Today is ${today}.`,
     "Habits:",
@@ -74,6 +88,7 @@ function buildDailyContext() {
     `- ${foodLine}`,
     `- ${waterLine}`,
     ...(readingLine ? [`- ${readingLine}`] : []),
+    ...extraLines.map((l) => `- ${l}`),
   ].join("\n");
 }
 

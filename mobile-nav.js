@@ -169,6 +169,19 @@ function mnavSubtitle(id) {
         if (m.avg == null) return { text: `${m.watching} watched` };
         return { text: `${m.signed(m.avg)}% today`, tone: m.tone(m.avg) };
       }
+      case "recovery": {
+        const r = window.recoverySummary && window.recoverySummary();
+        return { text: r ? r.short : "" };
+      }
+      case "review": {
+        const r = window.reviewSummary && window.reviewSummary();
+        if (!r) return { text: "" };
+        return { text: r.reviewed ? `Week ${r.week} reviewed` : r.short };
+      }
+      case "notes": {
+        const n = window.notesSummary && window.notesSummary();
+        return { text: n ? n.short : "" };
+      }
       case "settings": {
         const badge = document.querySelector(".m-sync-badge");
         return { text: badge && !badge.hidden ? "Synced" : "Sync & keys" };

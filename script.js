@@ -386,6 +386,9 @@ function switchSection(requested) {
   if (section === "fitness" && window.renderFitness) window.renderFitness();
   if (section === "fuel" && window.renderFood) window.renderFood();
   if (section === "reading" && window.renderReading) window.renderReading();
+  if (section === "recovery" && window.renderRecovery) window.renderRecovery();
+  if (section === "review" && window.renderReview) window.renderReview();
+  if (section === "notes" && window.renderNotes) window.renderNotes();
   if (section === "markets" && window.refreshMarkets) window.refreshMarkets();
   if (window.renderOverview) window.renderOverview();
   const miniBar = document.getElementById("mini-overview");

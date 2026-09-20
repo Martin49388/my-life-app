@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260916-5" />
+  <link rel="stylesheet" href="style.css?v=20260920-1" />
 </head>
 <body>
   <main class="app">
@@ -614,32 +614,162 @@
       </div>
     </section>
 
+    <!-- Review: the weekly review, mostly written by the app itself
+         (review.js). The old free-text log (journal.js, "journal-review")
+         lives on as the Notes block at the bottom. -->
     <section id="review-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">review</p>
-        <p class="section-hint">Look back — what worked, what didn't, what's next.</p>
+      <header class="dash-header">
+        <div class="dash-topline">
+          <p class="eyebrow">review</p>
+          <div class="dash-topline-actions">
+            <button type="button" class="live-pill" id="rev-pill" data-state="idle">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="rev-pill-label">Week in progress</span>
+              <span class="live-pill-detail" id="rev-pill-detail"></span>
+            </button>
+            <button type="button" class="quick-chip" id="rev-this-week" data-rev-action="this-week" hidden>This week</button>
+          </div>
+        </div>
+
+        <div class="rev-nav">
+          <button type="button" class="rev-nav-btn" data-rev-nav="-1" aria-label="Previous week">&#8249;</button>
+          <span class="rev-nav-label">
+            <span class="rev-week" id="rev-week">Week</span>
+            <span class="rev-range" id="rev-range"></span>
+          </span>
+          <button type="button" class="rev-nav-btn" data-rev-nav="1" id="rev-next" aria-label="Next week">&#8250;</button>
+        </div>
+
+        <div class="dash-hero">
+          <div class="rev-hero-main">
+            <p class="dash-hero-number" id="rev-score">—</p>
+            <p class="dash-hero-caption" id="rev-caption">Week score</p>
+          </div>
+          <div class="dash-stats" id="rev-stats"></div>
+        </div>
       </header>
 
-      <form class="journal-form" data-journal="review">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Scorecard</p>
+          <span class="journal-time" id="rev-compare"></span>
+        </div>
+        <ul class="rev-scorecard" id="rev-scorecard"></ul>
+        <p class="section-hint">Every number here is read back out of the rest of the app — the score is the average of the areas that had anything to measure.</p>
+      </div>
 
-      <ul class="journal-list" id="review-journal-list"></ul>
+      <div class="rev-cols">
+        <div class="dash-block">
+          <div class="dash-block-head">
+            <p class="eyebrow">Day by day</p>
+          </div>
+          <div class="rev-grid" id="rev-grid"></div>
+        </div>
+
+        <div class="dash-block">
+          <div class="dash-block-head">
+            <p class="eyebrow">What stands out</p>
+          </div>
+          <ul class="rev-highlights" id="rev-highlights"></ul>
+        </div>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Write-up</p>
+          <span class="journal-time" id="rev-saved"></span>
+        </div>
+        <div id="rev-writeup"></div>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Past reviews</p>
+          <span class="journal-time" id="rev-streak"></span>
+        </div>
+        <ul class="rev-past" id="rev-past"></ul>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Notes</p>
+        </div>
+        <p class="section-hint">Loose thoughts that don't belong to one particular week.</p>
+        <form class="journal-form" data-journal="review">
+          <input type="text" class="journal-input" placeholder="Add a note…" required />
+          <button type="submit">Add</button>
+        </form>
+        <ul class="journal-list" id="review-journal-list"></ul>
+      </div>
     </section>
 
+    <!-- Recovery: daily readiness check-in + trend (recovery.js). The old
+         free-text log (journal.js, "journal-recovery") is the Notes block. -->
     <section id="recovery-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">recovery</p>
-        <p class="section-hint">Sleep, soreness, rest days — anything affecting how your body's recovering.</p>
+      <header class="dash-header">
+        <div class="dash-topline">
+          <p class="eyebrow">recovery</p>
+          <div class="dash-topline-actions">
+            <button type="button" class="live-pill" id="rec-pill" data-state="idle" data-rec-action="focus">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="rec-pill-label">No check-in today</span>
+              <span class="live-pill-detail" id="rec-pill-detail"></span>
+            </button>
+            <button type="button" class="quick-chip" id="rec-today-btn" data-rec-action="today" hidden>Back to today</button>
+          </div>
+        </div>
+
+        <div class="dash-hero">
+          <div class="rec-hero-main">
+            <p class="dash-hero-number" id="rec-score">—</p>
+            <p class="dash-hero-caption" id="rec-caption">Readiness</p>
+          </div>
+          <div class="dash-stats" id="rec-stats"></div>
+        </div>
       </header>
 
-      <form class="journal-form" data-journal="recovery">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
+      <div class="dash-block">
+        <div class="dash-block-head rec-trend-head">
+          <div class="rec-tabs" id="rec-metrics" role="tablist" aria-label="Trend metric"></div>
+          <div class="rec-ranges" id="rec-ranges"></div>
+        </div>
+        <div class="rec-chart" id="rec-chart"></div>
+        <p class="dash-block-summary" id="rec-chart-summary"></p>
+        <div class="rec-readout" id="rec-readout" hidden></div>
+      </div>
 
-      <ul class="journal-list" id="recovery-journal-list"></ul>
+      <div class="rec-cols">
+        <div class="dash-block">
+          <div class="dash-block-head">
+            <p class="eyebrow" id="rec-checkin-title">Today's check-in</p>
+            <span class="journal-time" id="rec-saved"></span>
+          </div>
+          <div class="rec-checkin" id="rec-checkin"></div>
+        </div>
+
+        <div class="dash-block">
+          <div class="dash-block-head">
+            <p class="eyebrow">Signal</p>
+          </div>
+          <ul class="rec-signal" id="rec-signal"></ul>
+          <div class="rec-areas-block" id="rec-areas-block" hidden>
+            <p class="stat-label">Sore areas &middot; last 14 days</p>
+            <ul class="rec-areas-chart" id="rec-areas-chart"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Notes</p>
+        </div>
+        <p class="section-hint">What the numbers miss — a tweak, an illness, a late night.</p>
+        <form class="journal-form" data-journal="recovery">
+          <input type="text" class="journal-input" placeholder="Add a note…" required />
+          <button type="submit">Add</button>
+        </form>
+        <ul class="journal-list" id="recovery-journal-list"></ul>
+      </div>
     </section>
 
     <section id="mindset-section" hidden>
@@ -786,18 +916,50 @@
       </div>
     </section>
 
+    <!-- Notes: a capture inbox (notes.js), not a log. The old free-text
+         entries (journal.js, "journal-notes") are imported once on first
+         load and the old key is emptied. -->
     <section id="notes-section" hidden>
-      <header class="section-header-simple">
-        <p class="eyebrow">notes</p>
-        <p class="section-hint">Anything that doesn't have a home yet.</p>
+      <header class="dash-header">
+        <div class="dash-topline">
+          <p class="eyebrow">notes</p>
+          <div class="dash-topline-actions">
+            <button type="button" class="live-pill" id="nt-pill" data-state="idle">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="nt-pill-label">Empty inbox</span>
+              <span class="live-pill-detail" id="nt-pill-detail"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dash-hero">
+          <div class="nt-hero-main">
+            <p class="dash-hero-number" id="nt-count">0</p>
+            <p class="dash-hero-caption" id="nt-caption">nothing captured yet</p>
+          </div>
+          <div class="dash-stats" id="nt-stats"></div>
+        </div>
       </header>
 
-      <form class="journal-form" data-journal="notes">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
+      <form class="nt-capture" id="nt-form">
+        <p class="eyebrow">Capture</p>
+        <textarea id="nt-input" class="nt-input" rows="2" placeholder="Anything that doesn't have a home yet. #tag it to file it."></textarea>
+        <div class="nt-capture-foot">
+          <span class="nt-capture-tags" id="nt-capture-tags"></span>
+          <span class="nt-capture-hint">&#8984; + &crarr;</span>
+          <button type="submit" class="nt-save" id="nt-save" disabled>Save</button>
+        </div>
       </form>
 
-      <ul class="journal-list" id="notes-journal-list"></ul>
+      <div class="dash-block">
+        <div class="dash-block-head nt-toolbar">
+          <div class="nt-tabs" id="nt-tabs" role="tablist" aria-label="Which notes"></div>
+          <input type="search" id="nt-search" class="nt-search" placeholder="Search notes" autocomplete="off" />
+        </div>
+        <div class="nt-tagbar" id="nt-tagbar" hidden></div>
+        <p class="dash-block-summary" id="nt-status"></p>
+        <ul class="nt-grid" id="nt-list"></ul>
+      </div>
     </section>
 
     <section id="settings-section" hidden>
@@ -1023,24 +1185,27 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260916-5"></script>
+  <script src="config.js?v=20260920-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260916-5"></script>
-  <script src="script.js?v=20260916-5"></script>
-  <script src="news.js?v=20260916-5"></script>
-  <script src="goals.js?v=20260916-5"></script>
-  <script src="markets.js?v=20260916-5"></script>
-  <script src="fitness.js?v=20260916-5"></script>
-  <script src="food.js?v=20260916-5"></script>
-  <script src="water.js?v=20260916-5"></script>
-  <script src="blueprint.js?v=20260916-5"></script>
-  <script src="alfred.js?v=20260916-5"></script>
-  <script src="journal.js?v=20260916-5"></script>
-  <script src="reading.js?v=20260916-5"></script>
-  <script src="quotes.js?v=20260916-5"></script>
-  <script src="overview.js?v=20260916-5"></script>
-  <script src="glance.js?v=20260916-5"></script>
-  <script src="global-bar.js?v=20260916-5"></script>
-  <script src="mobile-nav.js?v=20260916-5"></script>
+  <script src="sync.js?v=20260920-1"></script>
+  <script src="script.js?v=20260920-1"></script>
+  <script src="news.js?v=20260920-1"></script>
+  <script src="goals.js?v=20260920-1"></script>
+  <script src="markets.js?v=20260920-1"></script>
+  <script src="fitness.js?v=20260920-1"></script>
+  <script src="food.js?v=20260920-1"></script>
+  <script src="water.js?v=20260920-1"></script>
+  <script src="blueprint.js?v=20260920-1"></script>
+  <script src="alfred.js?v=20260920-1"></script>
+  <script src="journal.js?v=20260920-1"></script>
+  <script src="reading.js?v=20260920-1"></script>
+  <script src="recovery.js?v=20260920-1"></script>
+  <script src="review.js?v=20260920-1"></script>
+  <script src="notes.js?v=20260920-1"></script>
+  <script src="quotes.js?v=20260920-1"></script>
+  <script src="overview.js?v=20260920-1"></script>
+  <script src="glance.js?v=20260920-1"></script>
+  <script src="global-bar.js?v=20260920-1"></script>
+  <script src="mobile-nav.js?v=20260920-1"></script>
 </body>
 </html>

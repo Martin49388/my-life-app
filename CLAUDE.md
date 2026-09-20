@@ -86,7 +86,10 @@ System (News/Markets/Notes/Settings — Settings opens a full section).
 Recovery, Mindset, Markets, Notes; Reading originally) started as the same simple
 pattern — a one-line note form + timestamped log, own localStorage
 key each (journal.js) — since none of them have real tracked structure
-specified yet, unlike Fitness/Food/Goals.
+specified yet, unlike Fitness/Food/Goals. Reading (2026-09-16) and then
+Recovery/Review/Notes (2026-09-20, see below) grew real structure; the
+plain pattern now survives as Mindset, plus the Notes block at the
+bottom of Blueprint/Markets/Reading/Recovery/Review.
 
 Motion: tab switches fade/slide in (0.22s). Checking a habit pulses the
 row before it re-renders. `budget-number` and the water total tween to
@@ -367,6 +370,94 @@ search add, paste add (dedupe, no-match fallback), finish → rate flow,
 manual add + remove, AI summary render. Open Library matching was also
 checked against the live API from the github.io origin with a mixed
 English/Czech list. Not yet tried on the real iPhone.
+
+## Recovery, Review and Notes (2026-09-20)
+
+Martin asked for "the remaining boring sections" — Recovery, Review,
+Notes — to be made aesthetic *and* useful, with no brief of his own
+("try your best and I'll see what you come up with"). All three were
+still the plain journal pattern. Each keeps its old free-text log as a
+Notes block at the bottom (nothing was thrown away), and all three follow
+the Overview/Markets visual language: one hero number, hairline rows,
+flat tinted cells, mono for numerals, monochrome (--gain stays
+Markets-only; --danger only marks an armed delete). Each file is one
+IIFE — classic scripts share a global scope (the collision that broke
+reading.js's first test run) — and exports only its render + summary.
+
+**Recovery (recovery.js, key `recovery`)** — a readiness layer.
+- Storage: `{ sleepTarget (minutes), log: { "YYYY-MM-DD": { sleep,
+  quality 1-5, energy 1-5, soreness 1-5, areas: [], rest, at, updated } } }`.
+- Readiness 0-100 = sleep vs target (weight 40), quality (20), energy
+  (25), soreness inverted (15), **normalised by the weights actually
+  filled in** — half a check-in reads as half a check-in, not a bad day.
+  Bands: 80+ Primed / 65 Good / 50 Manageable / 35 Run down / below
+  Depleted.
+- Check-in has no save button (every tap writes through, same as habits);
+  a day toggled back to empty deletes its entry rather than leaving a husk.
+- Trend: one chart, four metrics (readiness/sleep/energy/soreness) ×
+  14/30/90 days. Tapping a bar switches the check-in to that day, so
+  back-filling is the same UI as today (Fuel's day-switcher idea). Sleep
+  draws a dashed target line. An empty range shows a line of text instead
+  of 30 stub bars.
+- Signal block: only lines computable from real data — training streak
+  and last rest day (from fitness.js's `plan.log`), readiness vs a
+  session planned today, sleep debt over the last 7 logged nights,
+  repeated sore areas, and sleep→energy (NOT sleep→readiness, which
+  would be circular since readiness contains sleep).
+- Exports `window.recoveryScoreOn(date)` (Review reads it),
+  `window.recoverySummary()`.
+
+**Review (review.js, key `reviews`)** — the weekly review, mostly
+written by the app.
+- Storage: `{ "2026-W38": { rating 0-5, wins, drags, focus, focusHit,
+  monday, at, updated } }`, ISO week keys (week 1 = the week containing
+  4 January; the week belongs to its Thursday's year).
+- Week score = average of the areas that had anything to measure, out of
+  Habits / Training / Water / Fuel / Plan / Recovery, all read back out
+  of the other sections' storage. An unfinished week is compared against
+  **the same slice** of the week before (`weekData(monday, limit)`), so
+  Wednesday isn't measured against a full week.
+- Scorecard rows (bar capped at 240px — a 900px bar is decoration, not a
+  measurement), a 6×7 day-by-day heat grid, auto "what stands out" lines,
+  then the only three questions a person has to answer: what worked,
+  what dragged, one thing for next week. Last week's "one thing" is
+  carried into this week's write-up with Did it / Didn't, which writes
+  back to *that* week's record.
+- The write-up is rebuilt only when the viewed week changes
+  (`writeupWeek`), otherwise a re-render mid-sentence takes the caret
+  with it. Autosaves 500ms after the last keystroke.
+- Week navigation can't go past the current week; past reviews list
+  navigates back to any week.
+
+**Notes (notes.js, key `notes`)** — an inbox, not a log.
+- Storage: `[{ id, text, tags: [], pinned, archived, at, updated }]`.
+  Multi-line capture (⌘/Ctrl+↵ files it; plain ↵ is a newline), #tags
+  parsed out of the text and highlighted in place — the inline tag IS
+  the filter control, so cards don't repeat their tags in a chip row.
+- Triage: pin, edit in place, archive, two-tap delete, and **Send to** —
+  files the note as a journal entry in Blueprint/Review/Recovery/Mindset/
+  Markets/Reading, or turns it into a habit via `addHabit()`, then
+  archives it here.
+- Views Inbox / Pinned / Archive / All, tag bar with counts, search.
+- Migration: old `journal-notes` entries are imported once with ids
+  derived from their timestamps (`j<at>`), so a re-run — or a sync pull
+  that restores the old key — can't duplicate them; the old key is then
+  set to `[]` (not removed) so sync.js pushes the emptying too.
+
+Wiring: `switchSection()` calls each section's render; `mnavSubtitle()`
+has a case per section for the phone More sheet; Alfred's
+`buildDailyContext()` appends `window.recoverySummary/reviewSummary/
+notesSummary().line`; Overview's "Logged today" feed gained a generic
+`window.TODAY_LOG_SOURCES` array (files push a function returning
+`{key, section, text, at}` entries) instead of hand-wiring each new
+section into overview.js.
+
+Verified in headless Chromium (Europe/Prague, seeded and empty data) at
+1400px and 390px, light + dark: 55 interaction assertions covering every
+control in all three sections (check-in writes, back-filling a past day,
+metric/range switches, week navigation, autosave, the carried-over focus,
+tag filtering, send-to, edit, delete, search, migration) plus zero
+console/page errors. Not yet tried on the real iPhone.
 
 ## Next steps
 

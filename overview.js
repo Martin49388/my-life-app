@@ -282,6 +282,20 @@ function todaysLoggedEntries() {
     }
   }
 
+  // Sections that store something richer than a journal entry (Recovery's
+  // check-in, Review's write-up, Notes' captures) register a function here
+  // rather than each one being hand-wired into this file.
+  if (Array.isArray(window.TODAY_LOG_SOURCES)) {
+    for (const source of window.TODAY_LOG_SOURCES) {
+      try {
+        const extra = source();
+        if (Array.isArray(extra)) entries.push(...extra);
+      } catch {
+        // One broken source shouldn't empty the whole feed.
+      }
+    }
+  }
+
   return entries.sort((a, b) => b.at - a.at);
 }
 
