@@ -18,7 +18,6 @@
 // section (#mini-overview, toggled by switchSection in script.js).
 
 const OVERVIEW_DATE_FMT = { weekday: "long", month: "long", day: "numeric" };
-const OVERVIEW_NAME = "Martin";
 
 function bestStreak() {
   return habits.length ? Math.max(...habits.map(currentStreak)) : 0;
@@ -443,7 +442,7 @@ function renderOverview() {
   const streak = bestStreak();
   const logged = todaysLoggedEntries();
 
-  document.getElementById("overview-greeting").textContent = `${greetingFor(now)}, ${OVERVIEW_NAME}.`;
+  document.getElementById("overview-greeting").textContent = `${greetingFor(now)}.`;
   document.getElementById("overview-banked").textContent = `${banked}/${total}`;
   document.getElementById("overview-best-streak").textContent = `${streak}d`;
   document.getElementById("overview-perfect").textContent =
