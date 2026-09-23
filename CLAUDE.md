@@ -741,6 +741,15 @@ goal, Review no-key state, phone More sheet) plus a mocked-Gemini run
 screenshots of every section; zero page errors. Not seen on a real
 iPhone yet.
 
+- Briefing tabs (2026-09-23, Martin didn't want to scroll past News to
+  reach stocks): Markets | News segmented tabs, one part shown at a time,
+  Markets first by default, last choice in localStorage `briefing-tab`
+  (`setBriefingTab()` in script.js; the "markets"/"news" aliases pick
+  their tab). news.js/markets.js refresh checks look at their own part
+  with `closest("[hidden]")`. Habits' Daily/Monthly handlers are now
+  scoped to `.tab-btn[data-view]` — the unscoped `.tab-btn` selector
+  would have hijacked the new tab buttons.
+
 ## Rules
 
 - No token/API key ever pasted into chat — config file only (violated once

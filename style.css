@@ -8741,18 +8741,36 @@ button.app-status-pill:hover {
   gap: 20px;
 }
 
-.briefing-part + .briefing-part {
-  margin-top: 16px;
-  padding-top: 28px;
-  border-top: 1px solid var(--border);
+/* Markets and News sit behind two tabs, one at a time — the tabs are the
+   heading, so the parts' own "Markets"/"News" titles are hidden. */
+.briefing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  flex-wrap: wrap;
 }
 
-.sub-title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text);
+.briefing-part[hidden] {
+  display: none !important;
+}
+
+.briefing-part .sub-title {
+  display: none;
+}
+
+.briefing-tabs .tab-btn {
+  min-width: 96px;
+}
+
+@media (max-width: 640px) {
+  .briefing-tabs {
+    width: 100%;
+  }
+
+  .briefing-tabs .tab-btn {
+    flex: 1 1 0;
+  }
 }
 
 /* --- Overview: calmer hero + check-in --------------------------------- */

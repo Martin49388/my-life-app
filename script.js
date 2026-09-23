@@ -394,7 +394,7 @@ function render() {
   renderHeader();
   document.getElementById("daily-view").hidden = currentView !== "daily";
   document.getElementById("monthly-view").hidden = currentView !== "monthly";
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
+  document.querySelectorAll(".tab-btn[data-view]").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === currentView);
   });
   if (currentView === "daily") renderDaily();
@@ -403,7 +403,7 @@ function render() {
   if (window.renderOverview) window.renderOverview();
 }
 
-document.querySelectorAll(".tab-btn").forEach((btn) => {
+document.querySelectorAll(".tab-btn[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => {
     currentView = btn.dataset.view;
     localStorage.setItem(VIEW_KEY, currentView);
@@ -476,7 +476,45 @@ const ALL_SECTIONS = [
 //   News + Markets -> Briefing (each scrolls to its part)
 //   Mindset -> Notes           (its journal became #mindset notes)
 const SECTION_ALIASES = { food: "fuel", water: "fuel", news: "briefing", markets: "briefing", mindset: "notes" };
-const SECTION_SCROLL_TO = { water: "fuel-water", markets: "markets-section" };
+const SECTION_SCROLL_TO = { water: "fuel-water" };
+
+// Briefing shows one part at a time (Markets or News) behind two tabs, so
+// neither is a scroll away. The last choice is remembered per device;
+// opening "markets" or "news" by their old ids picks that tab.
+const BRIEFING_TAB_KEY = "briefing-tab";
+function setBriefingTab(tab) {
+  const current = tab === "news" ? "news" : "markets";
+  try {
+    localStorage.setItem(BRIEFING_TAB_KEY, current);
+  } catch {
+    // Not fatal — it just won't be remembered.
+  }
+  document.querySelectorAll("[data-briefing-tab]").forEach((b) => {
+    const on = b.dataset.briefingTab === current;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+  const newsPart = document.getElementById("news-section");
+  const marketsPart = document.getElementById("markets-section");
+  if (newsPart) newsPart.hidden = current !== "news";
+  if (marketsPart) marketsPart.hidden = current !== "markets";
+  const briefing = document.getElementById("briefing-section");
+  if (briefing && !briefing.hidden) {
+    if (current === "news" && window.openNews) window.openNews();
+    if (current === "markets" && window.refreshMarkets) window.refreshMarkets();
+  }
+}
+window.setBriefingTab = setBriefingTab;
+function savedBriefingTab() {
+  try {
+    return localStorage.getItem(BRIEFING_TAB_KEY) || "markets";
+  } catch {
+    return "markets";
+  }
+}
+document.querySelectorAll("[data-briefing-tab]").forEach((b) => {
+  b.addEventListener("click", () => setBriefingTab(b.dataset.briefingTab));
+});
 
 function switchSection(requested) {
   const section = SECTION_ALIASES[requested] || requested;
@@ -486,8 +524,7 @@ function switchSection(requested) {
     const el = document.getElementById(`${s}-section`);
     if (el) el.hidden = s !== section;
   });
-  if (section === "briefing" && window.openNews) window.openNews();
-  if (section === "briefing" && window.refreshMarkets) window.refreshMarkets();
+  if (section === "briefing") setBriefingTab(requested === "news" || requested === "markets" ? requested : savedBriefingTab());
   if (section === "blueprint" && window.renderBlueprint) window.renderBlueprint();
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
@@ -513,6 +550,7 @@ function switchSection(requested) {
   if (window.onSectionChange) window.onSectionChange(section);
 }
 window.switchSection = switchSection;
+setBriefingTab(savedBriefingTab());
 window.currentSection = "overview";
 
 document.querySelectorAll(".section-btn").forEach((btn) => {

@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260923-3" />
+  <link rel="stylesheet" href="style.css?v=20260923-4" />
 </head>
 <body>
   <main class="app">
@@ -824,52 +824,11 @@
     <section id="briefing-section" hidden>
       <header class="briefing-head">
         <h1 class="eyebrow page-title">Briefing</h1>
+        <nav class="view-tabs briefing-tabs" aria-label="Briefing view">
+          <button type="button" class="tab-btn" data-briefing-tab="markets">Markets</button>
+          <button type="button" class="tab-btn" data-briefing-tab="news">News</button>
+        </nav>
       </header>
-      <div id="news-section" class="briefing-part">
-      <header class="dash-header">
-        <div class="dash-topline">
-          <h2 class="sub-title">News</h2>
-          <div class="dash-topline-actions">
-            <span class="live-pill" id="news-pill" data-state="idle">
-              <span class="live-dot" aria-hidden="true"></span>
-              <span class="live-pill-label" id="news-pill-label">Not loaded</span>
-              <span class="live-pill-detail" id="news-pill-detail"></span>
-            </span>
-            <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
-          </div>
-        </div>
-
-        <a class="news-lead" id="news-lead" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
-
-        <div class="dash-stats">
-          <div class="dash-stat">
-            <span class="stat-label">Last 24h</span>
-            <span class="dash-stat-value" id="news-stat-24h">—</span>
-          </div>
-          <div class="dash-stat">
-            <span class="stat-label">New since visit</span>
-            <span class="dash-stat-value" id="news-stat-new">—</span>
-          </div>
-          <div class="dash-stat">
-            <span class="stat-label">Newest</span>
-            <span class="dash-stat-value" id="news-stat-newest">—</span>
-          </div>
-        </div>
-      </header>
-
-      <div class="dash-block">
-        <div class="dash-block-head">
-          <p class="eyebrow">Last 24 hours</p>
-          <span class="journal-time" id="news-pulse-caption"></span>
-        </div>
-        <div class="news-pulse" id="news-pulse"></div>
-      </div>
-
-      <div class="dash-block">
-        <div class="news-filters" id="news-filters"></div>
-        <ul class="news-list" id="news-list"></ul>
-      </div>
-    </div>
       <div id="markets-section" class="briefing-part">
       <header class="markets-header">
         <div class="markets-topline">
@@ -928,6 +887,51 @@
           <button type="submit">Add</button>
         </form>
         <ul class="journal-list" id="markets-journal-list"></ul>
+      </div>
+    </div>
+      <div id="news-section" class="briefing-part">
+      <header class="dash-header">
+        <div class="dash-topline">
+          <h2 class="sub-title">News</h2>
+          <div class="dash-topline-actions">
+            <span class="live-pill" id="news-pill" data-state="idle">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="news-pill-label">Not loaded</span>
+              <span class="live-pill-detail" id="news-pill-detail"></span>
+            </span>
+            <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
+          </div>
+        </div>
+
+        <a class="news-lead" id="news-lead" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <span class="stat-label">Last 24h</span>
+            <span class="dash-stat-value" id="news-stat-24h">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">New since visit</span>
+            <span class="dash-stat-value" id="news-stat-new">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">Newest</span>
+            <span class="dash-stat-value" id="news-stat-newest">—</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Last 24 hours</p>
+          <span class="journal-time" id="news-pulse-caption"></span>
+        </div>
+        <div class="news-pulse" id="news-pulse"></div>
+      </div>
+
+      <div class="dash-block">
+        <div class="news-filters" id="news-filters"></div>
+        <ul class="news-list" id="news-list"></ul>
       </div>
     </div>
     </section>
@@ -1224,34 +1228,34 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260923-3"></script>
+  <script src="config.js?v=20260923-4"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260923-3"></script>
-  <script src="script.js?v=20260923-3"></script>
-  <script src="news.js?v=20260923-3"></script>
-  <script src="goals.js?v=20260923-3"></script>
-  <script src="markets.js?v=20260923-3"></script>
-  <script src="fitness.js?v=20260923-3"></script>
-  <script src="food.js?v=20260923-3"></script>
-  <script src="water.js?v=20260923-3"></script>
-  <script src="weight.js?v=20260923-3"></script>
-  <script src="blueprint.js?v=20260923-3"></script>
-  <script src="alfred.js?v=20260923-3"></script>
-  <script src="journal.js?v=20260923-3"></script>
-  <script src="reading.js?v=20260923-3"></script>
-  <script src="recovery.js?v=20260923-3"></script>
-  <script src="review.js?v=20260923-3"></script>
-  <script src="notes.js?v=20260923-3"></script>
-  <script src="quotes.js?v=20260923-3"></script>
-  <script src="actions.js?v=20260923-3"></script>
-  <script src="checkin.js?v=20260923-3"></script>
-  <script src="overview.js?v=20260923-3"></script>
-  <script src="global-bar.js?v=20260923-3"></script>
-  <script src="mobile-nav.js?v=20260923-3"></script>
-  <script src="backup.js?v=20260923-3"></script>
+  <script src="sync.js?v=20260923-4"></script>
+  <script src="script.js?v=20260923-4"></script>
+  <script src="news.js?v=20260923-4"></script>
+  <script src="goals.js?v=20260923-4"></script>
+  <script src="markets.js?v=20260923-4"></script>
+  <script src="fitness.js?v=20260923-4"></script>
+  <script src="food.js?v=20260923-4"></script>
+  <script src="water.js?v=20260923-4"></script>
+  <script src="weight.js?v=20260923-4"></script>
+  <script src="blueprint.js?v=20260923-4"></script>
+  <script src="alfred.js?v=20260923-4"></script>
+  <script src="journal.js?v=20260923-4"></script>
+  <script src="reading.js?v=20260923-4"></script>
+  <script src="recovery.js?v=20260923-4"></script>
+  <script src="review.js?v=20260923-4"></script>
+  <script src="notes.js?v=20260923-4"></script>
+  <script src="quotes.js?v=20260923-4"></script>
+  <script src="actions.js?v=20260923-4"></script>
+  <script src="checkin.js?v=20260923-4"></script>
+  <script src="overview.js?v=20260923-4"></script>
+  <script src="global-bar.js?v=20260923-4"></script>
+  <script src="mobile-nav.js?v=20260923-4"></script>
+  <script src="backup.js?v=20260923-4"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->
-  <script src="offline.js?v=20260923-3"></script>
+  <script src="offline.js?v=20260923-4"></script>
 </body>
 </html>
