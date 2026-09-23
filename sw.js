@@ -28,7 +28,7 @@
 // one extra load. Everything not matching the current CACHE_VERSION is
 // deleted on activate, so old copies can't accumulate.
 
-const CACHE_VERSION = "batcave-v20260923-4";
+const CACHE_VERSION = "batcave-v20260923-5";
 
 // Relative to this file, which sits next to index.html — so the same list
 // works unchanged at the root of a local dev server and at

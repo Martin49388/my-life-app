@@ -750,6 +750,17 @@ iPhone yet.
   scoped to `.tab-btn[data-view]` — the unscoped `.tab-btn` selector
   would have hijacked the new tab buttons.
 
+- Habits month view rebuilt (2026-09-23, Martin's phone screenshot:
+  Sunday column cut off, dots wrapping out of cells, mono legend of
+  names that explained nothing, footer overlapping the last row). Cells
+  now shade green by the share of habits done that day (solid = perfect
+  day), tap a day to see done/missed habits, one row per habit with a
+  count + bar below (beside the calendar on desktop). Counted from the
+  first day anything was ever ticked, so a month started mid-way isn't
+  scored against days before tracking began. Root cause of the overflow:
+  `grid-template-columns: repeat(7, 1fr)` — 1fr has an auto minimum, so
+  cell content widened the grid; now `minmax(0, 1fr)`.
+
 ## Rules
 
 - No token/API key ever pasted into chat — config file only (violated once

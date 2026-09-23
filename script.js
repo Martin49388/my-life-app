@@ -316,79 +316,116 @@ function renderDaily() {
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// Month view: one calendar cell per day, shaded by how much of the day's
+// habits got done (full green = every habit, i.e. a perfect day) — the
+// old version drew one dot per habit, which wrapped and overflowed on a
+// phone and couldn't say WHICH habit a dot was. Tapping a day names what
+// was done; below, one row per habit with its count for the month.
+let monthSelectedDate = null;
+
+// Local escape (alfred.js's escapeHtml loads after this file, and this
+// view can render on page load).
+function habitEsc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+function habitsDoneOn(date) {
+  return habits.filter((h) => habitSatisfied(h, date));
+}
+
 function renderMonthly() {
   document.getElementById("month-label").textContent = `${MONTH_NAMES[viewedMonth]} ${viewedYear}`;
 
-  const legend = document.getElementById("legend");
-  legend.innerHTML = habits
-    .map((h) => `<span class="legend-item">${h.name}</span>`)
-    .join("");
+  const today = todayKey();
+  const daysInMonth = new Date(viewedYear, viewedMonth + 1, 0).getDate();
+  const leadingBlanks = (new Date(viewedYear, viewedMonth, 1).getDay() + 6) % 7; // Monday-first
+  const now = new Date();
+  const isCurrentMonth = viewedYear === now.getFullYear() && viewedMonth === now.getMonth();
+  const isFutureMonth = viewedYear > now.getFullYear() || (viewedYear === now.getFullYear() && viewedMonth > now.getMonth());
+  // Count from the first day anything was ever ticked, so a month you
+  // started tracking halfway through isn't scored against days before
+  // the app existed.
+  const firstTracked = habits.flatMap((h) => Object.keys(h.history)).sort()[0] || today;
+  const monthStart = dateKey(new Date(viewedYear, viewedMonth, 1));
+  const startDay = firstTracked > monthStart && firstTracked.slice(0, 7) === monthStart.slice(0, 7) ? Number(firstTracked.slice(8)) : 1;
+  const beforeTracking = firstTracked.slice(0, 7) > monthStart.slice(0, 7);
+  const lastDay = isFutureMonth || beforeTracking ? 0 : isCurrentMonth ? now.getDate() : daysInMonth;
+  const elapsedDays = Math.max(0, lastDay - startDay + 1);
+  const total = habits.length;
 
   const calendar = document.getElementById("calendar");
-  calendar.innerHTML = "";
-  WEEKDAY_LABELS.forEach((label) => {
-    const el = document.createElement("div");
-    el.className = "weekday-label";
-    el.textContent = label;
-    calendar.appendChild(el);
-  });
+  const cells = ["M", "T", "W", "T", "F", "S", "S"].map((l) => `<div class="weekday-label">${l}</div>`);
+  for (let i = 0; i < leadingBlanks; i++) cells.push(`<div class="day-cell is-blank" aria-hidden="true"></div>`);
 
-  const firstOfMonth = new Date(viewedYear, viewedMonth, 1);
-  const daysInMonth = new Date(viewedYear, viewedMonth + 1, 0).getDate();
-  const leadingBlanks = (firstOfMonth.getDay() + 6) % 7; // Monday-first
-
-  for (let i = 0; i < leadingBlanks; i++) {
-    calendar.appendChild(document.createElement("div"));
-  }
-
-  const today = todayKey();
+  let perfect = 0;
+  let checks = 0;
   for (let d = 1; d <= daysInMonth; d++) {
     const date = dateKey(new Date(viewedYear, viewedMonth, d));
-    const cell = document.createElement("div");
-    cell.className = "day-cell";
-    if (date === today) cell.classList.add("is-today");
-    if (isPerfectDay(date)) cell.classList.add("is-perfect");
+    const future = date > today;
+    const done = future ? 0 : habitsDoneOn(date).length;
+    const ratio = total && !future ? done / total : 0;
+    const tracked = !future && d >= startDay && d <= lastDay;
+    if (tracked && total && done === total) perfect++;
+    if (tracked) checks += done;
+    const cls = ["day-cell"];
+    if (future) cls.push("is-future");
+    if (date === today) cls.push("is-today");
+    if (!future && total && done === total) cls.push("is-perfect");
+    if (date === monthSelectedDate) cls.push("is-selected");
+    const label = future ? `${d}` : `${d}: ${done} of ${total} habits`;
+    cells.push(
+      `<button type="button" class="${cls.join(" ")}" data-date="${date}" style="--fill:${ratio.toFixed(2)}" aria-label="${label}" ${future ? "disabled" : ""}><span class="day-number">${d}</span></button>`
+    );
+  }
+  calendar.innerHTML = cells.join("");
 
-    const num = document.createElement("span");
-    num.className = "day-number";
-    num.textContent = d;
+  const possible = total * elapsedDays;
+  document.getElementById("month-summary").innerHTML = elapsedDays
+    ? `<strong>${perfect}</strong> perfect ${perfect === 1 ? "day" : "days"} · ${possible ? Math.round((checks / possible) * 100) : 0}% of habits done · ${elapsedDays} ${elapsedDays === 1 ? "day" : "days"} tracked`
+    : "Nothing to show yet for this month.";
 
-    const dots = document.createElement("div");
-    dots.className = "day-dots";
-    for (const h of habits) {
-      if (h.history[date]) {
-        const dot = document.createElement("span");
-        dot.className = "day-dot";
-        dots.appendChild(dot);
-      }
-    }
-
-    cell.append(num, dots);
-    calendar.appendChild(cell);
+  // Tapped day: what was and wasn't done.
+  const detail = document.getElementById("month-day-detail");
+  const inMonth = monthSelectedDate && monthSelectedDate.startsWith(`${viewedYear}-${String(viewedMonth + 1).padStart(2, "0")}`);
+  if (inMonth && total) {
+    const doneList = habitsDoneOn(monthSelectedDate);
+    const missed = habits.filter((h) => !doneList.includes(h));
+    const when = new Date(`${monthSelectedDate}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+    detail.innerHTML = `<strong>${habitEsc(when)} · ${doneList.length}/${total}</strong>` +
+      (doneList.length ? `<span class="month-done">✓ ${doneList.map((h) => habitEsc(h.name)).join(", ")}</span>` : "") +
+      (missed.length ? `<span class="month-missed">✗ ${missed.map((h) => habitEsc(h.name)).join(", ")}</span>` : "");
+    detail.hidden = false;
+  } else {
+    detail.innerHTML = "";
+    detail.hidden = true;
   }
 
-  const today_ = new Date();
-  const isCurrentMonth = viewedYear === today_.getFullYear() && viewedMonth === today_.getMonth();
-  const elapsedDays = isCurrentMonth ? today_.getDate() : daysInMonth;
-
-  let perfectCount = 0;
-  for (let d = 1; d <= elapsedDays; d++) {
-    if (isPerfectDay(dateKey(new Date(viewedYear, viewedMonth, d)))) perfectCount++;
-  }
-
-  const perHabit = habits
+  // One row per habit: how often this month.
+  const list = document.getElementById("month-habits");
+  list.innerHTML = habits
     .map((h) => {
       let count = 0;
-      for (let d = 1; d <= elapsedDays; d++) {
-        if (h.history[dateKey(new Date(viewedYear, viewedMonth, d))]) count++;
-      }
-      return `<span class="legend-item">${h.name} ${count}/${elapsedDays}</span>`;
+      for (let d = startDay; d <= lastDay; d++) if (h.history[dateKey(new Date(viewedYear, viewedMonth, d))]) count++;
+      const freq = habitFreq(h);
+      // What "on track" would be this far into the month.
+      const expected = freq === 7 ? elapsedDays : Math.max(1, Math.round((elapsedDays / 7) * freq));
+      const ratio = expected ? Math.min(1, count / expected) : 0;
+      const tone = !elapsedDays ? "" : ratio >= 0.8 ? " is-good" : ratio < 0.5 ? " is-warn" : "";
+      return `<li class="month-habit${tone}">
+        <span class="month-habit-name">${habitEsc(h.name)}</span>
+        <span class="month-habit-bar"><span style="width:${Math.round(ratio * 100)}%"></span></span>
+        <span class="month-habit-count">${count}/${expected}</span>
+      </li>`;
     })
     .join("");
-
-  document.getElementById("calendar-footer").innerHTML =
-    `<strong>${perfectCount} perfect</strong> / ${elapsedDays} days &nbsp; ${perHabit}`;
 }
+
+document.getElementById("calendar").addEventListener("click", (e) => {
+  const cell = e.target.closest(".day-cell[data-date]");
+  if (!cell || cell.disabled) return;
+  monthSelectedDate = monthSelectedDate === cell.dataset.date ? null : cell.dataset.date;
+  renderMonthly();
+});
 
 function render() {
   renderHeader();
