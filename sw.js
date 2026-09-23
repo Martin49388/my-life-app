@@ -61,7 +61,6 @@ const SHELL = [
   "./notes.js",
   "./quotes.js",
   "./overview.js",
-  "./glance.js",
   "./global-bar.js",
   "./mobile-nav.js",
   "./backup.js",

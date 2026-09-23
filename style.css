@@ -142,9 +142,8 @@ body {
 }
 
 /* Sidebar IS the nav now (see index.html) — the old top .section-tabs
-   bar is gone, and the old glance-tile sidebar it replaced is retired
-   (glance.js still runs but its target element no longer exists, so it's
-   a harmless no-op; not deleted this pass). */
+   bar and the old glance-tile sidebar it replaced are both gone
+   (glance.js was deleted 2026-09-23, dead CSS pass). */
 .sidebar {
   flex: 0 0 240px;
   position: sticky;
@@ -312,43 +311,6 @@ body {
   margin: 0;
 }
 
-.brand-header {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 4px;
-}
-
-.settings-btn {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: var(--text-faint);
-  cursor: pointer;
-}
-
-.settings-btn svg {
-  width: 17px;
-  height: 17px;
-}
-
-.settings-btn:hover,
-.settings-btn.on {
-  color: var(--accent);
-  border-color: var(--border);
-}
-
 /* Settings is now a full content section like Habits or Fitness (see
    #settings-section in index.html) rather than a small dropdown pinned to
    the sidebar. .settings-block just wraps each settings group so multiple
@@ -372,82 +334,11 @@ body {
   margin: 0 0 10px;
 }
 
-.swatch-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px 6px;
-}
-
-.swatch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 3px;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  cursor: pointer;
-  font-family: inherit;
-  min-width: 0;
-}
-
-.swatch:hover {
-  border-color: var(--border);
-}
-
-.swatch.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.swatch-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.swatch-name {
-  font-size: 9.5px;
-  line-height: 1.2;
-  color: var(--text-dim);
-  text-align: center;
-  max-width: 100%;
-}
-
-.swatch.selected .swatch-name {
-  color: var(--text);
-  font-weight: 700;
-}
-
 .settings-note {
   font-size: 10.5px;
   line-height: 1.4;
   color: var(--text-faint);
   margin: 11px 0 0;
-}
-
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.brand-icon {
-  width: 28px;
-  height: 15px;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.brand-name {
-  font-family: "Manrope", sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--text);
 }
 
 .stat-tiles {
@@ -1981,53 +1872,6 @@ body {
 #use-estimate-btn.ghost-btn:hover:not(:disabled) {
   color: var(--accent);
   border-color: var(--accent);
-}
-
-.intensity-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.intensity-label {
-  margin: 0;
-}
-
-.intensity-value {
-  font-family: "IBM Plex Mono", monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 10.5px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-#intensity-slider {
-  width: 100%;
-  margin: 8px 0 3px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-#intensity-slider:disabled {
-  cursor: default;
-}
-
-.settings-panel.no-tint .intensity-row,
-.settings-panel.no-tint #intensity-slider,
-.settings-panel.no-tint .intensity-ends {
-  opacity: 0.35;
-}
-
-.intensity-ends {
-  display: flex;
-  justify-content: space-between;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-faint);
 }
 
 .settings-version {

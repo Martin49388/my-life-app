@@ -586,17 +586,42 @@ most worth checking there.
   template, (4) commit + push + wait for Pages to rebuild, (5) sign in
   with the same email on both real devices — untested past confirming
   the code loads without errors.
-- Dead CSS cleanup — grown across passes, still deferred: the removed
-  color-picker's swatch/intensity selectors; `.glance-tile`/`.glance-label`
-  etc. (glance.js's target `#sidebar-content` was removed from the HTML in
-  Step 1, so `renderGlance()` is now a harmless no-op — glance.js could be
-  deleted outright, or repurposed for a tab-contextual sidebar later);
-  `.brand-header`/`.brand-mark`/`.brand-name`/`.settings-btn` (dead since
-  Step 1's sidebar-nav rewrite removed the old header markup)
+- Dead CSS cleanup — done (2026-09-23): deleted glance.js outright (its
+  script tag and sw.js precache entry too) rather than repurposing it,
+  since nothing pointed at a tab-contextual sidebar use for it; removed
+  the orphaned `.brand-header`/`.brand-mark`/`.brand-icon`/`.brand-name`/
+  `.settings-btn`(+svg/hover/on) and the old accent-color-picker's
+  `.swatch*`/`.intensity*`/`#intensity-slider` selectors — none were
+  referenced in index.html or any .js file. ~2.6KB removed, brace count
+  balanced before/after, all JS still passes `node -c`. Also caught and
+  fixed while in there: README.md still advertised the old Settings
+  accent-color/tint picker (gone) and never mentioned Alfred, Blueprint,
+  Recovery, Review, Mindset, Markets, Notes, offline, or Backup at all —
+  rewritten to match what's actually in the sidebar today.
 - This was the last of the explicitly-scoped structural passes — the
   brief that drove Steps 1-4 said so. What's left is Martin's own content
   to fill in (real per-section detail beyond the scaffolding), not more
   layout/typography/box rebuilding, unless he asks for another pass
+- launchd/ was untracked and machine-specific (a local dev-server
+  launcher with an absolute path baked in) — added to .gitignore
+  (2026-09-23)
+- Couldn't get a live browser onto the app this session (Chrome extension
+  not connected; the Browser pane's sandbox can't reach a localhost
+  server started from this shell — same issue noted earlier in this
+  file). Verified statically instead: all JS passes `node -c`, HTML tags
+  balance, Food lookup's key-resolution and USDA endpoint check out by
+  reading the code, and backup.js's export/restore round-trip (including
+  the sb-*/*-api-key exclusions and the pre-reload sync push) reads
+  correctly. None of this substitutes for Martin actually clicking
+  through it on a real device — see Next steps below.
+- projects/calibrate.md in the vault was still the blank template with
+  every field empty — filled in with actual current state, next actions
+  and open questions (2026-09-23), per the vault's own operating
+  protocol which asks for that at the end of every session
+- This file is 600+ lines against its own ~100-line budget ("Keep
+  CLAUDE.md under ~100 lines... not a changelog" — see Rules below).
+  Worth an actual pruning pass; not done this session since it means
+  deciding what history is safe to cut, which felt like Martin's call
 
 ## Rules
 
