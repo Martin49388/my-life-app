@@ -716,6 +716,20 @@
   // ---------------------------------------------------------------------
   // What the rest of the app reads
 
+  // For the daily check-in (checkin.js) and Alfred (actions.js): read or
+  // patch a day's entry without going through this page's controls.
+  window.RECOVERY_SCALES = SCALES;
+  window.recoveryEntry = function recoveryEntry(date) {
+    return entryFor(date);
+  };
+  window.recoverySet = function recoverySet(date, patch) {
+    const e = touch(date);
+    Object.assign(e, patch);
+    persist();
+    renderRecovery();
+    if (window.renderOverview) window.renderOverview();
+  };
+
   window.recoveryScoreOn = function recoveryScoreOn(date) {
     return readiness(entryFor(date));
   };

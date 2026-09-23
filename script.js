@@ -87,8 +87,73 @@ let currentView = localStorage.getItem(VIEW_KEY) || "daily";
 let viewedYear = new Date().getFullYear();
 let viewedMonth = new Date().getMonth(); // 0-indexed
 
-function addHabit(name) {
-  habits.push({ id: crypto.randomUUID(), name, history: {} });
+// perWeek: 7 = every day (the default, and what every habit saved before
+// this existed means); 1-6 = that many times in each Mon-Sun week, so a
+// rest day doesn't break anything.
+function addHabit(name, perWeek = 7) {
+  habits.push({ id: crypto.randomUUID(), name, history: {}, perWeek });
+  saveHabits(habits);
+  render();
+}
+
+function habitFreq(habit) {
+  const n = Number(habit.perWeek);
+  return n >= 1 && n <= 7 ? Math.round(n) : 7;
+}
+
+function weekStartKey(date) {
+  const d = new Date(date + "T00:00:00");
+  return addDays(date, -((d.getDay() + 6) % 7));
+}
+
+// Times done in the Mon-Sun week that contains `date`.
+function habitWeekCount(habit, date) {
+  const start = weekStartKey(date);
+  let n = 0;
+  for (let i = 0; i < 7; i++) if (habit.history[addDays(start, i)]) n++;
+  return n;
+}
+
+// Whether the habit counts as handled on `date`: ticked that day, or — for
+// an N-per-week habit — that week's quota is already met.
+function habitSatisfied(habit, date) {
+  if (habit.history[date]) return true;
+  const freq = habitFreq(habit);
+  return freq < 7 && habitWeekCount(habit, date) >= freq;
+}
+window.habitSatisfied = habitSatisfied;
+window.habitFreq = habitFreq;
+
+// Consecutive weeks that hit the quota, ending with this week if it's
+// already met, otherwise last week (this week is still in play).
+function weekStreak(habit) {
+  const freq = habitFreq(habit);
+  let cursor = weekStartKey(todayKey());
+  if (habitWeekCount(habit, cursor) < freq) cursor = addDays(cursor, -7);
+  let count = 0;
+  while (habitWeekCount(habit, cursor) >= freq && count < 520) {
+    count++;
+    cursor = addDays(cursor, -7);
+  }
+  return count;
+}
+
+function habitStreakText(habit) {
+  return habitFreq(habit) < 7 ? `${weekStreak(habit)}w streak` : `${currentStreak(habit)}d streak`;
+}
+window.habitStreakText = habitStreakText;
+
+const FREQ_CYCLE = [7, 6, 5, 4, 3, 2, 1];
+
+function freqLabel(freq) {
+  return freq === 7 ? "Daily" : `${freq}× a week`;
+}
+
+function cycleHabitFreq(habitId) {
+  const habit = habits.find((h) => h.id === habitId);
+  if (!habit) return;
+  const i = FREQ_CYCLE.indexOf(habitFreq(habit));
+  habit.perWeek = FREQ_CYCLE[(i + 1) % FREQ_CYCLE.length];
   saveHabits(habits);
   render();
 }
@@ -111,8 +176,11 @@ function deleteHabit(id) {
 }
 
 // Consecutive completed days ending today (or yesterday, so an unchecked
-// "today" doesn't zero out a streak still in progress).
+// "today" doesn't zero out a streak still in progress). Only meaningful
+// for daily habits — N-per-week ones count weeks instead (weekStreak), and
+// return 0 here so "best streak" stays in days.
 function currentStreak(habit) {
+  if (habitFreq(habit) < 7) return 0;
   let count = 0;
   let cursor = new Date();
   if (!habit.history[dateKey(cursor)]) cursor.setDate(cursor.getDate() - 1);
@@ -124,7 +192,7 @@ function currentStreak(habit) {
 }
 
 function isPerfectDay(date) {
-  return habits.length > 0 && habits.every((h) => h.history[date]);
+  return habits.length > 0 && habits.every((h) => habitSatisfied(h, date));
 }
 
 function perfectDaysThisMonth() {
@@ -142,7 +210,7 @@ function perfectDaysThisMonth() {
 function renderHeader() {
   const today = todayKey();
   const total = habits.length;
-  const done = habits.filter((h) => h.history[today]).length;
+  const done = habits.filter((h) => habitSatisfied(h, today)).length;
   const pct = total === 0 ? 0 : done / total;
 
   document.getElementById("today-count").textContent = `${done}/${total}`;
@@ -162,15 +230,34 @@ function renderDaily() {
   list.innerHTML = "";
 
   if (habits.length === 0) {
-    list.innerHTML = `<li class="empty-state">No habits yet — add your first one above.</li>`;
+    list.innerHTML = `<li class="empty-state empty-action">
+      <p>No habits yet. Start with one small thing you want to do every day.</p>
+      <button type="button" class="empty-btn" data-empty-action="add-habit">+ Add your first habit</button>
+    </li>`;
     return;
   }
 
+  // Weekday initials over the ten-day strips, so each square has a day.
+  const head = document.createElement("li");
+  head.className = "habit-days-head";
+  head.setAttribute("aria-hidden", "true");
+  const initials = ["M", "T", "W", "T", "F", "S", "S"];
+  let headCells = "";
+  for (let i = 9; i >= 0; i--) {
+    const d = addDays(today, -i);
+    const wd = (new Date(d + "T00:00:00").getDay() + 6) % 7;
+    headCells += `<span class="${i === 0 ? "is-today" : ""}">${initials[wd]}</span>`;
+  }
+  head.innerHTML = `<span class="habit-days-spacer"></span><span class="habit-days">${headCells}</span>`;
+  list.appendChild(head);
+
   for (const habit of habits) {
     const isDone = !!habit.history[today];
+    const freq = habitFreq(habit);
+    const weekMet = freq < 7 && !isDone && habitSatisfied(habit, today);
 
     const li = document.createElement("li");
-    li.className = "habit-row" + (isDone ? " done" : "");
+    li.className = "habit-row" + (isDone ? " done" : "") + (weekMet ? " week-met" : "");
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -189,17 +276,27 @@ function renderDaily() {
     const name = document.createElement("span");
     name.className = "habit-name";
     name.textContent = habit.name;
+    const meta = document.createElement("span");
+    meta.className = "habit-meta";
+    const freqBtn = document.createElement("button");
+    freqBtn.type = "button";
+    freqBtn.className = "habit-freq" + (freq < 7 ? " is-weekly" : "");
+    freqBtn.textContent = freq < 7 ? `${habitWeekCount(habit, today)}/${freq} this week` : "Daily";
+    freqBtn.title = `${freqLabel(freq)} — tap to change how often`;
+    freqBtn.addEventListener("click", () => cycleHabitFreq(habit.id));
     const streak = document.createElement("span");
     streak.className = "habit-streak";
-    streak.textContent = `${currentStreak(habit)}d streak`;
-    nameRow.append(name, streak);
+    streak.textContent = habitStreakText(habit);
+    meta.append(freqBtn, streak);
+    nameRow.append(name, meta);
 
     const history = document.createElement("div");
     history.className = "habit-history";
     for (let i = 9; i >= 0; i--) {
       const d = addDays(today, -i);
       const cell = document.createElement("span");
-      cell.className = "history-cell" + (habit.history[d] ? " filled" : "");
+      cell.className = "history-cell" + (habit.history[d] ? " filled" : "") + (i === 0 ? " is-today" : "");
+      cell.title = new Date(d + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) + (habit.history[d] ? " — done" : "");
       history.appendChild(cell);
     }
 
@@ -335,6 +432,10 @@ document.getElementById("next-month").addEventListener("click", () => {
 const addToggleBtn = document.getElementById("add-habit-toggle-btn");
 const addForm = document.getElementById("add-habit-form");
 
+document.getElementById("habit-list").addEventListener("click", (e) => {
+  if (e.target.closest('[data-empty-action="add-habit"]')) addToggleBtn.click();
+});
+
 addToggleBtn.addEventListener("click", () => {
   addToggleBtn.hidden = true;
   addForm.hidden = false;
@@ -345,8 +446,9 @@ addForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const input = document.getElementById("habit-name-input");
   const name = input.value.trim();
+  const freqSelect = document.getElementById("habit-freq-input");
   if (name) {
-    addHabit(name);
+    addHabit(name, freqSelect ? Number(freqSelect.value) : 7);
     input.value = "";
   }
   addForm.hidden = true;
@@ -360,17 +462,21 @@ addForm.addEventListener("submit", (e) => {
 // another hidden-toggle line per section.
 const ALL_SECTIONS = [
   "overview",
-  "habits", "goals", "alfred", "blueprint", "review",
+  "habits", "goals", "blueprint", "review",
   "fitness", "fuel", "recovery",
-  "mindset", "reading",
-  "news", "markets", "notes",
-  "settings",
+  "reading", "notes",
+  "briefing", "settings",
+  // Not in the sidebar — reached through the Ask bar / center button.
+  "alfred",
 ];
 
-// Food and Water were merged into one "Fuel" section. The old ids still
-// work as aliases (Overview's tiles, anything saved from before the
-// merge) — "water" also scrolls to the water block.
-const SECTION_ALIASES = { food: "fuel", water: "fuel" };
+// Merged sections keep working under their old ids (Overview's tiles,
+// Review's rows, anything saved from before a merge):
+//   Food + Water -> Fuel      ("water" scrolls to the water block)
+//   News + Markets -> Briefing (each scrolls to its part)
+//   Mindset -> Notes           (its journal became #mindset notes)
+const SECTION_ALIASES = { food: "fuel", water: "fuel", news: "briefing", markets: "briefing", mindset: "notes" };
+const SECTION_SCROLL_TO = { water: "fuel-water", markets: "markets-section" };
 
 function switchSection(requested) {
   const section = SECTION_ALIASES[requested] || requested;
@@ -380,7 +486,8 @@ function switchSection(requested) {
     const el = document.getElementById(`${s}-section`);
     if (el) el.hidden = s !== section;
   });
-  if (section === "news" && window.openNews) window.openNews();
+  if (section === "briefing" && window.openNews) window.openNews();
+  if (section === "briefing" && window.refreshMarkets) window.refreshMarkets();
   if (section === "blueprint" && window.renderBlueprint) window.renderBlueprint();
   if (section === "goals" && window.renderGoals) window.renderGoals();
   if (section === "fitness" && window.renderFitness) window.renderFitness();
@@ -389,7 +496,6 @@ function switchSection(requested) {
   if (section === "recovery" && window.renderRecovery) window.renderRecovery();
   if (section === "review" && window.renderReview) window.renderReview();
   if (section === "notes" && window.renderNotes) window.renderNotes();
-  if (section === "markets" && window.refreshMarkets) window.refreshMarkets();
   if (window.renderOverview) window.renderOverview();
   const miniBar = document.getElementById("mini-overview");
   if (miniBar) miniBar.hidden = section === "overview";
@@ -397,8 +503,8 @@ function switchSection(requested) {
 
   const changed = window.currentSection !== section;
   window.currentSection = section;
-  if (requested === "water") {
-    document.getElementById("fuel-water")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
+  if (SECTION_SCROLL_TO[requested]) {
+    document.getElementById(SECTION_SCROLL_TO[requested])?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
   } else if (changed) {
     // A new section starts at its top, not wherever the last one was scrolled to.
     window.scrollTo(0, 0);

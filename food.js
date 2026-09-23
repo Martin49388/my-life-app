@@ -26,6 +26,8 @@ const ACTIVITY_FACTORS = {
 // they're two independent stops on the scale.
 const DEFAULT_FOOD = {
   target: 3500,
+  // Grams a day. null = suggest one from body weight (see proteinTarget).
+  proteinTarget: null,
   maintenance: null,
   days: {},
   showEstimator: false,
@@ -70,10 +72,28 @@ function defaultMeal() {
 }
 
 function addEntry(name, kcal, protein, meal) {
-  if (!food.days[viewedDate]) food.days[viewedDate] = [];
-  food.days[viewedDate].push({ id: crypto.randomUUID(), name, kcal, protein: protein || 0, meal });
+  addEntryOn(viewedDate, name, kcal, protein, meal);
+}
+
+// Same as addEntry but for any day — Alfred and the check-in log to today
+// whatever day the Fuel page happens to be showing.
+function addEntryOn(date, name, kcal, protein, meal) {
+  if (!food.days[date]) food.days[date] = [];
+  food.days[date].push({ id: crypto.randomUUID(), name, kcal, protein: protein || 0, meal: meal || defaultMeal() });
   saveFood();
   window.renderFood();
+}
+
+// The daily protein goal: whatever Martin set, else ~1.8 g per kg of the
+// latest logged body weight, else 150 g.
+function proteinTarget() {
+  if (food.proteinTarget > 0) return food.proteinTarget;
+  const kg = (window.latestWeight && window.latestWeight()?.kg) || food.body.weight;
+  return kg ? Math.round((kg * 1.8) / 5) * 5 : 150;
+}
+
+function proteinOn(date) {
+  return entriesFor(date).reduce((sum, e) => sum + (e.protein || 0), 0);
 }
 
 function deleteEntry(id) {
@@ -124,26 +144,24 @@ function renderBudget() {
   const eatenEl = document.getElementById("fuel-eaten-caption");
   if (eatenEl) eatenEl.textContent = ` · ${consumed.toLocaleString()} of ${target.toLocaleString()} eaten`;
 
-  document.getElementById("protein-total").textContent =
-    `${entries.reduce((sum, e) => sum + (e.protein || 0), 0)}g`;
+  const protein = entries.reduce((sum, e) => sum + (e.protein || 0), 0);
+  const pGoal = proteinTarget();
+  document.getElementById("protein-total").textContent = `${protein} / ${pGoal} g`;
+  const pFill = document.getElementById("protein-bar-fill");
+  if (pFill) {
+    pFill.style.width = `${Math.min(100, (protein / pGoal) * 100)}%`;
+    pFill.parentElement.classList.toggle("is-met", protein >= pGoal);
+  }
 
-  // One bar, split into a segment per meal: shows how much of the budget is
-  // gone and where it went, without needing a second chart. Target and
-  // maintenance sit on the same bar as stops, so the scale has to reach
-  // whichever of the three is largest.
+  // One bar, split into a segment per meal: full width is the target, so
+  // how much is left reads straight off it. (The old Target/Maintain pins
+  // sitting on the bar were hard to read — maintenance is now a line in
+  // the legend instead.)
   const maintain = maintenanceCalories() ?? food.maintenance;
-  // Headroom past the largest value keeps the rightmost stop's label from
-  // running off the edge of the bar.
-  const scale = Math.max(target, consumed, maintain || 0) * 1.15 || 1;
+  const scale = Math.max(target, consumed) || 1;
   const bar = document.getElementById("budget-bar");
   bar.innerHTML = "";
   bar.classList.toggle("over", over);
-
-  const stopPct = (value) => `${Math.min(100, (value / scale) * 100)}%`;
-  document.getElementById("budget-stop-target").style.left = stopPct(target);
-  const maintainStop = document.getElementById("budget-stop-maintain");
-  maintainStop.hidden = !maintain;
-  if (maintain) maintainStop.style.left = stopPct(maintain);
 
   MEALS.forEach((meal, i) => {
     const mealTotal = entries.filter((e) => e.meal === meal).reduce((sum, e) => sum + e.kcal, 0);
@@ -160,7 +178,7 @@ function renderBudget() {
     const mealTotal = entries.filter((e) => e.meal === meal).reduce((sum, e) => sum + e.kcal, 0);
     if (mealTotal === 0) return "";
     return `<span class="legend-item"><span class="legend-swatch seg-${i}"></span>${meal} ${mealTotal}</span>`;
-  }).join("");
+  }).join("") + (maintain ? `<span class="legend-item legend-maintain">Maintenance ≈ ${maintain.toLocaleString()} kcal</span>` : "");
 }
 
 function renderQuickAdd() {
@@ -283,6 +301,8 @@ function renderScale() {
 
 window.renderFood = function renderFood() {
   document.getElementById("kcal-target-input").value = food.target;
+  const pInput = document.getElementById("protein-target-input");
+  if (pInput && document.activeElement !== pInput) pInput.value = proteinTarget();
   document.getElementById("food-date-label").textContent = formatDateLabel(viewedDate);
   renderEstimator();
   renderBudget();
@@ -350,6 +370,17 @@ document.getElementById("kcal-target-input").addEventListener("change", (e) => {
   }
   window.renderFood();
 });
+
+document.getElementById("protein-target-input")?.addEventListener("change", (e) => {
+  const value = parseInt(e.target.value, 10);
+  food.proteinTarget = value > 0 ? value : null;
+  saveFood();
+  window.renderFood();
+});
+
+window.proteinTarget = proteinTarget;
+window.proteinOn = proteinOn;
+window.addEntryOn = addEntryOn;
 
 const foodToggleBtn = document.getElementById("add-food-toggle-btn");
 const foodForm = document.getElementById("add-food-form");

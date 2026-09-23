@@ -39,7 +39,7 @@ function trainingWeekDots() {
 
 function overviewStandards() {
   const today = todayKey();
-  const habitsDone = habits.filter((h) => h.history[today]).length;
+  const habitsDone = habits.filter((h) => habitSatisfied(h, today)).length;
   const habitsTotal = habits.length;
 
   const waterMl = typeof waterToday === "function" ? waterToday() : 0;
@@ -80,7 +80,7 @@ function overviewStandards() {
       label: "Food",
       section: "fuel",
       value: kcalToday.toLocaleString(),
-      sub: `of ${kcalTarget.toLocaleString()} kcal · ${proteinToday}g protein`,
+      sub: `of ${kcalTarget.toLocaleString()} kcal · ${proteinToday}/${typeof proteinTarget === "function" ? proteinTarget() : 150}g protein`,
       progress: ratio(kcalToday, kcalTarget),
       met: kcalToday > 0 && kcalToday <= kcalTarget,
       over: kcalToday > kcalTarget,
@@ -157,6 +157,22 @@ function renderPlanPill() {
 // ---------------------------------------------------------------------------
 // Standards tiles — built once, then updated in place so bars animate.
 
+// Amber when a daily standard is clearly behind for the time of day: the
+// day is treated as running 07:00-22:00, and "behind" means less than
+// half of where an even pace would have you. Training is weekly, so it
+// uses days of the week instead. Nothing is flagged before 11:00.
+function isBehindPace(s) {
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  if (s.id === "training") {
+    const dayOfWeek = ((now.getDay() + 6) % 7) + 1; // Mon=1..Sun=7
+    return dayOfWeek >= 3 && s.progress < (dayOfWeek / 7) * 0.5;
+  }
+  if (hour < 11) return false;
+  const expected = Math.min(1, (hour - 7) / 15);
+  return s.progress < expected * 0.5;
+}
+
 const CHECK_SVG = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const overviewPrevMet = {};
 
@@ -189,6 +205,7 @@ function renderStandardTiles(standards) {
     if (!tile) return;
     tile.classList.toggle("is-met", s.met);
     tile.classList.toggle("is-over", Boolean(s.over));
+    tile.classList.toggle("is-behind", !s.met && !s.over && isBehindPace(s));
     tile.querySelector(".ov-tile-value").textContent = s.value;
     tile.querySelector(".ov-tile-sub").textContent = s.sub;
     tile.querySelector(".ov-tile-bar span").style.width = `${Math.round((s.met ? 1 : s.progress) * 100)}%`;
@@ -214,7 +231,7 @@ function renderTodaysPlan() {
   const summaryEl = document.getElementById("overview-plan-summary");
   const trackEl = document.getElementById("overview-plan-track");
   if (typeof loadWeekPlan !== "function") {
-    planList.innerHTML = `<li class="empty-state">Set up a week plan in Blueprint first.</li>`;
+    planList.innerHTML = `<li class="empty-state empty-action"><p>No week plan yet.</p><button type="button" class="empty-btn" data-goto="blueprint">Plan your week →</button></li>`;
     return;
   }
 
@@ -227,7 +244,7 @@ function renderTodaysPlan() {
   if (entries.length === 0) {
     summaryEl.textContent = "";
     trackEl.innerHTML = "";
-    planList.innerHTML = `<li class="empty-state">Nothing planned for today yet — add it in Blueprint.</li>`;
+    planList.innerHTML = `<li class="empty-state empty-action"><p>Nothing planned for today.</p><button type="button" class="empty-btn" data-goto="blueprint">Plan today →</button></li>`;
     return;
   }
 
@@ -302,7 +319,7 @@ function renderTodaysLog(entries) {
   const list = document.getElementById("overview-today-log");
   if (!list) return;
   if (entries.length === 0) {
-    list.innerHTML = `<li class="empty-state">Nothing logged yet today — use the bar below to log or ask anything.</li>`;
+    list.innerHTML = `<li class="empty-state empty-action"><p>Nothing logged yet today.</p><button type="button" class="empty-btn" data-overview-action="checkin">Start daily check-in</button></li>`;
     return;
   }
   list.innerHTML = entries
@@ -390,7 +407,7 @@ function renderOverviewGoals() {
   const list = document.getElementById("overview-goals");
   if (!list) return;
   if (typeof goals === "undefined" || goals.length === 0) {
-    list.innerHTML = `<li class="empty-state">No goals yet — set one in Goals.</li>`;
+    list.innerHTML = `<li class="empty-state empty-action"><p>No goals yet.</p><button type="button" class="empty-btn" data-goto="goals">Set a goal →</button></li>`;
     return;
   }
   const active = goals
@@ -403,7 +420,7 @@ function renderOverviewGoals() {
     })
     .slice(0, 4);
   if (!active.length) {
-    list.innerHTML = `<li class="empty-state">Every goal is complete — time to set a new one.</li>`;
+    list.innerHTML = `<li class="empty-state empty-action"><p>Every goal is complete.</p><button type="button" class="empty-btn" data-goto="goals">Set a new one →</button></li>`;
     return;
   }
   list.innerHTML = active
@@ -465,6 +482,7 @@ function renderOverview() {
   renderBriefing();
   renderOverviewGoals();
   renderMiniOverview(banked, total, streak, planText);
+  if (window.renderCheckinCta) window.renderCheckinCta();
 }
 window.renderOverview = renderOverview;
 
@@ -505,6 +523,7 @@ function handleOverviewClick(e) {
     const kind = action.dataset.overviewAction;
     if (kind === "water" && typeof addWater === "function") addWater(250);
     if (kind === "alfred") overviewNavigate("alfred");
+    if (kind === "checkin" && window.openCheckin) window.openCheckin();
     return;
   }
   if (e.target.closest(".plan-check")) return;

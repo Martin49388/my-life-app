@@ -682,6 +682,65 @@ most worth checking there.
   seeded data: all 15 sections x desktop 1440 + phone 390, dark, plus
   light spot checks; no page errors. Still not seen on the real iPhone.
 
+## Round 2: fewer sections, status colours, check-in, weight, Alfred logs (2026-09-23)
+
+Martin: "do all that" on a list of design + content suggestions.
+- Nav 15 -> 12. **Briefing** (`#briefing-section`) wraps News and Markets
+  (both now `<div class="briefing-part">` keeping their old ids, so
+  news.js/markets.js work unchanged; their "is it on screen" interval
+  checks now look at `#briefing-section`). **Mindset folded into Notes**:
+  notes.js `migrateMindset()` turns `journal-mindset` entries into notes
+  tagged #mindset (ids `m<at>`), the Quotes list moved to a card in Notes.
+  **Alfred left the sidebar** (still a section; reached via the Ask bar /
+  phone center button; `group: null` in MNAV_SECTIONS keeps its header
+  label). Old ids alias: news/markets -> briefing (markets scrolls to its
+  part), mindset -> notes, in SECTION_ALIASES and MNAV_RENAMED.
+- Status colours `--good` (green) / `--warn` (amber), status only:
+  met tiles/ring/checkboxes/history cells/complete goals/good scorecard
+  rows green; Overview tiles amber when behind pace for the time of day
+  (`isBehindPace()` in overview.js, 07:00-22:00 day, <50% of even pace,
+  nothing before 11:00) or over target; weak scorecard rows amber.
+- Small text: every rule with IBM Plex Mono under 16px switched to
+  Manrope + tabular-nums; mono stays for big numbers.
+- Overview: stats row under the greeting hidden, replaced by the daily
+  check-in button; right column reordered Goals -> Quote -> Briefing.
+- Empty states have buttons (`.empty-action` / `.empty-btn`); the
+  "Nothing logged yet" under journal inputs is hidden.
+- Fuel: Target/Maintain pins removed from the calorie bar (full width =
+  target; maintenance is a legend line). **Protein goal**:
+  `food.proteinTarget` (null = 1.8 g/kg of latest weight, else 150),
+  input in the hero stats, progress row under the bar. **Body weight**
+  (weight.js, key `weight` = `{log: {date: kg}, times: {date: ms}}`):
+  card in Fuel with input + 7-day-average trend chart; logging also sets
+  `food.body.weight`.
+- **Flexible habits**: `habit.perWeek` 1-7 (default 7). `habitSatisfied(h,
+  date)` = ticked that day OR that Mon-Sun week's quota met — used for
+  counts, perfect days, Overview, Review, phone More sheet. Weekly habits
+  show "2/4 this week" (tap to cycle frequency) and a week streak;
+  `currentStreak()` returns 0 for them so "best streak" stays in days.
+  Ten-day strip has weekday initials above it.
+- **Daily check-in** (checkin.js): sheet with sleep hours + quality +
+  energy (writes via new `window.recoverySet/recoveryEntry`), weight,
+  water, habits. Everything writes through; "Done" records the day in
+  `checkin-log`, which Overview's button reads.
+- **Alfred logs** (actions.js): `window.appActions.parseLocal()` handles
+  plain commands with no API call/key ("drank 500ml", "weight 82.4",
+  "slept 7.5h", "done meditate", "oats 450 kcal 20g protein", "trained",
+  "note: ..."); anything else goes to Gemini in JSON mode returning
+  `{reply, actions}`. Whitelisted, bounded, additive actions only (water,
+  food, habit, weight, sleep, training, note, goal) — no deletes; unknown
+  types are ignored. Applied actions show as green chips in the chat.
+  `window.callGemini()` in alfred.js is now shared.
+- **Alfred's take** on Review: Gemini summary stored on the week record
+  (`reviews[key].ai`), auto-written for last week (and this week on
+  Sundays) when a key exists, "Write it"/"Rewrite" button otherwise.
+Verified in headless Chromium: 36 interaction checks (desktop + phone:
+nav, aliases, local logging, check-in writes, habit frequency, protein
+goal, Review no-key state, phone More sheet) plus a mocked-Gemini run
+(actions applied, unknown action ignored, weekly summary written);
+screenshots of every section; zero page errors. Not seen on a real
+iPhone yet.
+
 ## Rules
 
 - No token/API key ever pasted into chat — config file only (violated once

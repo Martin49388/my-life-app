@@ -380,7 +380,7 @@ document.getElementById("refresh-news").addEventListener("click", () => window.l
 // While News is on screen: keep "x min ago" labels honest, and refresh
 // once the data is older than five minutes.
 setInterval(() => {
-  const section = document.getElementById("news-section");
+  const section = document.getElementById("briefing-section");
   if (!section || section.hidden || document.hidden) return;
   if (Date.now() - newsLoadedAt >= NEWS_STALE_MS) window.loadNews();
   else renderNews();

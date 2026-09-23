@@ -37,7 +37,9 @@ function buildDailyContext() {
 
   const habitLines = habits.map((h) => {
     const doneToday = !!h.history[today];
-    return `${h.name}: ${doneToday ? "done" : "not done"} today, ${currentStreak(h)}d streak`;
+    const freq = habitFreq(h);
+    const weekly = freq < 7 ? ` (${freq}x/week, ${habitWeekCount(h, today)} done this week)` : "";
+    return `${h.name}${weekly}: ${doneToday ? "done" : "not done"} today, ${habitStreakText(h)}`;
   });
 
   const goalLines = goals.map(
@@ -50,7 +52,10 @@ function buildDailyContext() {
   const foodEntries = entriesFor(today);
   const kcalToday = foodEntries.reduce((sum, e) => sum + e.kcal, 0);
   const proteinToday = foodEntries.reduce((sum, e) => sum + (e.protein || 0), 0);
-  const foodLine = `Food today: ${kcalToday}/${food.target} kcal, ${proteinToday}g protein`;
+  const pGoal = typeof proteinTarget === "function" ? proteinTarget() : null;
+  const foodLine = `Food today: ${kcalToday}/${food.target} kcal, ${proteinToday}${pGoal ? `/${pGoal}` : ""}g protein`;
+  const latestKg = window.latestWeight ? window.latestWeight() : null;
+  const weightLine = latestKg ? `Body weight: ${latestKg.kg.toFixed(1)} kg (logged ${latestKg.date})` : null;
 
   const waterMl = waterToday();
   const waterLine = `Water today: ${(waterMl / 1000).toFixed(2)}L of ${(water.target / 1000).toFixed(1)}L target`;
@@ -87,16 +92,62 @@ function buildDailyContext() {
     `- ${fitnessLine}`,
     `- ${foodLine}`,
     `- ${waterLine}`,
+    ...(weightLine ? [`- ${weightLine}`] : []),
     ...(readingLine ? [`- ${readingLine}`] : []),
     ...extraLines.map((l) => `- ${l}`),
   ].join("\n");
 }
 
-async function askAlfred(question) {
+// One Gemini call, shared with review.js (weekly summary). Returns the
+// response text, or throws with a readable message.
+async function callGemini(prompt, { json = false } = {}) {
   const key = geminiKey();
-  if (!key) {
-    return "No Gemini key set — add one in Settings under Alfred (AI).";
+  if (!key) throw new Error("No Gemini key set — add one in Settings under Alfred (AI).");
+  // Google retired gemini-2.0-flash (404'd live — see decisions log);
+  // gemini-3.6-flash is what its own error message named as the
+  // replacement.
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(key)}`;
+  const body = { contents: [{ parts: [{ text: prompt }] }] };
+  if (json) body.generationConfig = { responseMimeType: "application/json" };
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`HTTP ${res.status}: ${errBody.slice(0, 200)}`);
   }
+  const data = await res.json();
+  return (data.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "").trim();
+}
+window.callGemini = callGemini;
+
+const ALFRED_ACTIONS_SPEC = [
+  "You can also change the app when Martin asks you to log or record something.",
+  "Allowed actions (JSON objects):",
+  '- {"type":"water","ml":500}',
+  '- {"type":"food","name":"Chicken rice bowl","kcal":780,"protein":55,"meal":"Lunch"} (meal: Breakfast|Lunch|Dinner|Snacks; estimate kcal/protein sensibly if not given)',
+  '- {"type":"habit","name":"<an existing habit name>"} (marks it done today)',
+  '- {"type":"weight","kg":82.4}',
+  '- {"type":"sleep","hours":7.5,"quality":4,"energy":3,"soreness":2} (1-5 scales, all optional except what he said)',
+  '- {"type":"training"} (marks today\'s planned session done)',
+  '- {"type":"note","text":"..."}',
+  '- {"type":"goal","name":"<an existing goal name>","delta":5}',
+  "Only include actions he clearly asked for. Never invent data. You cannot delete anything.",
+  'Respond with JSON only, exactly: {"reply": "...", "actions": [...]}. If you logged something, the reply confirms it in one short line; otherwise it answers the question.',
+].join("\n");
+
+const ALFRED_LOCAL_HELP =
+  "I can log without a key — try “drank 500ml”, “weight 82.4”, “slept 7.5h”, “done meditate”, “oats 450 kcal 20g protein”, “trained” or “note: …”. For questions about your week, add a Gemini key in Settings → Alfred (AI).";
+
+// Returns { answer, actions } where actions are the human lines of what
+// was actually changed in the app.
+async function askAlfred(question) {
+  // 1. Plain logging commands are handled here — instant, offline, no key.
+  const local = window.appActions ? window.appActions.parseLocal(question) : null;
+  if (local) {
+    const actions = window.appActions.apply(local);
+    return { answer: actions.length ? "Logged." : "Couldn't match that to anything in the app.", actions };
+  }
+
+  if (!geminiKey()) return { answer: ALFRED_LOCAL_HELP, actions: [] };
 
   const systemInstruction =
     "You are Alfred, a blunt personal check-in assistant inside Martin's " +
@@ -105,42 +156,44 @@ async function askAlfred(question) {
     "schedule.' Use only the data given below; don't invent numbers. Keep " +
     "answers short — a few sentences, not a report.";
 
-  const prompt = `${systemInstruction}\n\n${buildDailyContext()}\n\nQuestion: ${question}`;
-
-  // Google retired gemini-2.0-flash (404'd live — see decisions log);
-  // gemini-3.6-flash is what its own error message named as the
-  // replacement.
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(key)}`;
+  const prompt = `${systemInstruction}\n\n${ALFRED_ACTIONS_SPEC}\n\n${buildDailyContext()}\n\nMessage: ${question}`;
 
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-    });
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(`HTTP ${res.status}: ${errBody.slice(0, 200)}`);
+    const text = await callGemini(prompt, { json: true });
+    let parsed = null;
+    try {
+      parsed = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+    } catch {
+      parsed = null;
     }
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "(no response)";
-    return text.trim();
+    if (!parsed) return { answer: text || "(no response)", actions: [] };
+    const actions = window.appActions ? window.appActions.apply(parsed.actions) : [];
+    return { answer: String(parsed.reply || (actions.length ? "Logged." : "(no response)")), actions };
   } catch (err) {
-    return `Couldn't reach Alfred: ${err.message}`;
+    return { answer: `Couldn't reach Alfred: ${err.message}`, actions: [] };
   }
 }
+
+const ALFRED_SUGGESTIONS = ["How's my week going?", "What's still open today?", "drank 500ml", "slept 7.5h", "What should I eat to hit protein?"];
 
 function renderAlfredLog() {
   const log = document.getElementById("alfred-log");
   if (alfredLog.length === 0) {
-    log.innerHTML = `<p class="alfred-empty">Ask how your week's going, or anything else — Alfred reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>`;
+    log.innerHTML = `<div class="alfred-empty">
+        <p class="alfred-empty-title">Ask, or just tell Alfred what you did.</p>
+        <p>He reads today's habits, goals, training, food, water and recovery, answers straight — and logs things for you: “drank 500ml”, “weight 82.4”, “done meditate”, “chicken bowl 780 kcal 55g protein”.</p>
+      </div>`;
     return;
   }
   log.innerHTML = alfredLog
     .map(
       (entry) => `
       <div class="alfred-entry alfred-you"><span class="alfred-role">You</span>${escapeHtml(entry.question)}</div>
-      <div class="alfred-entry alfred-reply"><span class="alfred-role">Alfred</span>${escapeHtml(entry.answer)}</div>`
+      <div class="alfred-entry alfred-reply"><span class="alfred-role">Alfred</span>${escapeHtml(entry.answer)}${
+        entry.actions && entry.actions.length
+          ? `<span class="alfred-actions">${entry.actions.map((a) => `<span class="alfred-action">${escapeHtml(a)}</span>`).join("")}</span>`
+          : ""
+      }</div>`
     )
     .join("");
   log.scrollTop = log.scrollHeight;
@@ -154,21 +207,27 @@ function escapeHtml(str) {
 
 async function handleAlfredQuestion(question) {
   const log = document.getElementById("alfred-log");
+  if (!alfredLog.length) log.innerHTML = "";
   log.innerHTML += `<div class="alfred-entry alfred-you"><span class="alfred-role">You</span>${escapeHtml(question)}</div>
     <div class="alfred-entry alfred-reply alfred-loading" id="alfred-pending"><span class="alfred-role">Alfred</span>…</div>`;
   log.scrollTop = log.scrollHeight;
 
-  const answer = await askAlfred(question);
-  alfredLog.push({ question, answer, at: Date.now() });
+  const { answer, actions } = await askAlfred(question);
+  alfredLog.push({ question, answer, actions, at: Date.now() });
   saveAlfredLog(alfredLog);
   renderAlfredLog();
 }
 
 window.handleAlfredQuestion = handleAlfredQuestion;
 
-document.getElementById("alfred-checkin-btn").addEventListener("click", () => {
-  handleAlfredQuestion("How's my week going?");
-});
+const alfredQuick = document.getElementById("alfred-quick");
+if (alfredQuick) {
+  alfredQuick.innerHTML = ALFRED_SUGGESTIONS.map((q) => `<button type="button" class="alfred-suggest">${escapeHtml(q)}</button>`).join("");
+  alfredQuick.addEventListener("click", (e) => {
+    const b = e.target.closest(".alfred-suggest");
+    if (b) handleAlfredQuestion(b.textContent);
+  });
+}
 
 document.getElementById("alfred-form").addEventListener("submit", (e) => {
   e.preventDefault();

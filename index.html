@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260923-2" />
+  <link rel="stylesheet" href="style.css?v=20260923-3" />
 </head>
 <body>
   <main class="app">
@@ -46,7 +46,6 @@
           <button type="button" class="nav-link section-btn active" data-section="overview">Overview</button>
           <button type="button" class="nav-link section-btn" data-section="habits">Habits</button>
           <button type="button" class="nav-link section-btn" data-section="goals">Goals</button>
-          <button type="button" class="nav-link section-btn" data-section="alfred">Alfred</button>
           <button type="button" class="nav-link section-btn" data-section="blueprint">Blueprint</button>
           <button type="button" class="nav-link section-btn" data-section="review">Review</button>
 
@@ -56,13 +55,11 @@
           <button type="button" class="nav-link section-btn" data-section="recovery">Recovery</button>
 
           <p class="nav-group-label">Mind</p>
-          <button type="button" class="nav-link section-btn" data-section="mindset">Mindset</button>
           <button type="button" class="nav-link section-btn" data-section="reading">Reading</button>
-
-          <p class="nav-group-label">System</p>
-          <button type="button" class="nav-link section-btn" data-section="news">News</button>
-          <button type="button" class="nav-link section-btn" data-section="markets">Markets</button>
           <button type="button" class="nav-link section-btn" data-section="notes">Notes</button>
+
+          <p class="nav-group-label">World</p>
+          <button type="button" class="nav-link section-btn" data-section="briefing">Briefing</button>
           <button type="button" class="nav-link section-btn" data-section="settings" id="settings-nav-btn">Settings</button>
         </nav>
 
@@ -97,7 +94,11 @@
           <div class="ov-hero-text">
             <h1 class="ov-greeting" id="overview-greeting">Hello.</h1>
             <p class="overview-status" id="overview-status"></p>
-            <div class="dash-stats">
+            <button type="button" class="checkin-cta" id="overview-checkin-btn">
+              <span class="checkin-cta-label" id="overview-checkin-label">Start daily check-in</span>
+              <span class="checkin-cta-detail" id="overview-checkin-detail">Habits, sleep, water, weight — about a minute</span>
+            </button>
+            <div class="dash-stats ov-hero-stats">
               <div class="dash-stat">
                 <span class="stat-label">Best streak</span>
                 <span class="dash-stat-value" id="overview-best-streak">0d</span>
@@ -140,6 +141,14 @@
         <div class="ov-col">
           <div class="dash-block">
             <div class="dash-block-head">
+              <p class="eyebrow">Goals in motion</p>
+              <button type="button" class="dash-link" data-goto="goals">All goals &rarr;</button>
+            </div>
+            <ul class="ov-goals" id="overview-goals"></ul>
+          </div>
+
+          <div class="dash-block">
+            <div class="dash-block-head">
               <p class="eyebrow">Quote of the day</p>
             </div>
             <button type="button" class="quote-of-day" id="overview-quote-btn">
@@ -158,13 +167,6 @@
             </div>
           </div>
 
-          <div class="dash-block">
-            <div class="dash-block-head">
-              <p class="eyebrow">Goals in motion</p>
-              <button type="button" class="dash-link" data-goto="goals">All goals &rarr;</button>
-            </div>
-            <ul class="ov-goals" id="overview-goals"></ul>
-          </div>
         </div>
       </div>
     </section>
@@ -205,6 +207,15 @@
           <button type="button" id="add-habit-toggle-btn">+ Add habit</button>
           <form id="add-habit-form" hidden>
             <input type="text" id="habit-name-input" placeholder="New habit, e.g. Drink water" required />
+            <select id="habit-freq-input" aria-label="How often">
+              <option value="7">Every day</option>
+              <option value="6">6× a week</option>
+              <option value="5">5× a week</option>
+              <option value="4">4× a week</option>
+              <option value="3">3× a week</option>
+              <option value="2">2× a week</option>
+              <option value="1">1× a week</option>
+            </select>
             <button type="submit">Add</button>
           </form>
         </div>
@@ -224,51 +235,7 @@
       <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
 
-    <section id="news-section" hidden>
-      <header class="dash-header">
-        <div class="dash-topline">
-          <h1 class="eyebrow page-title">News</h1>
-          <div class="dash-topline-actions">
-            <span class="live-pill" id="news-pill" data-state="idle">
-              <span class="live-dot" aria-hidden="true"></span>
-              <span class="live-pill-label" id="news-pill-label">Not loaded</span>
-              <span class="live-pill-detail" id="news-pill-detail"></span>
-            </span>
-            <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
-          </div>
-        </div>
-
-        <a class="news-lead" id="news-lead" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
-
-        <div class="dash-stats">
-          <div class="dash-stat">
-            <span class="stat-label">Last 24h</span>
-            <span class="dash-stat-value" id="news-stat-24h">—</span>
-          </div>
-          <div class="dash-stat">
-            <span class="stat-label">New since visit</span>
-            <span class="dash-stat-value" id="news-stat-new">—</span>
-          </div>
-          <div class="dash-stat">
-            <span class="stat-label">Newest</span>
-            <span class="dash-stat-value" id="news-stat-newest">—</span>
-          </div>
-        </div>
-      </header>
-
-      <div class="dash-block">
-        <div class="dash-block-head">
-          <p class="eyebrow">Last 24 hours</p>
-          <span class="journal-time" id="news-pulse-caption"></span>
-        </div>
-        <div class="news-pulse" id="news-pulse"></div>
-      </div>
-
-      <div class="dash-block">
-        <div class="news-filters" id="news-filters"></div>
-        <ul class="news-list" id="news-list"></ul>
-      </div>
-    </section>
+    
 
     <section id="goals-section" hidden>
       <header class="app-header">
@@ -392,30 +359,23 @@
               <span class="stat-label">Target</span>
               <input type="number" id="kcal-target-input" class="target-input fuel-target-input" min="500" max="10000" step="50" inputmode="numeric" />
             </label>
-            <div class="fuel-stat">
-              <span class="stat-label">Protein</span>
-              <span class="fuel-stat-value" id="protein-total">0g</span>
-            </div>
-            <div class="fuel-stat">
-              <span class="stat-label">Water</span>
-              <span class="fuel-stat-value" id="fuel-water-stat">0.00L</span>
-            </div>
+            <label class="fuel-stat">
+              <span class="stat-label">Protein goal (g)</span>
+              <input type="number" id="protein-target-input" class="target-input fuel-target-input" min="20" max="400" step="5" inputmode="numeric" />
+            </label>
           </div>
         </div>
 
         <div class="budget">
           <div class="budget-bar-wrap">
             <div class="budget-bar" id="budget-bar"></div>
-            <div class="budget-stop budget-stop-maintain" id="budget-stop-maintain" hidden>
-              <span class="stop-cap"></span>
-              <span class="stop-label">Maintain</span>
-            </div>
-            <div class="budget-stop budget-stop-target" id="budget-stop-target">
-              <span class="stop-cap"></span>
-              <span class="stop-label">Target</span>
-            </div>
           </div>
           <div class="budget-legend" id="budget-legend"></div>
+          <div class="protein-row">
+            <span class="protein-label">Protein</span>
+            <div class="protein-bar"><span id="protein-bar-fill"></span></div>
+            <span class="protein-caption" id="protein-total">0 / 150 g</span>
+          </div>
         </div>
       </header>
 
@@ -433,6 +393,19 @@
           <button type="button" id="water-remove-btn" aria-label="Remove 250 ml">&minus; 250 ml</button>
           <button type="button" id="water-add-btn" aria-label="Add 250 ml">+ 250 ml</button>
         </div>
+      </div>
+
+      <div class="fuel-block weight-block" id="fuel-weight">
+        <div class="fuel-block-head">
+          <p class="eyebrow">Body weight</p>
+          <p class="weight-figure"><span id="weight-latest">—</span></p>
+        </div>
+        <form class="weight-form" id="weight-form">
+          <input type="number" id="weight-input" min="25" max="350" step="0.1" inputmode="decimal" placeholder="kg" aria-label="Weight in kg" />
+          <button type="submit" id="weight-submit">Log weight</button>
+        </form>
+        <div class="weight-chart" id="weight-chart"></div>
+        <p class="weight-caption" id="weight-caption"></p>
       </div>
 
       <div class="fuel-block">
@@ -537,9 +510,7 @@
         <p class="alfred-empty">Ask how your week's going, or anything else — Alfred reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>
       </div>
 
-      <div class="alfred-quick">
-        <button type="button" id="alfred-checkin-btn">How's my week going?</button>
-      </div>
+      <div class="alfred-quick" id="alfred-quick"></div>
 
       <form id="alfred-form">
         <input type="text" id="alfred-input" placeholder="Ask Alfred…" required />
@@ -674,6 +645,14 @@
         </div>
       </div>
 
+      <div class="dash-block rev-ai-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Alfred's take</p>
+          <button type="button" class="dash-link" id="rev-ai-btn" data-rev-action="ai" hidden>Write it</button>
+        </div>
+        <div class="rev-ai" id="rev-ai"></div>
+      </div>
+
       <div class="dash-block">
         <div class="dash-block-head">
           <p class="eyebrow">Write-up</p>
@@ -772,32 +751,7 @@
       </div>
     </section>
 
-    <section id="mindset-section" hidden>
-      <header class="section-header-simple">
-        <h1 class="eyebrow page-title">Mindset</h1>
-        <p class="section-hint">Headspace, focus, mood — short notes on how you're thinking.</p>
-      </header>
-
-      <div class="dash-block">
-        <div class="dash-block-head">
-          <p class="eyebrow">Quotes</p>
-        </div>
-        <p class="section-hint">One new quote appears here automatically every day — tap any of them for more on it.</p>
-        <ul class="journal-list" id="mindset-quotes-list"></ul>
-      </div>
-
-      <div class="dash-block">
-        <div class="dash-block-head">
-          <p class="eyebrow">Journal</p>
-        </div>
-        <form class="journal-form" data-journal="mindset">
-          <input type="text" class="journal-input" placeholder="Headspace, focus, mood…" required />
-          <button type="submit">Add</button>
-        </form>
-
-        <ul class="journal-list" id="mindset-journal-list"></ul>
-      </div>
-    </section>
+    
 
     <!-- Reading: book log (reading.js). The old free-text notes
          (journal.js, "journal-reading") live on in the Notes block. -->
@@ -862,10 +816,64 @@
       </div>
     </section>
 
-    <section id="markets-section" hidden>
+    
+
+    <!-- Notes: a capture inbox (notes.js), not a log. The old free-text
+         entries (journal.js, "journal-notes") are imported once on first
+         load and the old key is emptied. -->
+    <section id="briefing-section" hidden>
+      <header class="briefing-head">
+        <h1 class="eyebrow page-title">Briefing</h1>
+      </header>
+      <div id="news-section" class="briefing-part">
+      <header class="dash-header">
+        <div class="dash-topline">
+          <h2 class="sub-title">News</h2>
+          <div class="dash-topline-actions">
+            <span class="live-pill" id="news-pill" data-state="idle">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="live-pill-label" id="news-pill-label">Not loaded</span>
+              <span class="live-pill-detail" id="news-pill-detail"></span>
+            </span>
+            <button type="button" id="refresh-news" class="refresh-btn">Refresh</button>
+          </div>
+        </div>
+
+        <a class="news-lead" id="news-lead" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <span class="stat-label">Last 24h</span>
+            <span class="dash-stat-value" id="news-stat-24h">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">New since visit</span>
+            <span class="dash-stat-value" id="news-stat-new">—</span>
+          </div>
+          <div class="dash-stat">
+            <span class="stat-label">Newest</span>
+            <span class="dash-stat-value" id="news-stat-newest">—</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Last 24 hours</p>
+          <span class="journal-time" id="news-pulse-caption"></span>
+        </div>
+        <div class="news-pulse" id="news-pulse"></div>
+      </div>
+
+      <div class="dash-block">
+        <div class="news-filters" id="news-filters"></div>
+        <ul class="news-list" id="news-list"></ul>
+      </div>
+    </div>
+      <div id="markets-section" class="briefing-part">
       <header class="markets-header">
         <div class="markets-topline">
-          <h1 class="eyebrow page-title">Markets</h1>
+          <h2 class="sub-title">Markets</h2>
           <span class="market-status" id="market-status" data-state="closed">
             <span class="market-dot" aria-hidden="true"></span>
             <span class="market-status-label" id="market-status-label">Market closed</span>
@@ -921,11 +929,8 @@
         </form>
         <ul class="journal-list" id="markets-journal-list"></ul>
       </div>
+    </div>
     </section>
-
-    <!-- Notes: a capture inbox (notes.js), not a log. The old free-text
-         entries (journal.js, "journal-notes") are imported once on first
-         load and the old key is emptied. -->
     <section id="notes-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
@@ -966,6 +971,13 @@
         <div class="nt-tagbar" id="nt-tagbar" hidden></div>
         <p class="dash-block-summary" id="nt-status"></p>
         <ul class="nt-grid" id="nt-list"></ul>
+      </div>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Quotes</p>
+          <span class="journal-time">One a day, kept here</span>
+        </div>
+        <ul class="journal-list" id="mindset-quotes-list"></ul>
       </div>
     </section>
 
@@ -1212,31 +1224,34 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260923-2"></script>
+  <script src="config.js?v=20260923-3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260923-2"></script>
-  <script src="script.js?v=20260923-2"></script>
-  <script src="news.js?v=20260923-2"></script>
-  <script src="goals.js?v=20260923-2"></script>
-  <script src="markets.js?v=20260923-2"></script>
-  <script src="fitness.js?v=20260923-2"></script>
-  <script src="food.js?v=20260923-2"></script>
-  <script src="water.js?v=20260923-2"></script>
-  <script src="blueprint.js?v=20260923-2"></script>
-  <script src="alfred.js?v=20260923-2"></script>
-  <script src="journal.js?v=20260923-2"></script>
-  <script src="reading.js?v=20260923-2"></script>
-  <script src="recovery.js?v=20260923-2"></script>
-  <script src="review.js?v=20260923-2"></script>
-  <script src="notes.js?v=20260923-2"></script>
-  <script src="quotes.js?v=20260923-2"></script>
-  <script src="overview.js?v=20260923-2"></script>
-  <script src="global-bar.js?v=20260923-2"></script>
-  <script src="mobile-nav.js?v=20260923-2"></script>
-  <script src="backup.js?v=20260923-2"></script>
+  <script src="sync.js?v=20260923-3"></script>
+  <script src="script.js?v=20260923-3"></script>
+  <script src="news.js?v=20260923-3"></script>
+  <script src="goals.js?v=20260923-3"></script>
+  <script src="markets.js?v=20260923-3"></script>
+  <script src="fitness.js?v=20260923-3"></script>
+  <script src="food.js?v=20260923-3"></script>
+  <script src="water.js?v=20260923-3"></script>
+  <script src="weight.js?v=20260923-3"></script>
+  <script src="blueprint.js?v=20260923-3"></script>
+  <script src="alfred.js?v=20260923-3"></script>
+  <script src="journal.js?v=20260923-3"></script>
+  <script src="reading.js?v=20260923-3"></script>
+  <script src="recovery.js?v=20260923-3"></script>
+  <script src="review.js?v=20260923-3"></script>
+  <script src="notes.js?v=20260923-3"></script>
+  <script src="quotes.js?v=20260923-3"></script>
+  <script src="actions.js?v=20260923-3"></script>
+  <script src="checkin.js?v=20260923-3"></script>
+  <script src="overview.js?v=20260923-3"></script>
+  <script src="global-bar.js?v=20260923-3"></script>
+  <script src="mobile-nav.js?v=20260923-3"></script>
+  <script src="backup.js?v=20260923-3"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->
-  <script src="offline.js?v=20260923-2"></script>
+  <script src="offline.js?v=20260923-3"></script>
 </body>
 </html>

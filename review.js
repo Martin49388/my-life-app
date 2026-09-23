@@ -120,10 +120,10 @@
     const habitCount = typeof habits !== "undefined" ? habits.length : 0;
     cells.habits = days.map((d) => {
       if (!habitCount || future(d)) return { ratio: null, text: habitCount ? "still to come" : "no habits set" };
-      const done = habits.filter((h) => h.history[d]).length;
+      const done = habits.filter((h) => (window.habitSatisfied ? window.habitSatisfied(h, d) : h.history[d])).length;
       return { ratio: done / habitCount, text: `${done}/${habitCount} habits` };
     });
-    const habitDone = counted.reduce((sum, d) => sum + (habitCount ? habits.filter((h) => h.history[d]).length : 0), 0);
+    const habitDone = counted.reduce((sum, d) => sum + (habitCount ? habits.filter((h) => (window.habitSatisfied ? window.habitSatisfied(h, d) : h.history[d])).length : 0), 0);
     const habitTotal = habitCount * counted.length;
     metrics.push({
       id: "habits",
@@ -460,7 +460,7 @@
         const dir = delta == null ? "none" : delta > 1 ? "up" : delta < -1 ? "down" : "flat";
         const deltaText = delta == null ? "" : dir === "flat" ? "±0" : `${delta > 0 ? "+" : "−"}${Math.abs(delta)}`;
         return `
-        <li class="rev-row" data-goto="${m.section}" role="link" tabindex="0">
+        <li class="rev-row${m.ratio == null ? "" : m.ratio >= 0.8 ? " is-good" : m.ratio < 0.5 ? " is-warn" : ""}" data-goto="${m.section}" role="link" tabindex="0">
           <span class="rev-row-label">${m.label}</span>
           <span class="rev-row-bar"><span style="width:${m.ratio == null ? 0 : Math.round(m.ratio * 100)}%"></span></span>
           <span class="rev-row-value">${esc(m.value)}</span>
@@ -637,6 +637,99 @@
   // ---------------------------------------------------------------------
   // Render everything
 
+  // ---------------------------------------------------------------------
+  // Alfred's take — a short written summary of the week from Gemini,
+  // stored on the week's record ({ai: {text, at}}) so it syncs and never
+  // has to be generated twice. Written automatically for last week (and
+  // for this week from Sunday on) the first time Review is opened with a
+  // Gemini key; otherwise on the button.
+
+  const aiInFlight = new Set();
+  const aiFailed = {};
+
+  function hasGeminiKey() {
+    return typeof geminiKey === "function" && Boolean(geminiKey());
+  }
+
+  function aiPrompt(data, record, previous) {
+    const lines = data.metrics.map((m) => `- ${m.label}: ${m.value} (${m.detail})`);
+    const hl = highlights(data).map((l) => `- ${l}`);
+    const written = record
+      ? [
+          record.wins ? `What worked (his words): ${record.wins}` : "",
+          record.drags ? `What dragged (his words): ${record.drags}` : "",
+          record.focus ? `His one thing for next week: ${record.focus}` : "",
+        ].filter(Boolean)
+      : [];
+    return [
+      "You are Alfred, the blunt check-in assistant in Martin's personal tracking app.",
+      `Write his summary of ${weekRange(data.monday)} (${data.span} of 7 days counted so far).`,
+      "3-5 short sentences, plain text, no headings or bullet points, no cushioning:",
+      "what went well, what slipped (use the numbers), and one concrete focus for next week.",
+      "Use only the data below — don't invent anything.",
+      "",
+      `Week score: ${data.score ?? "n/a"}/100${previous && previous.score != null ? ` (previous week, same days: ${previous.score})` : ""}`,
+      ...lines,
+      ...(hl.length ? ["Highlights:", ...hl] : []),
+      ...written,
+    ].join("\n");
+  }
+
+  async function generateAi(monday) {
+    const key = weekKeyOf(monday);
+    if (aiInFlight.has(key) || !window.callGemini) return;
+    aiInFlight.add(key);
+    delete aiFailed[key];
+    renderReview();
+    try {
+      const data = weekData(monday);
+      const previous = weekData(addDays(monday, -7), data.span);
+      const text = await window.callGemini(aiPrompt(data, reviewFor(key), previous));
+      if (text) writeReview(key, { ai: { text, at: Date.now() } });
+      else aiFailed[key] = "Empty reply";
+    } catch (err) {
+      aiFailed[key] = err.message;
+    }
+    aiInFlight.delete(key);
+    renderReview();
+  }
+
+  function renderAi(data, record) {
+    const el = document.getElementById("rev-ai");
+    const btn = document.getElementById("rev-ai-btn");
+    if (!el) return;
+    const key = weekKeyOf(data.monday);
+    const ai = record && record.ai;
+    const keyOk = hasGeminiKey();
+    if (btn) {
+      btn.hidden = !keyOk || aiInFlight.has(key);
+      btn.textContent = ai ? "Rewrite" : "Write it";
+    }
+    if (aiInFlight.has(key)) {
+      el.innerHTML = `<p class="rev-ai-text is-loading">Alfred is reading your week…</p>`;
+      return;
+    }
+    if (ai && ai.text) {
+      el.innerHTML = `<p class="rev-ai-text">${esc(ai.text)}</p>`;
+      return;
+    }
+    if (!keyOk) {
+      el.innerHTML = `<p class="rev-ai-text is-empty">Add a Gemini key in Settings → Alfred (AI) and Alfred writes a short summary of every week here.</p>`;
+      return;
+    }
+    if (aiFailed[key]) {
+      el.innerHTML = `<p class="rev-ai-text is-empty">Couldn't write it (${esc(aiFailed[key])}). Try "Write it" again.</p>`;
+      return;
+    }
+    el.innerHTML = `<p class="rev-ai-text is-empty">No summary for this week yet.</p>`;
+
+    // Auto: last week once it's over, and this week from Sunday on.
+    const thisMonday = mondayOf(todayKey());
+    const isLastWeek = data.monday === addDays(thisMonday, -7);
+    const isSunday = new Date().getDay() === 0;
+    if (isLastWeek || (data.monday === thisMonday && isSunday)) generateAi(data.monday);
+  }
+
   function renderReview() {
     if (!document.getElementById("rev-scorecard")) return;
     if (!viewMonday) viewMonday = mondayOf(todayKey());
@@ -650,6 +743,7 @@
     renderScorecard(data, previous);
     renderGrid(data);
     renderHighlights(data);
+    renderAi(data, record);
     renderWriteup(data, record);
     renderPast();
   }
@@ -680,6 +774,10 @@
       const action = ev.target.closest("[data-rev-action]");
       if (action && action.dataset.revAction === "this-week") {
         goToWeek(mondayOf(todayKey()));
+        return;
+      }
+      if (action && action.dataset.revAction === "ai") {
+        generateAi(viewMonday);
         return;
       }
 

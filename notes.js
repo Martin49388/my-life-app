@@ -31,7 +31,6 @@
     { id: "blueprint", label: "Blueprint" },
     { id: "review", label: "Review" },
     { id: "recovery", label: "Recovery" },
-    { id: "mindset", label: "Mindset" },
     { id: "markets", label: "Markets" },
     { id: "reading", label: "Reading" },
     { id: "habit", label: "New habit" },
@@ -105,6 +104,32 @@
   }
 
   migrateLegacy();
+
+  // Mindset was folded into Notes (2026-09-23): its journal entries become
+  // notes tagged #mindset, once, keyed by timestamp so re-running or a
+  // sync pull can't duplicate them.
+  function migrateMindset() {
+    let changed = false;
+    try {
+      const raw = localStorage.getItem("journal-mindset");
+      const old = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(old) || !old.length) return;
+      for (const entry of old) {
+        if (!entry || !entry.text) continue;
+        const id = `m${entry.at}`;
+        if (notes.some((n) => n.id === id)) continue;
+        const text = /#mindset\b/i.test(entry.text) ? entry.text : `${entry.text} #mindset`;
+        notes.push({ id, text, tags: parseTags(text), pinned: false, archived: false, at: entry.at, updated: entry.at });
+        changed = true;
+      }
+      localStorage.setItem("journal-mindset", "[]");
+    } catch {
+      // Nothing to import.
+    }
+    if (changed) persist();
+  }
+
+  migrateMindset();
 
   // ---------------------------------------------------------------------
   // Data helpers
@@ -432,6 +457,7 @@
     if (statusEl) statusEl.textContent = status;
   }
   window.renderNotes = renderNotes;
+  window.addNote = addNote;
 
   // ---------------------------------------------------------------------
   // Interaction

@@ -18,24 +18,24 @@
 const MNAV_QUERY = window.matchMedia("(max-width: 640px)");
 const MNAV_TABS_KEY = "nav-tabs";
 const MNAV_DEFAULT_TABS = ["habits", "blueprint"];
-const MNAV_GROUPS = ["Daily", "Body", "Mind", "System"];
+const MNAV_GROUPS = ["Daily", "Body", "Mind", "World"];
 
+// group: null = a real section with a header label, but no tile in the
+// More sheet (Alfred has the center button instead).
 const MNAV_SECTIONS = [
   { id: "overview", label: "Overview", group: "Daily", icon: "home" },
   { id: "habits", label: "Habits", group: "Daily", icon: "habits" },
   { id: "goals", label: "Goals", group: "Daily", icon: "goals" },
-  { id: "alfred", label: "Alfred", group: "Daily", icon: "alfred" },
   { id: "blueprint", label: "Blueprint", group: "Daily", icon: "blueprint" },
   { id: "review", label: "Review", group: "Daily", icon: "review" },
   { id: "fitness", label: "Fitness", group: "Body", icon: "fitness" },
   { id: "fuel", label: "Fuel", group: "Body", icon: "fuel" },
   { id: "recovery", label: "Recovery", group: "Body", icon: "recovery" },
-  { id: "mindset", label: "Mindset", group: "Mind", icon: "mindset" },
   { id: "reading", label: "Reading", group: "Mind", icon: "reading" },
-  { id: "news", label: "News", group: "System", icon: "news" },
-  { id: "markets", label: "Markets", group: "System", icon: "markets" },
-  { id: "notes", label: "Notes", group: "System", icon: "notes" },
-  { id: "settings", label: "Settings", group: "System", icon: "settings" },
+  { id: "notes", label: "Notes", group: "Mind", icon: "notes" },
+  { id: "briefing", label: "Briefing", group: "World", icon: "news" },
+  { id: "settings", label: "Settings", group: "World", icon: "settings" },
+  { id: "alfred", label: "Alfred", group: null, icon: "alfred" },
 ];
 
 // 24×24 line icons, drawn for this app (stroke = currentColor).
@@ -75,14 +75,14 @@ function mnavSection(id) {
 
 // Sections that were merged into another one — a tab pinned before the
 // merge follows it instead of silently resetting both tabs to defaults.
-const MNAV_RENAMED = { food: "fuel", water: "fuel" };
+const MNAV_RENAMED = { food: "fuel", water: "fuel", news: "briefing", markets: "briefing", mindset: "notes" };
 
 function mnavLoadTabs() {
   try {
     const saved = JSON.parse(localStorage.getItem(MNAV_TABS_KEY));
     if (Array.isArray(saved)) {
       const valid = [...new Set(saved.map((id) => MNAV_RENAMED[id] || id))].filter(
-        (id) => id !== "overview" && mnavSection(id)
+        (id) => id !== "overview" && mnavSection(id) && mnavSection(id).group
       );
       // Pinning both Food and Water collapses to one Fuel tab — top the
       // pair back up with a default that isn't already there.
@@ -128,7 +128,7 @@ function mnavSubtitle(id) {
         return { text: `${s.filter((x) => x.met).length}/${s.length} banked` };
       }
       case "habits": {
-        const done = habits.filter((h) => h.history[todayKey()]).length;
+        const done = habits.filter((h) => habitSatisfied(h, todayKey())).length;
         return { text: habits.length ? `${done}/${habits.length} today` : "No habits yet" };
       }
       case "goals": {
@@ -157,6 +157,7 @@ function mnavSubtitle(id) {
         if (r.reading.length) return { text: r.reading[0].title };
         return { text: r.total ? `${r.finishedThisYear} this year` : "Add your books" };
       }
+      case "briefing":
       case "news": {
         const n = window.newsSnapshot && window.newsSnapshot();
         if (!n || !n.items.length) return { text: "Headlines" };

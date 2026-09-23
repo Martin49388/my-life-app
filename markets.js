@@ -707,7 +707,7 @@ window.marketsSummary = function marketsSummary() {
 // the tab is visible, and US trading (incl. pre/after hours) is happening.
 setInterval(() => {
   renderMarketStatus();
-  const section = document.getElementById("markets-section");
+  const section = document.getElementById("briefing-section");
   if (!section || section.hidden || document.hidden) return;
   if (marketSession().state === "closed") {
     renderUpdatedLabel();
@@ -717,7 +717,7 @@ setInterval(() => {
 }, MKT_REFRESH_MS);
 
 document.addEventListener("visibilitychange", () => {
-  const section = document.getElementById("markets-section");
+  const section = document.getElementById("briefing-section");
   if (!document.hidden && section && !section.hidden) refreshQuotes();
 });
 
