@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260923-1" />
+  <link rel="stylesheet" href="style.css?v=20260923-2" />
 </head>
 <body>
   <main class="app">
@@ -171,7 +171,7 @@
 
     <section id="habits-section" hidden>
       <header class="app-header">
-        <p class="eyebrow">today's overview</p>
+        <h1 class="eyebrow page-title">Habits</h1>
         <div class="stat-tiles">
           <div class="stat-tile ring-tile">
             <svg class="ring" viewBox="0 0 40 40" id="today-ring">
@@ -227,7 +227,7 @@
     <section id="news-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
-          <p class="eyebrow">news</p>
+          <h1 class="eyebrow page-title">News</h1>
           <div class="dash-topline-actions">
             <span class="live-pill" id="news-pill" data-state="idle">
               <span class="live-dot" aria-hidden="true"></span>
@@ -272,7 +272,7 @@
 
     <section id="goals-section" hidden>
       <header class="app-header">
-        <p class="eyebrow">in progress</p>
+        <h1 class="eyebrow page-title">Goals</h1>
         <div class="stat-tiles">
           <div class="stat-tile">
             <span class="stat-label">Active</span>
@@ -331,7 +331,7 @@
     </section>
     <section id="fitness-section" hidden>
       <header class="app-header">
-        <p class="eyebrow">weekly plan</p>
+        <h1 class="eyebrow page-title">Fitness</h1>
         <div class="stat-tiles">
           <div class="stat-tile">
             <span class="stat-label">This week</span>
@@ -374,7 +374,7 @@
     <section id="fuel-section" hidden>
       <header class="fuel-header">
         <div class="fuel-topline">
-          <p class="eyebrow">fuel</p>
+          <h1 class="eyebrow page-title">Fuel</h1>
           <div class="fuel-day" role="group" aria-label="Day shown">
             <button type="button" id="food-prev-day" class="fuel-day-btn" aria-label="Previous day">&lsaquo;</button>
             <button type="button" id="food-date-label" class="fuel-day-label" title="Back to today"></button>
@@ -529,9 +529,10 @@
 
     <section id="alfred-section" hidden>
       <header class="app-header">
-        <p class="eyebrow">check-in</p>
+        <h1 class="eyebrow page-title">Alfred</h1>
       </header>
 
+      <div class="dash-block alfred-card">
       <div class="alfred-log" id="alfred-log">
         <p class="alfred-empty">Ask how your week's going, or anything else — Alfred reads today's habits, goals, fitness, food and water and answers straight, no cushioning.</p>
       </div>
@@ -544,14 +545,13 @@
         <input type="text" id="alfred-input" placeholder="Ask Alfred…" required />
         <button type="submit">Send</button>
       </form>
-
-      <p class="sync-note">Uses the Gemini API &middot; key lives in config.js, not committed</p>
+      </div>
     </section>
 
     <section id="blueprint-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
-          <p class="eyebrow">blueprint</p>
+          <h1 class="eyebrow page-title">Blueprint</h1>
           <button type="button" class="live-pill" id="blueprint-pill" data-state="idle">
             <span class="live-dot" aria-hidden="true"></span>
             <span class="live-pill-label" id="blueprint-pill-label">Nothing planned today</span>
@@ -620,7 +620,7 @@
     <section id="review-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
-          <p class="eyebrow">review</p>
+          <h1 class="eyebrow page-title">Review</h1>
           <div class="dash-topline-actions">
             <button type="button" class="live-pill" id="rev-pill" data-state="idle">
               <span class="live-dot" aria-hidden="true"></span>
@@ -708,7 +708,7 @@
     <section id="recovery-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
-          <p class="eyebrow">recovery</p>
+          <h1 class="eyebrow page-title">Recovery</h1>
           <div class="dash-topline-actions">
             <button type="button" class="live-pill" id="rec-pill" data-state="idle" data-rec-action="focus">
               <span class="live-dot" aria-hidden="true"></span>
@@ -774,22 +774,29 @@
 
     <section id="mindset-section" hidden>
       <header class="section-header-simple">
-        <p class="eyebrow">mindset</p>
+        <h1 class="eyebrow page-title">Mindset</h1>
         <p class="section-hint">Headspace, focus, mood — short notes on how you're thinking.</p>
       </header>
 
-      <div>
-        <p class="eyebrow">Quotes</p>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Quotes</p>
+        </div>
         <p class="section-hint">One new quote appears here automatically every day — tap any of them for more on it.</p>
         <ul class="journal-list" id="mindset-quotes-list"></ul>
       </div>
 
-      <form class="journal-form" data-journal="mindset">
-        <input type="text" class="journal-input" placeholder="Add a note…" required />
-        <button type="submit">Add</button>
-      </form>
+      <div class="dash-block">
+        <div class="dash-block-head">
+          <p class="eyebrow">Journal</p>
+        </div>
+        <form class="journal-form" data-journal="mindset">
+          <input type="text" class="journal-input" placeholder="Headspace, focus, mood…" required />
+          <button type="submit">Add</button>
+        </form>
 
-      <ul class="journal-list" id="mindset-journal-list"></ul>
+        <ul class="journal-list" id="mindset-journal-list"></ul>
+      </div>
     </section>
 
     <!-- Reading: book log (reading.js). The old free-text notes
@@ -797,7 +804,7 @@
     <section id="reading-section" hidden>
       <header class="read-header">
         <div class="read-topline">
-          <p class="eyebrow">reading</p>
+          <h1 class="eyebrow page-title">Reading</h1>
           <button type="button" class="read-primary-btn" data-read-add="search">+ Add books</button>
         </div>
 
@@ -858,7 +865,7 @@
     <section id="markets-section" hidden>
       <header class="markets-header">
         <div class="markets-topline">
-          <p class="eyebrow">markets</p>
+          <h1 class="eyebrow page-title">Markets</h1>
           <span class="market-status" id="market-status" data-state="closed">
             <span class="market-dot" aria-hidden="true"></span>
             <span class="market-status-label" id="market-status-label">Market closed</span>
@@ -922,7 +929,7 @@
     <section id="notes-section" hidden>
       <header class="dash-header">
         <div class="dash-topline">
-          <p class="eyebrow">notes</p>
+          <h1 class="eyebrow page-title">Notes</h1>
           <div class="dash-topline-actions">
             <button type="button" class="live-pill" id="nt-pill" data-state="idle">
               <span class="live-dot" aria-hidden="true"></span>
@@ -964,7 +971,7 @@
 
     <section id="settings-section" hidden>
       <header class="section-header-simple">
-        <p class="eyebrow">settings</p>
+        <h1 class="eyebrow page-title">Settings</h1>
         <p class="section-hint">Account &amp; sync</p>
       </header>
 
@@ -1205,31 +1212,31 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260923-1"></script>
+  <script src="config.js?v=20260923-2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260923-1"></script>
-  <script src="script.js?v=20260923-1"></script>
-  <script src="news.js?v=20260923-1"></script>
-  <script src="goals.js?v=20260923-1"></script>
-  <script src="markets.js?v=20260923-1"></script>
-  <script src="fitness.js?v=20260923-1"></script>
-  <script src="food.js?v=20260923-1"></script>
-  <script src="water.js?v=20260923-1"></script>
-  <script src="blueprint.js?v=20260923-1"></script>
-  <script src="alfred.js?v=20260923-1"></script>
-  <script src="journal.js?v=20260923-1"></script>
-  <script src="reading.js?v=20260923-1"></script>
-  <script src="recovery.js?v=20260923-1"></script>
-  <script src="review.js?v=20260923-1"></script>
-  <script src="notes.js?v=20260923-1"></script>
-  <script src="quotes.js?v=20260923-1"></script>
-  <script src="overview.js?v=20260923-1"></script>
-  <script src="global-bar.js?v=20260923-1"></script>
-  <script src="mobile-nav.js?v=20260923-1"></script>
-  <script src="backup.js?v=20260923-1"></script>
+  <script src="sync.js?v=20260923-2"></script>
+  <script src="script.js?v=20260923-2"></script>
+  <script src="news.js?v=20260923-2"></script>
+  <script src="goals.js?v=20260923-2"></script>
+  <script src="markets.js?v=20260923-2"></script>
+  <script src="fitness.js?v=20260923-2"></script>
+  <script src="food.js?v=20260923-2"></script>
+  <script src="water.js?v=20260923-2"></script>
+  <script src="blueprint.js?v=20260923-2"></script>
+  <script src="alfred.js?v=20260923-2"></script>
+  <script src="journal.js?v=20260923-2"></script>
+  <script src="reading.js?v=20260923-2"></script>
+  <script src="recovery.js?v=20260923-2"></script>
+  <script src="review.js?v=20260923-2"></script>
+  <script src="notes.js?v=20260923-2"></script>
+  <script src="quotes.js?v=20260923-2"></script>
+  <script src="overview.js?v=20260923-2"></script>
+  <script src="global-bar.js?v=20260923-2"></script>
+  <script src="mobile-nav.js?v=20260923-2"></script>
+  <script src="backup.js?v=20260923-2"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->
-  <script src="offline.js?v=20260923-1"></script>
+  <script src="offline.js?v=20260923-2"></script>
 </body>
 </html>

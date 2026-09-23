@@ -648,6 +648,39 @@ most worth checking there.
   installed could've kept serving stale cached files for an extra
   load or two via the stale-while-revalidate path. Not a data-loss
   bug, just a deploy-visibility one; fixed going forward.
+- CORRECTION to the second dead-CSS pass above: `.is-list` and
+  `.ov-dot.is-missed` were NOT dead — reading.js sets
+  `` `read-shelf is-${readView}` `` and overview.js sets
+  `` `ov-dot is-${d.state}` `` (state "missed"). Both restored in the
+  design pass below. Lesson: grep for `is-${` before trusting a
+  dead-class scan.
+- Legibility + structure pass (2026-09-23, commit "Readable, card-based
+  layout"): Martin said the grey was hard to see, there was too much
+  small useless text, and sections looked unorganized. Changes, all in
+  one layer at the END of style.css plus small HTML edits:
+  * Tokens: --text-dim/--text-faint raised to >=4.5:1 contrast in both
+    themes (old faint was ~3:1); new --card/--card-border; lighter
+    --track and --surface-2 so bars/chips show on cards.
+  * Every font-size under 13px lifted a notch (9px->10.5, 10->11.5,
+    11->12, 12->13...).
+  * Each section now opens with an `<h1 class="eyebrow page-title">`
+    (hidden under 640px, where the phone header names the section).
+  * Every content block (.dash-block/.fuel-block/.read-block/
+    .markets-block/.session/.settings-block/.goal-group/#daily-view/
+    #monthly-view/.nt-capture/.ov-tile) is a card; block headings are
+    15px full-strength text, not 10px faint mono caps. Mindset and
+    Alfred were regrouped into cards in index.html.
+  * Hidden: #mini-overview (the repeated summary bar on every
+    section), all .sync-note footers, "Personal OS" tag, flavour
+    .section-hint text outside Settings; ✕ delete buttons only show on
+    row hover on devices with a mouse.
+  * Quote of the day: with no Gemini key it now shows a rotating
+    public-domain classic (Marcus Aurelius/Seneca/Epictetus/Aristotle)
+    instead of an error message styled as a quote. Not saved to the log.
+  * Bat logo inverted on the light theme (it was white-on-white).
+  Verified in headless Chromium (cloud side, fonts served locally) with
+  seeded data: all 15 sections x desktop 1440 + phone 390, dark, plus
+  light spot checks; no page errors. Still not seen on the real iPhone.
 
 ## Rules
 

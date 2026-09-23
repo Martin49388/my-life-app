@@ -47,7 +47,10 @@ async function generateTodayQuote() {
   const key = geminiKey(); // defined in alfred.js, which loads before this file
   if (!key) {
     generatingQuote = false;
-    renderQuoteOfDay("No Gemini key set — add one in Settings under Alfred (AI).");
+    // No key (e.g. the GitHub Pages copy): show a classic instead of an
+    // error message dressed up as a quote. Not saved to the log, so a
+    // real generated quote takes over as soon as a key is added.
+    renderQuoteOfDay(null, fallbackQuote());
     return;
   }
 
@@ -127,7 +130,25 @@ document.addEventListener("keydown", (e) => {
 
 // errorText is only passed while there's no quote for today yet (loading
 // or failed) — once one exists it always wins.
-function renderQuoteOfDay(errorText) {
+// Short lines from public-domain classics, correctly attributed —
+// rotated by day of the year when there's no Gemini key to generate one.
+const FALLBACK_QUOTES = [
+  { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius" },
+  { text: "The impediment to action advances action. What stands in the way becomes the way.", author: "Marcus Aurelius" },
+  { text: "We suffer more often in imagination than in reality.", author: "Seneca" },
+  { text: "It is not that we have a short time to live, but that we waste a lot of it.", author: "Seneca" },
+  { text: "First say to yourself what you would be; and then do what you have to do.", author: "Epictetus" },
+  { text: "No man is free who is not master of himself.", author: "Epictetus" },
+  { text: "Well begun is half done.", author: "Aristotle" },
+];
+
+function fallbackQuote() {
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  return FALLBACK_QUOTES[dayOfYear % FALLBACK_QUOTES.length];
+}
+
+function renderQuoteOfDay(errorText, fallback) {
   const textEl = document.getElementById("overview-quote-text");
   const authorEl = document.getElementById("overview-quote-author");
   const btn = document.getElementById("overview-quote-btn");
@@ -138,6 +159,13 @@ function renderQuoteOfDay(errorText) {
     textEl.textContent = entry.text;
     authorEl.textContent = `— ${entry.author}`;
     btn.onclick = () => openQuoteModal(entry);
+    return;
+  }
+
+  if (fallback) {
+    textEl.textContent = fallback.text;
+    authorEl.textContent = `— ${fallback.author}`;
+    btn.onclick = null;
     return;
   }
 
