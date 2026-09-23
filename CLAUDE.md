@@ -580,12 +580,13 @@ most worth checking there.
   underneath, careful this time to never sync or wipe the `sb-*`
   keys Supabase's own client uses to persist the session (attempt #2's
   pull-and-reload logic would otherwise sign every device back out on
-  its first sync). STILL NEEDS: Martin has to (1) create/reuse a
-  Supabase project and paste its URL + anon key into sync.js, (2) run
-  SUPABASE.md's SQL, (3) add `{{ .Token }}` to the Magic Link email
-  template, (4) commit + push + wait for Pages to rebuild, (5) sign in
-  with the same email on both real devices — untested past confirming
-  the code loads without errors.
+  its first sync). Project URL + anon key are confirmed already in
+  sync.js (not placeholders) — this note previously said that step was
+  still pending; it wasn't, as of 2026-09-23. STILL NEEDS (can't be
+  checked from the repo alone): confirm SUPABASE.md's SQL has actually
+  been run, confirm `{{ .Token }}` is live in the Magic Link email
+  template, and sign in with the same email on both real devices to see
+  "Synced" on each — none of this is verifiable without Martin.
 - Dead CSS cleanup — done (2026-09-23): deleted glance.js outright (its
   script tag and sw.js precache entry too) rather than repurposing it,
   since nothing pointed at a tab-contextual sidebar use for it; removed
@@ -622,6 +623,31 @@ most worth checking there.
   CLAUDE.md under ~100 lines... not a changelog" — see Rules below).
   Worth an actual pruning pass; not done this session since it means
   deciding what history is safe to cut, which felt like Martin's call
+- Second dead-CSS pass (2026-09-23, later same day): wrote a script to
+  cross-check every CSS class/id against actual usage in the JS/HTML
+  instead of eyeballing it. Removed 8 more confirmed-orphaned rules
+  (~1.5KB): `.settings-note`, `.budget-headline`, `.estimator-row`, the
+  whole pre-Fuel-merge water widget (`.water-widget`/`.water-headline`/
+  `.water-total`/`.water-target-label`/`.water-bar-wrap`/`.water-bar` —
+  superseded by `.fuel-water-total`/`.fuel-water-target`, kept
+  `.water-actions` which is still live), `.overview-actions`, the old
+  pre-OTP `.sync-id-row` auth UI (kept `.account-actions`, which
+  replaced it), `.ov-dot.is-missed` (a day-dot state CSS supports but
+  overview.js never applies), and `.is-list` (a Reading shelf list-view
+  toggle that was styled but never wired to a button). False positives
+  the script caught and did NOT remove: `seg-*`/`tint-*`/`spark-down`
+  all get built from template literals (`` `seg-${i}` ``, `` `tint-${tint}` ``,
+  `` `spark-${tone}` ``) — a plain grep misses those, worth remembering
+  before trusting this kind of scan again.
+- Bumped the cache-bust version — `?v=20260920-2` → `?v=20260923-1`
+  across every script/link tag in index.html, and `CACHE_VERSION` to
+  match in sw.js. This file's own Rules say the two must move together
+  in the same commit as any shipped change, and neither the glance.js
+  removal earlier today nor (looking back) some earlier sessions'
+  style.css edits had bumped it — so devices with the PWA already
+  installed could've kept serving stale cached files for an extra
+  load or two via the stale-while-revalidate path. Not a data-loss
+  bug, just a deploy-visibility one; fixed going forward.
 
 ## Rules
 

@@ -334,13 +334,6 @@ body {
   margin: 0 0 10px;
 }
 
-.settings-note {
-  font-size: 10.5px;
-  line-height: 1.4;
-  color: var(--text-faint);
-  margin: 11px 0 0;
-}
-
 .stat-tiles {
   display: flex;
   gap: 10px;
@@ -1317,13 +1310,6 @@ body {
   gap: 10px;
 }
 
-.budget-headline {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 0;
-}
-
 .budget-number {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
@@ -1563,10 +1549,6 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-}
-
-.estimator-row {
-  display: flex;
 }
 
 #estimator-toggle-btn {
@@ -1886,48 +1868,6 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* Water tracker (Food section) */
-.water-widget {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 4px;
-}
-
-.water-headline {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-family: "IBM Plex Mono", monospace;
-}
-
-.water-total {
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.water-target-label {
-  font-size: 13px;
-  color: var(--text-dim);
-}
-
-.water-bar-wrap {
-  height: 8px;
-  border-radius: 99px;
-  background: var(--track);
-  overflow: hidden;
-}
-
-.water-bar {
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: width 0.3s ease;
-}
-
 .water-actions {
   display: flex;
   gap: 8px;
@@ -2206,12 +2146,6 @@ body {
   margin: 0;
 }
 
-.overview-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 /* Mini-overview: condensed header shown above every section except
    Overview itself (see #mini-overview in index.html, toggled in
    switchSection() in script.js) — just banked count + best streak,
@@ -2316,30 +2250,6 @@ body {
 .settings-form input:focus {
   outline: none;
   border-bottom-color: var(--accent);
-}
-
-.sync-id-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sync-id-row input {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.sync-id-row button {
-  flex: 0 0 auto;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 10px;
-  border-radius: 7px;
-  background: none;
-  color: var(--text-dim);
-  border: 1px solid var(--border);
-  cursor: pointer;
 }
 
 .account-actions {
@@ -4403,10 +4313,6 @@ a.news-row-link:hover {
   color: var(--text);
 }
 
-.ov-dot.is-missed {
-  opacity: 0.55;
-}
-
 @keyframes tileBanked {
   0% {
     transform: scale(1);
@@ -6213,15 +6119,6 @@ a.news-row-link:hover {
 
 .book-stars-off {
   color: var(--track);
-}
-
-.is-list .shelf-items {
-  display: flex;
-  flex-direction: column;
-}
-
-.is-list .shelf-items > li + li {
-  border-top: 1px solid var(--border);
 }
 
 .shelf-row {
