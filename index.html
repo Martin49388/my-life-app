@@ -561,6 +561,18 @@
         </div>
       </header>
 
+      <div class="dash-block ap-card" id="alfred-plan">
+        <div class="dash-block-head">
+          <p class="eyebrow">Plan the week with Alfred</p>
+          <span class="journal-time">from your goals, last review, habits and training</span>
+        </div>
+        <div class="ap-row">
+          <input type="text" id="ap-note" class="ap-note" placeholder="Anything different this week? e.g. exams Wed, gym before work" maxlength="300" autocomplete="off" />
+          <button type="button" class="read-primary-btn ap-go" id="ap-go">Draft my week</button>
+        </div>
+        <p class="ap-status" id="ap-status" hidden></p>
+      </div>
+
       <div class="week-strip" id="week-plan-days"></div>
 
       <div class="dash-block">
@@ -1231,6 +1243,19 @@
     </form>
   </div>
 
+  <!-- Alfred's week draft (planner.js). Same sheet shell as Goals/Reading. -->
+  <div class="modal-overlay book-overlay" id="ap-overlay" hidden>
+    <div class="modal-card book-sheet ap-sheet" role="dialog" aria-modal="true" aria-labelledby="ap-title">
+      <button type="button" class="modal-close" id="ap-close" aria-label="Close">&#10005;</button>
+      <p class="book-sheet-title" id="ap-title">Alfred's draft</p>
+      <div id="ap-body"></div>
+      <div class="gl-sheet-actions ap-actions">
+        <button type="button" class="gl-ghost-btn" id="ap-discard">Discard</button>
+        <button type="button" class="read-primary-btn gl-submit" id="ap-apply">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay book-overlay" id="book-modal-overlay" hidden>
     <div class="modal-card book-sheet" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
       <button type="button" class="modal-close" id="book-modal-close" aria-label="Close">&#10005;</button>
@@ -1337,6 +1362,7 @@
   <script src="reading.js?v=20260924-1"></script>
   <script src="recovery.js?v=20260924-1"></script>
   <script src="review.js?v=20260924-1"></script>
+  <script src="planner.js?v=20260924-1"></script>
   <script src="notes.js?v=20260924-1"></script>
   <script src="quotes.js?v=20260924-1"></script>
   <script src="actions.js?v=20260924-1"></script>

@@ -211,6 +211,16 @@ function escapeHtml(str) {
 }
 
 async function handleAlfredQuestion(question) {
+  // "plan my week", "draft the week — exams Wed": that's Blueprint's
+  // planner, not a chat answer. Whatever follows "week" becomes the note.
+  if (window.alfredPlanner && /^(please\s+)?(plan|draft|schedule|organi[sz]e|redo)\b.{0,20}\bweek\b/i.test(question)) {
+    const note = question.replace(/^.*?\bweek\b[\s,:;.\-—]*/i, "");
+    if (window.switchSection) window.switchSection("blueprint");
+    const input = document.getElementById("ap-note");
+    if (input) input.value = note;
+    window.alfredPlanner.makeDraft();
+    return;
+  }
   const log = document.getElementById("alfred-log");
   if (!alfredLog.length) log.innerHTML = "";
   log.innerHTML += `<div class="alfred-entry alfred-you"><span class="alfred-role">You</span>${escapeHtml(question)}</div>

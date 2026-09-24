@@ -48,6 +48,7 @@ const SHELL = [
   "./script.js",
   "./news.js",
   "./goals.js",
+  "./planner.js",
   "./markets.js",
   "./fitness.js",
   "./food.js",
