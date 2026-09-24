@@ -1,0 +1,319 @@
+/* ------------------------------------------------------------------------
+   Fuel — food + water on one page (food.js, water.js). Same dashboard
+   language as Markets/Overview: one big number, stats split by hairlines,
+   flat blocks with an eyebrow head. The budget bar and the estimator keep
+   their existing styles from further up.
+   ------------------------------------------------------------------------ */
+
+#fuel-section:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.fuel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.fuel-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fuel-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.fuel-day-btn,
+.fuel-day-label {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  cursor: pointer;
+}
+
+.fuel-day-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.fuel-day-btn:hover,
+.fuel-day-label:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.fuel-day-label {
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.fuel-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px 32px;
+  flex-wrap: wrap;
+}
+
+.fuel-hero-main {
+  min-width: 0;
+}
+
+.fuel-hero-number {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.fuel-hero-number.over {
+  color: var(--danger);
+}
+
+.fuel-hero-caption {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.fuel-hero-stats {
+  display: flex;
+}
+
+.fuel-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 18px;
+}
+
+.fuel-stat:first-child {
+  padding-left: 0;
+}
+
+.fuel-stat + .fuel-stat {
+  border-left: 1px solid var(--border);
+}
+
+.fuel-target-input {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.fuel-target-input {
+  width: 6ch;
+  line-height: 1.4;
+}
+
+.fuel-target-input::-webkit-inner-spin-button,
+.fuel-target-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.fuel-target-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.fuel-header .budget-bar-wrap {
+  margin-top: 18px;
+}
+
+.fuel-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fuel-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.fuel-head-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fuel-head-btn:hover {
+  border-color: var(--accent);
+}
+
+.fuel-head-btn[hidden] {
+  display: none;
+}
+
+/* Water gauge: one glass per 250 ml, filled from the bottom. */
+.fuel-water-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.fuel-water-total {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.fuel-water-target {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.fuel-glasses {
+  display: grid;
+  grid-template-columns: repeat(var(--glasses, 16), minmax(0, 1fr));
+  gap: 5px;
+  max-width: calc(var(--glasses, 16) * 36px);
+}
+
+.fuel-water .water-actions {
+  max-width: calc(var(--glasses, 16) * 36px);
+}
+
+.fuel-glass {
+  position: relative;
+  height: 38px;
+  overflow: hidden;
+  background: var(--track);
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
+  border-radius: 3px;
+}
+
+.fuel-glass > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: var(--accent);
+  opacity: 0.55;
+  transition: height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+}
+
+.fuel-glass.is-full > span {
+  opacity: 0.8;
+}
+
+.fuel-water.is-met .fuel-glass > span {
+  opacity: 1;
+}
+
+.fuel-water-note {
+  margin: -2px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.fuel-water-note.is-met {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.fuel-water .water-actions button {
+  padding: 10px 0;
+  border-radius: 10px;
+}
+
+.fuel-block #add-food-form {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.fuel-block #add-food-form input,
+.fuel-block #add-food-form select {
+  background: var(--bg);
+}
+
+.fuel-block .estimator {
+  border: none;
+}
+
+@media (max-width: 640px) {
+  #fuel-section .fuel-topline > .eyebrow {
+    display: none;
+  }
+
+  #fuel-section .fuel-day {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .fuel-hero-number {
+    font-size: 56px;
+  }
+
+  .fuel-hero-stats {
+    width: 100%;
+  }
+
+  .fuel-stat {
+    flex: 1 1 0;
+    padding: 2px 12px;
+  }
+
+  /* iOS forces inputs to 16px (see the phone shell), so match the
+     neighbouring stat values to the target input. */
+
+  .fuel-glass {
+    height: 32px;
+  }
+
+  .fuel-glasses {
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fuel-glass > span {
+    transition: none;
+  }
+}
+

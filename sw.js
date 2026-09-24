@@ -28,7 +28,7 @@
 // one extra load. Everything not matching the current CACHE_VERSION is
 // deleted on activate, so old copies can't accumulate.
 
-const CACHE_VERSION = "batcave-v20260924-1";
+const CACHE_VERSION = "batcave-v20260924-2";
 
 // Relative to this file, which sits next to index.html — so the same list
 // works unchanged at the root of a local dev server and at
@@ -37,7 +37,28 @@ const CACHE_VERSION = "batcave-v20260924-1";
 const SHELL = [
   "./",
   "./index.html",
-  "./style.css",
+  "./css/01-base-layout.css",
+  "./css/02-sidebar-settings-shell.css",
+  "./css/03-habits-fitness.css",
+  "./css/04-fuel-food-log.css",
+  "./css/05-alfred-journals-settings.css",
+  "./css/06-markets.css",
+  "./css/07-dashboard-shared.css",
+  "./css/08-news.css",
+  "./css/09-overview.css",
+  "./css/10-phone-shell.css",
+  "./css/11-fuel.css",
+  "./css/12-reading.css",
+  "./css/13-recovery-review-notes.css",
+  "./css/14-status-pills-backup.css",
+  "./css/20-layer-legibility.css",
+  "./css/21-layer-round2.css",
+  "./css/22-habits-month.css",
+  "./css/23-goals.css",
+  "./css/24-fuel-calorie-goal.css",
+  "./css/25-goals-linked-status.css",
+  "./css/26-alfred-planner.css",
+  "./css/27-reminders.css",
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

@@ -1,0 +1,26 @@
+name: Smoke test
+
+# Every push: syntax-check all JavaScript, then open the app in a real
+# browser (desktop + phone size) and click through it. See tests/smoke.mjs.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Syntax check
+        run: for f in *.js scripts/*.mjs tests/*.mjs; do node --check "$f" || exit 1; done
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm test

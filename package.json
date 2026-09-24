@@ -1,0 +1,11 @@
+{
+  "name": "batcave",
+  "private": true,
+  "description": "Batcave — Martin's personal tracking app. No build step; this file only exists for the smoke test.",
+  "scripts": {
+    "test": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.0"
+  }
+}

@@ -1,0 +1,174 @@
+/* ======================================================================
+   Legibility + structure layer (2026-09-23)
+
+   Martin: "the gray is hard to see, a lot of small useless text, it
+   looks unorganized, hard to tell where is what in each section."
+   Three fixes, all layered here at the end so they win over the
+   per-section rules above without rewriting them:
+     1. Contrast — --text-dim/--text-faint raised to >=4.5:1 on both the
+        page and the new card surface (the old faint grey was ~3:1 at
+        9-11px). Every font-size under 13px was also lifted a notch.
+     2. Structure — every content block in every section sits on its own
+        card (--card), and each card's heading is a real heading
+        (15px, full-strength text) instead of a faint 10px mono label.
+        Each section opens with a proper page title.
+     3. Less noise — the per-section mini summary bar, the "saved on
+        this device only" footers, flavour-text hints and always-on
+        delete crosses are gone or hidden until hover.
+   ====================================================================== */
+
+/* --- 1. Section rhythm ---------------------------------------------- */
+#overview-section:not([hidden]),
+#habits-section:not([hidden]),
+#goals-section:not([hidden]),
+#alfred-section:not([hidden]),
+#blueprint-section:not([hidden]),
+#review-section:not([hidden]),
+#fitness-section:not([hidden]),
+#fuel-section:not([hidden]),
+#recovery-section:not([hidden]),
+#reading-section:not([hidden]),
+#news-section:not([hidden]),
+#markets-section:not([hidden]),
+#notes-section:not([hidden]),
+#settings-section:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- 2. Page titles -------------------------------------------------- */
+.page-title {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--text);
+  margin: 0;
+}
+
+/* The phone header already names the section. */
+@media (max-width: 640px) {
+  .page-title {
+    display: none;
+  }
+}
+
+/* --- 3. Cards -------------------------------------------------------- */
+.dash-block,
+.fuel-block,
+.read-block,
+.markets-block,
+.session,
+.settings-block:has(.settings-title),
+#daily-view:not([hidden]),
+#monthly-view:not([hidden]),
+.nt-capture {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px 22px 22px;
+}
+
+.settings-block {
+  max-width: 560px;
+}
+
+.ov-tile {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+}
+
+.ov-tile.is-met {
+  background: color-mix(in srgb, var(--accent) 9%, var(--card));
+}
+
+.ov-grid {
+  gap: 20px;
+}
+
+.ov-col {
+  gap: 20px;
+}
+
+.rec-cols,
+.rev-cols {
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .dash-block,
+  .fuel-block,
+  .read-block,
+  .markets-block,
+  .session,
+  .settings-block:has(.settings-title),
+  #daily-view:not([hidden]),
+  #monthly-view:not([hidden]),
+  .nt-capture {
+    padding: 16px;
+    border-radius: 14px;
+  }
+}
+
+/* --- 4. Headings inside cards --------------------------------------- */
+.dash-block-head .eyebrow,
+.fuel-block-head .eyebrow,
+.read-block-head .eyebrow,
+.markets-block-head .eyebrow,
+.dash-block > .eyebrow,
+.nt-capture > .eyebrow,
+.settings-title {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--text);
+}
+
+/* Remaining small labels (stat captions, overview date, nav groups):
+   still small caps, but readable grey instead of near-black. */
+.eyebrow,
+.stat-label,
+.nav-group-label {
+  color: var(--text-dim);
+}
+
+/* --- 5. Less noise --------------------------------------------------- */
+.sync-note,
+.sidebar-brand-tag {
+  display: none !important;
+}
+
+.content section:not(#settings-section) .section-hint {
+  display: none;
+}
+
+@media (hover: hover) {
+  li .delete-btn {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  li:hover .delete-btn,
+  li:focus-within .delete-btn {
+    opacity: 1;
+  }
+}
+
+/* The bat mark is a white PNG — invisible on the light theme without this. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .sidebar-brand-mark,
+  :root:not([data-theme="dark"]) .m-header-mark {
+    filter: invert(1);
+  }
+}
+:root[data-theme="light"] .sidebar-brand-mark,
+:root[data-theme="light"] .m-header-mark {
+  filter: invert(1);
+}
+

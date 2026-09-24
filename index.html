@@ -19,7 +19,31 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260924-1" />
+  <!-- Styles load in this order and later files override earlier ones:
+       01-14 are the sections, 20+ are later passes and newer features.
+       See css/README.md. -->
+  <link rel="stylesheet" href="css/01-base-layout.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/02-sidebar-settings-shell.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/03-habits-fitness.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/04-fuel-food-log.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/05-alfred-journals-settings.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/06-markets.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/07-dashboard-shared.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/08-news.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/09-overview.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/10-phone-shell.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/11-fuel.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/12-reading.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/13-recovery-review-notes.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/14-status-pills-backup.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/20-layer-legibility.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/21-layer-round2.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/22-habits-month.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/23-goals.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/24-fuel-calorie-goal.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/25-goals-linked-status.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/26-alfred-planner.css?v=20260924-2" />
+  <link rel="stylesheet" href="css/27-reminders.css?v=20260924-2" />
 </head>
 <body>
   <main class="app">
@@ -67,7 +91,6 @@
       </aside>
 
       <div class="content">
-    <div class="mini-overview" id="mini-overview" hidden></div>
 
     <section id="overview-section">
       <header class="ov-header">
@@ -1355,36 +1378,36 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260924-1"></script>
+  <script src="config.js?v=20260924-2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260924-1"></script>
-  <script src="script.js?v=20260924-1"></script>
-  <script src="news.js?v=20260924-1"></script>
-  <script src="goals.js?v=20260924-1"></script>
-  <script src="markets.js?v=20260924-1"></script>
-  <script src="fitness.js?v=20260924-1"></script>
-  <script src="food.js?v=20260924-1"></script>
-  <script src="water.js?v=20260924-1"></script>
-  <script src="weight.js?v=20260924-1"></script>
-  <script src="blueprint.js?v=20260924-1"></script>
-  <script src="alfred.js?v=20260924-1"></script>
-  <script src="journal.js?v=20260924-1"></script>
-  <script src="reading.js?v=20260924-1"></script>
-  <script src="recovery.js?v=20260924-1"></script>
-  <script src="review.js?v=20260924-1"></script>
-  <script src="planner.js?v=20260924-1"></script>
-  <script src="notes.js?v=20260924-1"></script>
-  <script src="quotes.js?v=20260924-1"></script>
-  <script src="actions.js?v=20260924-1"></script>
-  <script src="checkin.js?v=20260924-1"></script>
-  <script src="overview.js?v=20260924-1"></script>
-  <script src="global-bar.js?v=20260924-1"></script>
-  <script src="mobile-nav.js?v=20260924-1"></script>
-  <script src="backup.js?v=20260924-1"></script>
-  <script src="reminders.js?v=20260924-1"></script>
+  <script src="sync.js?v=20260924-2"></script>
+  <script src="script.js?v=20260924-2"></script>
+  <script src="news.js?v=20260924-2"></script>
+  <script src="goals.js?v=20260924-2"></script>
+  <script src="markets.js?v=20260924-2"></script>
+  <script src="fitness.js?v=20260924-2"></script>
+  <script src="food.js?v=20260924-2"></script>
+  <script src="water.js?v=20260924-2"></script>
+  <script src="weight.js?v=20260924-2"></script>
+  <script src="blueprint.js?v=20260924-2"></script>
+  <script src="alfred.js?v=20260924-2"></script>
+  <script src="journal.js?v=20260924-2"></script>
+  <script src="reading.js?v=20260924-2"></script>
+  <script src="recovery.js?v=20260924-2"></script>
+  <script src="review.js?v=20260924-2"></script>
+  <script src="planner.js?v=20260924-2"></script>
+  <script src="notes.js?v=20260924-2"></script>
+  <script src="quotes.js?v=20260924-2"></script>
+  <script src="actions.js?v=20260924-2"></script>
+  <script src="checkin.js?v=20260924-2"></script>
+  <script src="overview.js?v=20260924-2"></script>
+  <script src="global-bar.js?v=20260924-2"></script>
+  <script src="mobile-nav.js?v=20260924-2"></script>
+  <script src="backup.js?v=20260924-2"></script>
+  <script src="reminders.js?v=20260924-2"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->
-  <script src="offline.js?v=20260924-1"></script>
+  <script src="offline.js?v=20260924-2"></script>
 </body>
 </html>

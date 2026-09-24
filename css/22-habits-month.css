@@ -1,0 +1,230 @@
+/* --- Habits: month view (rebuilt 2026-09-23) ---------------------------
+   Cells shade green by the share of habits done that day; a perfect day
+   is solid green. minmax(0, 1fr) columns so the grid can never be wider
+   than its card (plain 1fr let cell content push Sunday off-screen). */
+#monthly-view:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.month-summary {
+  margin: 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.month-summary strong {
+  color: var(--text);
+}
+
+.calendar {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekday-label {
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 2px;
+}
+
+.day-cell {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.day-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--good);
+  opacity: calc(var(--fill, 0) * 0.55);
+}
+
+.day-cell.is-perfect::before {
+  opacity: 1;
+}
+
+.day-cell.is-blank {
+  visibility: hidden;
+}
+
+.day-cell.is-future {
+  background: transparent;
+  border-color: var(--border);
+  cursor: default;
+}
+
+.day-cell.is-today {
+  border: 2px solid var(--text);
+}
+
+.day-cell.is-selected {
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--text-dim);
+}
+
+.day-cell .day-number {
+  position: relative;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.day-cell.is-future .day-number {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.day-cell.is-perfect .day-number {
+  color: var(--card);
+}
+
+.month-scale {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.month-scale-bar {
+  width: 90px;
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--surface-2), color-mix(in srgb, var(--good) 55%, var(--surface-2)), var(--good));
+}
+
+.month-day-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.month-day-detail[hidden] {
+  display: none;
+}
+
+.month-done {
+  color: var(--good);
+}
+
+.month-missed {
+  color: var(--text-dim);
+}
+
+.month-habits {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.month-habit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(60px, 38%) 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.month-habit + .month-habit {
+  border-top: 1px solid var(--border);
+}
+
+.month-habit-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.month-habit-bar {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.month-habit-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.month-habit.is-good .month-habit-bar > span {
+  background: var(--good);
+}
+
+.month-habit.is-warn .month-habit-bar > span {
+  background: var(--warn);
+}
+
+.month-habit-count {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+@media (max-width: 640px) {
+  .calendar {
+    gap: 4px;
+  }
+
+  .day-cell {
+    border-radius: 8px;
+  }
+
+  .day-cell .day-number {
+    font-size: 12.5px;
+  }
+}
+
+/* Desktop: calendar on the left at a sensible size, habit rows beside it. */
+@media (min-width: 900px) {
+  #monthly-view:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+    align-content: start;
+    column-gap: 32px;
+    row-gap: 14px;
+  }
+
+  #monthly-view > * {
+    grid-column: 1;
+  }
+
+  #monthly-view > .month-habits {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    align-self: start;
+    padding-top: 0;
+    border-top: none;
+  }
+}
+

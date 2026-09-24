@@ -1,0 +1,627 @@
+/* One number per screen gets to be the thing you actually look at —
+   everything else in the header stays small and muted (.stat-tile-muted). */
+.stat-value-primary {
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1.05;
+}
+
+.stat-tile-muted {
+  padding: 6px 10px;
+}
+
+.stat-tile-muted .stat-value {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.stat-tile-muted .stat-label {
+  font-size: 10.5px;
+}
+
+.view-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.tab-btn {
+  font-family: "Manrope", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  padding: 7px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+#add-habit-form {
+  display: flex;
+  gap: 8px;
+}
+
+#add-habit-form[hidden] {
+  display: none;
+}
+
+#habit-name-input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#habit-name-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#add-habit-form button {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#add-habit-form button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#habit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-state {
+  color: var(--text-faint);
+  font-size: 14px;
+  padding: 24px 4px;
+  text-align: center;
+}
+
+.habit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+}
+
+.habit-row + .habit-row {
+  border-top: 1px solid var(--border);
+}
+
+.habit-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.habit-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.habit-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.habit-name {
+  font-weight: 500;
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.habit-row.done .habit-name {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.habit-streak {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.habit-history {
+  display: flex;
+}
+
+.history-cell {
+  background: var(--track);
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.month-nav button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  justify-content: center;
+  margin: 10px 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.calendar {
+  display: grid;
+}
+
+.weekday-label {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.day-cell {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.day-cell.is-today {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+.day-cell.is-perfect {
+  background: var(--accent-soft);
+}
+
+.day-number {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.sync-note {
+  text-align: center;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 4px 0 0;
+}
+
+/* .section-tabs (the old top tab bar) is gone from index.html — the
+   sidebar's .nav-link/.nav-link.active rules (see near .sidebar above)
+   are what style navigation now. .section-btn is kept only as the
+   behavioral hook script.js's click handler still queries by; it carries
+   no visual styling of its own anymore. */
+
+.add-habit-toggle {
+  margin-top: 4px;
+}
+
+#add-habit-toggle-btn {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-faint);
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#add-habit-toggle-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.refresh-btn {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.refresh-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-fade-in,
+  .habit-pulse {
+    animation: none !important;
+  }
+}
+
+/* Tab switch: content fades/slides in instead of just appearing.
+   Reduced-motion users never get the class added (see script.js). */
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-fade-in {
+  animation: tabFadeIn 0.22s ease;
+}
+
+/* Habit row: a brief pulse on check-off, on top of the existing
+   strikethrough, instead of just the strikethrough alone. */
+@keyframes habitPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1.015);
+    opacity: 0.82;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.habit-pulse {
+  animation: habitPulse 0.15s ease;
+}
+
+.day-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 3px 10px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 0;
+  transition: border-color 0.2s ease;
+}
+
+.day-chip.rest {
+  border-bottom-style: dashed;
+}
+
+.day-chip.is-today {
+  border-bottom-color: var(--accent);
+}
+
+.day-chip.selected {
+  border-bottom-color: var(--accent);
+  border-bottom-width: 3px;
+}
+
+.day-chip-label {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.day-chip-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-chip.rest .day-chip-title {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.day-chip-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9px;
+}
+
+.volume-bar {
+  width: 2.5px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0.55;
+}
+
+.day-chip.selected .volume-bar {
+  opacity: 1;
+}
+
+.session {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-day {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Reads as a heading until you click it, then behaves like the input it is. */
+.session-title-input {
+  font-family: "Manrope", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  padding: 2px 0;
+  width: 100%;
+}
+
+.session-title-input::placeholder {
+  color: var(--text-faint);
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.session-title-input:hover {
+  border-bottom-color: var(--border);
+}
+
+.session-title-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.exercise-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 4px;
+}
+
+.exercise-row + .exercise-row {
+  border-top: 1px solid var(--border);
+}
+
+.exercise-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.exercise-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.exercise-name {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exercise-row.done .exercise-name {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.exercise-detail {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+#add-exercise-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#add-exercise-form[hidden] {
+  display: none;
+}
+
+#add-exercise-form input {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#add-exercise-form input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#exercise-name-input {
+  flex: 1 1 100%;
+}
+
+#exercise-sets-input {
+  flex: 1 1 70px;
+  width: 70px;
+}
+
+#exercise-reps-input {
+  flex: 1 1 110px;
+}
+
+#add-exercise-form button {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.target-input {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--border);
+  padding: 0;
+  width: 58px;
+}
+
+.target-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.budget {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-number {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.budget-number.over {
+  color: var(--danger);
+}
+
+.budget-caption {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+

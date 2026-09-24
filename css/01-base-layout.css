@@ -1,0 +1,142 @@
+:root {
+  --bg: #f2f2f4;
+  --surface: #f2f2f4;
+  --surface-2: #ebebee;
+  --card: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.07);
+  --border: rgba(0, 0, 0, 0.1);
+  --text: #111113;
+  --text-dim: #45454b;
+  --text-faint: #686870;
+  --accent: #111111;
+  --accent-soft: #e4e4e8;
+  --accent-ink: #f4f4f4;
+  --track: #dcdce0;
+  --danger: #b8402f;
+  --gain: #25784a;
+  --shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0c;
+    --surface: #0b0b0c;
+    --surface-2: #202024;
+    --card: #151517;
+    --card-border: rgba(255, 255, 255, 0.07);
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #f4f4f5;
+    --text-dim: #b0b0b6;
+    --text-faint: #86868e;
+    --accent: #f2f2f2;
+    --accent-soft: #26262a;
+    --accent-ink: #0a0a0a;
+    --track: #2a2a2e;
+    --danger: #e0685a;
+    --gain: #4fbf7f;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0b0c;
+  --surface: #0b0b0c;
+  --surface-2: #202024;
+  --card: #151517;
+  --card-border: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #f4f4f5;
+  --text-dim: #b0b0b6;
+  --text-faint: #86868e;
+  --accent: #f2f2f2;
+  --accent-soft: #26262a;
+  --accent-ink: #0a0a0a;
+  --track: #2a2a2e;
+  --danger: #e0685a;
+  --gain: #4fbf7f;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Manrope", system-ui, sans-serif;
+  margin: 0;
+}
+
+/* Persistent input bar, visible across every section — a second front
+   door into Alfred (see global-bar.js). This and .sidebar are the only
+   two real bordered boxes left in the app; everything else is flat
+   rows and hairlines (see the Step 3 commit). */
+#global-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 32px));
+  display: flex;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 10px 10px 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  z-index: 20;
+}
+
+#global-bar-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+#global-bar-input:focus {
+  outline: none;
+}
+
+#global-bar-input::placeholder {
+  color: var(--text-faint);
+}
+
+#global-bar button[type="submit"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 7px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  #global-bar {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Above 640px the single 520px column is gone: .app grows to fit an
+   asymmetric two-zone layout (sticky glance sidebar + flexible content).
+   Below 640px this collapses back to the original centered single column —
+   see the max-width:640px block at the bottom of this section. */
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 auto;
+}
+

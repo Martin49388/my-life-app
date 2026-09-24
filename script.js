@@ -436,7 +436,6 @@ function render() {
   });
   if (currentView === "daily") renderDaily();
   else renderMonthly();
-  if (window.renderGlance) window.renderGlance();
   if (window.renderOverview) window.renderOverview();
 }
 
@@ -572,8 +571,6 @@ function switchSection(requested) {
   if (section === "notes" && window.renderNotes) window.renderNotes();
   if (section === "settings" && window.renderReminders) window.renderReminders();
   if (window.renderOverview) window.renderOverview();
-  const miniBar = document.getElementById("mini-overview");
-  if (miniBar) miniBar.hidden = section === "overview";
   playTabEnter(document.getElementById(`${section}-section`));
 
   const changed = window.currentSection !== section;

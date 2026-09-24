@@ -14,8 +14,6 @@
 //     Blueprint) and everything logged today.
 //   - Right column: quote of the day, a briefing (watchlist move + latest
 //     headline), and goals in motion.
-// Also renders the condensed "mini-overview" bar shown above every other
-// section (#mini-overview, toggled by switchSection in script.js).
 
 const OVERVIEW_DATE_FMT = { weekday: "long", month: "long", day: "numeric" };
 
@@ -482,37 +480,14 @@ function renderOverview() {
 
   renderOverviewRing(standards);
   renderStandardTiles(standards);
-  const planText = renderPlanPill();
+  renderPlanPill();
   renderTodaysPlan();
   renderTodaysLog(logged);
   renderBriefing();
   renderOverviewGoals();
-  renderMiniOverview(banked, total, streak, planText);
   if (window.renderCheckinCta) window.renderCheckinCta();
 }
 window.renderOverview = renderOverview;
-
-// The slim header shown above every other section — the numbers worth
-// carrying around, plus what's on the plan right now.
-function renderMiniOverview(banked, total, streak, planText) {
-  const bar = document.getElementById("mini-overview");
-  if (!bar) return;
-  // Blueprint shows the same pill in its own header — don't repeat it.
-  const onBlueprint = document.getElementById("blueprint-section")?.hidden === false;
-  const plan =
-    planText && planText.state !== "idle" && !onBlueprint
-      ? `<button type="button" class="mini-overview-plan" data-state="${planText.state}" data-goto="blueprint">
-          <span class="live-dot" aria-hidden="true"></span>
-          <span class="mini-overview-plan-label">${overviewEsc(planText.label)}</span>
-          <span class="mini-overview-plan-detail">${overviewEsc(planText.detail)}</span>
-        </button>`
-      : "";
-  bar.innerHTML = `
-    <span class="mini-overview-item"><strong>${banked}/${total}</strong> banked today</span>
-    <span class="mini-overview-item"><strong>${streak}d</strong> best streak</span>
-    ${plan}
-  `;
-}
 
 // ---------------------------------------------------------------------------
 // Interaction: tiles, tags, cards and links navigate via data-goto; quick
@@ -547,7 +522,6 @@ function handleOverviewKey(e) {
 
 document.getElementById("overview-section")?.addEventListener("click", handleOverviewClick);
 document.getElementById("overview-section")?.addEventListener("keydown", handleOverviewKey);
-document.getElementById("mini-overview")?.addEventListener("click", handleOverviewClick);
 
 // Keep the clock-driven bits (greeting, now/next, plan timeline) current.
 let overviewLastMinute = -1;

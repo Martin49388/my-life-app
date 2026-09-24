@@ -1,0 +1,545 @@
+/* ------------------------------------------------------------------------
+   Shared dashboard pieces — Overview, Blueprint and News (overview.js,
+   blueprint.js, news.js). Same visual language as Markets above (which
+   keeps its own class names): a live pill, one big number, stats with
+   hairline dividers, flat tinted tiles. Monochrome — green stays a
+   Markets-only color.
+   ------------------------------------------------------------------------ */
+
+#overview-section:not([hidden]),
+#news-section:not([hidden]),
+#blueprint-section:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.dash-header,
+.ov-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dash-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  flex-wrap: wrap;
+}
+
+.dash-topline-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dash-topline-actions .quick-chip,
+.dash-topline-actions .refresh-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-dim);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+button.live-pill {
+  cursor: pointer;
+}
+
+button.live-pill:hover {
+  border-color: var(--text-faint);
+}
+
+.live-pill-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.live-pill-detail {
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.live-pill-detail:empty {
+  display: none;
+}
+
+.live-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+
+[data-state="live"] > .live-dot {
+  background: var(--accent);
+}
+
+[data-state="next"] > .live-dot {
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+[data-state="loading"] > .live-dot {
+  background: var(--accent);
+  animation: liveBlink 1s ease-in-out infinite;
+}
+
+[data-state="error"] > .live-dot {
+  background: var(--danger);
+}
+
+[data-state="live"] > .live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  opacity: 0;
+  animation: marketPulse 2.2s ease-out infinite;
+}
+
+@keyframes liveBlink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.dash-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  flex-wrap: wrap;
+}
+
+.dash-hero-number {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.dash-hero-caption {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.dash-stats {
+  display: flex;
+  row-gap: 12px;
+}
+
+.dash-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 18px;
+}
+
+.dash-stat:first-child {
+  padding-left: 0;
+}
+
+.dash-stat + .dash-stat {
+  border-left: 1px solid var(--border);
+}
+
+.dash-stat-value {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.dash-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dash-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dash-block-summary {
+  margin: -4px 0 0;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.dash-block-summary:empty {
+  display: none;
+}
+
+.dash-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dash-link:hover {
+  color: var(--text);
+}
+
+/* Day timeline track (Blueprint + Overview) -------------------------- */
+
+.day-track {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.day-track-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.day-track-block {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  border-right: 1.5px solid var(--bg);
+  background: color-mix(in srgb, var(--accent) 45%, var(--surface-2));
+}
+
+.day-track-block.is-done {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-2));
+}
+
+.day-track-block.is-now {
+  background: var(--accent);
+}
+
+.day-track-point {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--text-dim);
+}
+
+.day-track-now {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--danger);
+}
+
+.day-track-scale {
+  position: relative;
+  height: 12px;
+}
+
+.day-track-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  line-height: 1;
+  color: var(--text-faint);
+}
+
+.day-track-tick:first-child {
+  transform: none;
+}
+
+.day-track-tick:last-child {
+  transform: translateX(-100%);
+}
+
+.day-track-compact .day-track-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.day-track-compact .day-track-block {
+  border-right-width: 1px;
+  border-right-color: transparent;
+}
+
+.day-track-compact .day-track-now {
+  top: -2px;
+  bottom: -2px;
+}
+
+/* Plan block rows (Blueprint's day list + Overview's today) ---------- */
+
+.plan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-block {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 11px 2px;
+}
+
+.plan-block + .plan-block {
+  border-top: 1px solid var(--border);
+}
+
+.plan-block.is-now {
+  margin: 0 -8px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.plan-block-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 44px;
+  flex-shrink: 0;
+  padding-top: 1px;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.plan-block-end {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.plan-block-rail {
+  width: 3px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: var(--track);
+}
+
+.plan-block.is-now .plan-block-rail,
+.plan-block.is-next .plan-block-rail {
+  background: var(--accent);
+}
+
+.plan-block.is-next .plan-block-rail {
+  opacity: 0.45;
+}
+
+.plan-block-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.plan-block-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.plan-block-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.plan-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+
+.plan-badge-live {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.plan-progress {
+  display: block;
+  height: 3px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.plan-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.6s ease;
+}
+
+.plan-block.is-done .plan-block-title {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.plan-block.is-past .plan-block-title,
+.plan-block.is-past .plan-block-time {
+  color: var(--text-dim);
+}
+
+.plan-block .plan-check,
+.plan-block .delete-btn {
+  align-self: center;
+}
+
+.plan-block-enter {
+  animation: stockRowEnter 0.4s ease-out;
+}
+
+/* Blueprint week strip ----------------------------------------------- */
+
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.week-tile {
+  --load: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  padding: 11px 12px 12px;
+  border: none;
+  border-radius: 8px;
+  outline: 1.5px solid transparent;
+  outline-offset: 1px;
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--accent) calc(var(--load) * 13%), var(--surface-2));
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease, outline-color 0.2s ease, transform 0.15s ease;
+}
+
+.week-tile:hover {
+  transform: translateY(-1px);
+}
+
+.week-tile.is-selected {
+  outline-color: var(--accent);
+}
+
+.week-tile:focus-visible {
+  outline-color: var(--text-dim);
+}
+
+.week-tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 17px;
+}
+
+.week-tile-day {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.week-tile-today {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.week-tile-hours {
+  margin-top: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+.week-tile.is-empty .week-tile-hours {
+  color: var(--text-faint);
+}
+
+.week-tile-count {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.week-tile .day-track {
+  margin-top: 8px;
+}
+

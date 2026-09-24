@@ -1,0 +1,812 @@
+/* ======================================================================
+   Goals (rebuilt 2026-09-24)
+
+   Replaces the swipe carousel + horizon rail. Both horizons are visible
+   at once (two cards side by side on wide screens), each goal carries a
+   pace status, and create/edit happens in a sheet (same shell as
+   Reading's book sheet). Status colours follow the Round 2 rule:
+   green = on track / done, amber = behind, red = overdue, grey = no
+   deadline. Everything else stays black and grey.
+   ====================================================================== */
+
+.gl-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  flex-wrap: wrap;
+}
+
+.gl-hero[hidden],
+.gl-stats[hidden],
+.gl-groups[hidden],
+.gl-empty[hidden],
+.gl-done-block[hidden],
+.gl-focus[hidden] {
+  display: none;
+}
+
+/* Focus callout: the one goal that most needs a look. */
+.gl-focus {
+  --tone: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(340px, 100%);
+  padding: 14px 16px 15px;
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--tone);
+  border-radius: 12px;
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.gl-focus:hover {
+  border-color: var(--border);
+  border-left-color: var(--tone);
+}
+
+.gl-focus:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.gl-focus[data-status="on-track"] { --tone: var(--good); }
+.gl-focus[data-status="behind"] { --tone: var(--warn); }
+.gl-focus[data-status="overdue"] { --tone: var(--danger); }
+
+.gl-focus .stat-label {
+  color: var(--tone);
+}
+
+.gl-focus-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-focus-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.gl-focus-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tone);
+}
+
+.gl-focus-meta {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stats row: tiny status dot in front of each label. */
+.gl-stat .stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.gl-stat-dot {
+  flex-shrink: 0;
+}
+
+.gl-stat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--text-faint);
+}
+
+.gl-stat[data-status="on-track"] .gl-stat-dot { background: var(--good); }
+.gl-stat[data-status="behind"] .gl-stat-dot { background: var(--warn); }
+.gl-stat[data-status="overdue"] .gl-stat-dot { background: var(--danger); }
+.gl-stat[data-status="done"] .gl-stat-dot { background: var(--text-dim); }
+
+.gl-stat[data-zero="true"] .read-stat-value {
+  color: var(--text-faint);
+}
+
+/* --- Groups ----------------------------------------------------------- */
+.gl-groups {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .gl-groups {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.gl-block,
+.gl-done-block,
+.gl-empty {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px 22px 14px;
+}
+
+.gl-block .read-block-head .eyebrow,
+.gl-done-toggle .eyebrow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--text);
+}
+
+.gl-block-n {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.gl-block-sub {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.gl-list,
+.gl-done-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Goal row --------------------------------------------------------- */
+.gl-row {
+  --tone: var(--text-faint);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.gl-row + .gl-row {
+  border-top: 1px solid var(--border);
+}
+
+.gl-row[data-status="on-track"],
+.gl-row[data-status="done"] { --tone: var(--good); }
+.gl-row[data-status="behind"] { --tone: var(--warn); }
+.gl-row[data-status="overdue"] { --tone: var(--danger); }
+
+.gl-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gl-main:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.gl-line1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gl-name {
+  min-width: 0;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-main:hover .gl-name {
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+
+.gl-pct {
+  flex-shrink: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.gl-pct small {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-left: 1px;
+}
+
+.gl-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--track);
+}
+
+.gl-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
+}
+
+.gl-row[data-status="done"] .gl-bar-fill { background: var(--good); }
+.gl-row[data-status="behind"] .gl-bar-fill { background: var(--warn); }
+.gl-row[data-status="overdue"] .gl-bar-fill { background: var(--danger); }
+
+/* Pace marker: where an even pace would put you today. */
+.gl-bar-pace {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--text);
+  opacity: 0.55;
+}
+
+.gl-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.gl-val strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gl-meta-bad {
+  color: var(--danger);
+}
+
+.gl-chip {
+  --tone: var(--text-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--tone);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gl-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: currentColor;
+}
+
+.gl-chip[data-status="on-track"],
+.gl-chip[data-status="done"] { --tone: var(--good); }
+.gl-chip[data-status="behind"] { --tone: var(--warn); }
+.gl-chip[data-status="overdue"] { --tone: var(--danger); }
+.gl-chip[data-status="open"] { --tone: var(--text-dim); }
+
+/* Stepper: one pill, two halves, big enough to hit with a thumb. */
+.gl-step {
+  flex-shrink: 0;
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gl-step-btn {
+  min-width: 40px;
+  height: 36px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.gl-step-btn + .gl-step-btn {
+  border-left: 1px solid var(--border);
+}
+
+.gl-step-plus {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.gl-step-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.gl-step-plus:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 85%, var(--card));
+}
+
+.gl-step-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.gl-step-btn:disabled {
+  color: var(--text-faint);
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Just hit the target: a short green moment before it moves to Completed. */
+.gl-row.is-just-done {
+  animation: glDone 1.6s ease;
+}
+
+@keyframes glDone {
+  0% { background: transparent; }
+  15% { background: var(--good-soft); }
+  70% { background: var(--good-soft); }
+  100% { background: transparent; }
+}
+
+.gl-row.is-just-done .gl-pct {
+  color: var(--good);
+}
+
+/* Empty group: a question, not a dead "nothing here". */
+.gl-group-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0 12px;
+}
+
+.gl-group-empty p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* --- Completed -------------------------------------------------------- */
+.gl-done-block {
+  padding-bottom: 20px;
+}
+
+.gl-done-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.gl-done-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.gl-done-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.gl-done-list {
+  margin-top: 10px;
+}
+
+.gl-done-list[hidden] {
+  display: none;
+}
+
+.gl-done-row + .gl-done-row {
+  border-top: 1px solid var(--border);
+}
+
+.gl-done-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gl-done-check {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: var(--good);
+  color: var(--card);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gl-done-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-done-meta {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Empty section ---------------------------------------------------- */
+.gl-empty {
+  align-items: flex-start;
+  gap: 12px;
+  padding: 26px 24px;
+}
+
+.gl-empty-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.gl-empty-text {
+  margin: 0;
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.gl-ideas,
+.gl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gl-chip-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gl-chip-btn:hover {
+  border-color: var(--text-dim);
+}
+
+.gl-chip-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.gl-empty-cta {
+  margin-top: 6px;
+  padding: 9px 18px;
+  font-size: 14px;
+}
+
+/* --- Sheet ------------------------------------------------------------ */
+body.goal-sheet-open {
+  overflow: hidden;
+}
+
+.goal-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+}
+
+.goal-sheet .book-sheet-title {
+  margin: 0;
+}
+
+.gl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.gl-field .stat-label em {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-faint);
+  margin-left: 4px;
+}
+
+.gl-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.goal-sheet input,
+.goal-sheet textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  color-scheme: light dark;
+}
+
+.goal-sheet textarea {
+  resize: vertical;
+  min-height: 44px;
+  line-height: 1.45;
+}
+
+.goal-sheet input:focus-visible,
+.goal-sheet textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.goal-sheet input[name="name"] {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.gl-seg {
+  align-self: flex-start;
+}
+
+.gl-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.gl-history[hidden] {
+  display: none;
+}
+
+.gl-hist-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.gl-hist-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.gl-spark {
+  width: 100%;
+  height: 56px;
+  overflow: visible;
+}
+
+.gl-spark-target {
+  stroke: var(--text-faint);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.gl-spark-line {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.gl-spark-dot {
+  fill: var(--text);
+}
+
+.gl-sheet-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.gl-sheet-edit-actions {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+
+.gl-sheet-edit-actions[hidden] {
+  display: none;
+}
+
+.gl-submit {
+  margin-left: auto;
+  padding: 10px 22px;
+  font-size: 14px;
+}
+
+.gl-ghost-btn {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gl-ghost-btn:hover {
+  border-color: var(--text-dim);
+}
+
+.gl-danger {
+  color: var(--danger);
+}
+
+.gl-danger.is-armed {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+/* --- Phone ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .gl-block,
+  .gl-done-block,
+  .gl-empty {
+    padding: 16px 16px 10px;
+    border-radius: 14px;
+  }
+
+  .gl-focus {
+    width: 100%;
+  }
+
+  /* 2x2 on the phone instead of four squeezed columns. */
+  .gl-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 0;
+  }
+
+  .gl-stats .read-stat,
+  .gl-stats .read-stat:first-child {
+    padding: 2px 0 2px 16px;
+    border-left: 1px solid var(--border);
+  }
+
+  .gl-stats .read-stat:nth-child(odd) {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .gl-row {
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .gl-step {
+    flex-direction: column-reverse;
+    border-radius: 14px;
+  }
+
+  .gl-step-btn {
+    min-width: 44px;
+    height: 34px;
+  }
+
+  .gl-step-btn + .gl-step-btn {
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gl-block-sub {
+    display: none;
+  }
+
+  .gl-sheet-actions {
+    flex-wrap: wrap;
+  }
+
+  .gl-submit {
+    flex: 1 1 100%;
+    order: -1;
+    padding: 13px;
+    font-size: 15px;
+  }
+
+  .gl-sheet-edit-actions {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+
+  .gl-sheet-edit-actions .gl-ghost-btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-bar-fill,
+  .gl-done-toggle svg {
+    transition: none;
+  }
+
+  .gl-row.is-just-done {
+    animation: none;
+  }
+}
+

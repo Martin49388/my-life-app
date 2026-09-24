@@ -1,0 +1,700 @@
+/* Overview ------------------------------------------------------------ */
+
+.ov-hero {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.ov-ring-wrap {
+  position: relative;
+  width: 152px;
+  height: 152px;
+  flex-shrink: 0;
+}
+
+.ov-ring {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ov-ring-track,
+.ov-ring-fill {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.ov-ring-track {
+  stroke: var(--track);
+}
+
+.ov-ring-fill {
+  stroke: var(--accent);
+  stroke-opacity: 0.5;
+  transition: stroke-dasharray 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), stroke-opacity 0.3s ease, opacity 0.3s ease;
+}
+
+.ov-ring-fill.is-met {
+  stroke-opacity: 1;
+}
+
+.ov-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ov-ring-number {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.ov-hero-text {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ov-greeting {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+.ov-hero-text .overview-status {
+  font-size: 15px;
+}
+
+.ov-hero-text .dash-stats {
+  margin-top: 10px;
+}
+
+.ov-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ov-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 14px 16px;
+  outline: 1.5px solid transparent;
+  outline-offset: 1px;
+  cursor: pointer;
+  transition: background-color 0.4s ease, transform 0.15s ease;
+}
+
+.ov-tile:hover {
+  transform: translateY(-1px);
+}
+
+.ov-tile:focus-visible {
+  outline-color: var(--accent);
+}
+
+.ov-tile.is-met {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+}
+
+.ov-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 24px;
+}
+
+.ov-tile-check {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.ov-tile-check svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ov-tile.is-met .ov-tile-check {
+  display: inline-flex;
+}
+
+.ov-tile-action {
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ov-tile-action:hover {
+  border-color: var(--accent);
+}
+
+.ov-tile-action:active {
+  transform: scale(0.95);
+}
+
+.ov-tile-value {
+  margin-top: 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.ov-tile-sub {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ov-tile-bar {
+  margin-top: auto;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  overflow: hidden;
+}
+
+.ov-tile-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  opacity: 0.55;
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ov-tile.is-met .ov-tile-bar span {
+  opacity: 1;
+}
+
+.ov-tile.is-over .ov-tile-bar span {
+  background: var(--danger);
+  opacity: 1;
+}
+
+.ov-week-dots {
+  display: flex;
+  gap: 4px;
+  margin: -4px 0 12px;
+}
+
+.ov-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  color: var(--text-faint);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+}
+
+.ov-dot.is-today {
+  outline: 1px solid var(--text-dim);
+  outline-offset: -1px;
+  color: var(--text);
+}
+
+.ov-dot.is-missed {
+  opacity: 0.55;
+}
+
+@keyframes tileBanked {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ov-tile-banked {
+  animation: tileBanked 0.5s ease;
+}
+
+.ov-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: start;
+}
+
+.ov-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ov-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ov-log-row {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.ov-log-row + .ov-log-row {
+  border-top: 1px solid var(--border);
+}
+
+.ov-log-time {
+  width: 44px;
+  flex-shrink: 0;
+  padding-top: 2px;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.ov-log-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.ov-log-tag {
+  padding: 1px 7px;
+  border: none;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ov-log-tag:hover {
+  color: var(--text);
+}
+
+.ov-log-text {
+  font-size: 14px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+#overview-section .quote-of-day {
+  position: relative;
+  padding: 6px 0 0 30px;
+  border-top: none;
+}
+
+#overview-section .quote-of-day::before {
+  content: "\201C";
+  position: absolute;
+  top: -6px;
+  left: -2px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 48px;
+  line-height: 1;
+  color: var(--text-faint);
+}
+
+#overview-section .quote-of-day-text {
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.45;
+}
+
+#overview-section .quote-of-day-author {
+  margin-top: 12px;
+}
+
+.ov-brief {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ov-brief-card:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ov-brief-card:hover {
+  transform: translateY(-1px);
+}
+
+.ov-brief-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.ov-brief-state {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.ov-brief-state[data-state="open"] {
+  color: var(--gain);
+}
+
+.ov-brief-state[data-state="new"] {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.ov-brief-number {
+  margin-top: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.ov-brief-sub {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-faint);
+}
+
+.ov-brief-headline {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  hyphens: auto;
+}
+
+.ov-brief-empty {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.ov-goals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ov-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 11px 0;
+  cursor: pointer;
+}
+
+.ov-goal + .ov-goal {
+  border-top: 1px solid var(--border);
+}
+
+.ov-goal-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ov-goal-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ov-goal:hover .ov-goal-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ov-goal-pct {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.ov-goal-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.ov-goal-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.ov-goal-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 980px) {
+  .ov-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  #overview-section:not([hidden]),
+  #news-section:not([hidden]),
+  #blueprint-section:not([hidden]) {
+    gap: 26px;
+  }
+
+  .dash-hero-number {
+    font-size: 52px;
+  }
+
+  .dash-hero .dash-stats {
+    width: 100%;
+  }
+
+  .dash-stats {
+    width: 100%;
+  }
+
+  .dash-stat {
+    flex: 1 1 0;
+    padding: 2px 10px;
+  }
+
+  .dash-stat-value {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ov-hero {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px 18px;
+  }
+
+  .ov-hero-text {
+    display: contents;
+  }
+
+  .ov-ring-wrap {
+    grid-row: 1 / span 2;
+    width: 108px;
+    height: 108px;
+  }
+
+  .ov-ring-number {
+    font-size: 26px;
+  }
+
+  .ov-greeting {
+    grid-column: 2;
+    align-self: end;
+    font-size: 28px;
+  }
+
+  .ov-hero-text .overview-status {
+    grid-column: 2;
+    align-self: start;
+    font-size: 13.5px;
+  }
+
+  .ov-hero-text .dash-stats {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+  }
+
+  .ov-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ov-tile {
+    padding: 12px 12px 14px;
+  }
+
+  .ov-tile-value {
+    font-size: 24px;
+  }
+
+  .ov-week-dots {
+    gap: 3px;
+  }
+
+  .ov-dot {
+    width: 15px;
+    height: 15px;
+    font-size: 9.5px;
+  }
+
+  .ov-brief {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .week-strip {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 108px;
+    margin: 0 -16px;
+    padding: 3px 16px 6px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 16px;
+    scrollbar-width: none;
+  }
+
+  .week-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .week-tile {
+    scroll-snap-align: start;
+  }
+
+  .news-lead:not([hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .news-lead-title {
+    font-size: 22px;
+  }
+
+  .news-thumb {
+    width: 76px;
+  }
+
+  .news-filters {
+    flex-wrap: nowrap;
+    margin: 0 -16px;
+    padding: 0 16px 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .news-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .news-chip {
+    flex-shrink: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-state] > .live-dot,
+  [data-state] > .live-dot::after,
+  .skeleton-line,
+  .news-skeleton .news-thumb,
+  .ov-tile-banked,
+  .plan-block-enter {
+    animation: none !important;
+  }
+
+  .ov-tile,
+  .week-tile,
+  .ov-brief-card,
+  .ov-ring-fill,
+  .ov-tile-bar span,
+  .plan-progress > span,
+  .news-pulse-bar,
+  .news-row-link {
+    transition: none;
+  }
+
+  .ov-tile:hover,
+  .week-tile:hover,
+  .ov-brief-card:hover {
+    transform: none;
+  }
+}
+

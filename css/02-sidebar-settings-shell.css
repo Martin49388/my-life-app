@@ -1,0 +1,261 @@
+/* Sidebar IS the nav now (see index.html) — the old top .section-tabs
+   bar and the old glance-tile sidebar it replaced are both gone
+   (glance.js was deleted 2026-09-23, dead CSS pass). */
+.sidebar {
+  flex: 0 0 240px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-right: 1px solid var(--border);
+  padding: 28px 22px;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 32px 40px 130px;
+}
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-brand-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-brand-mark {
+  /* Height pinned close to the 17px title text (.sidebar-brand-name)
+     so it reads as part of the wordmark, not a big logo bolted on. */
+  height: 14px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-name {
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.sidebar-brand-tag {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-group-label {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 14px 0 4px;
+}
+
+.nav-link {
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 7px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+.nav-link.active {
+  color: var(--text);
+  font-weight: 700;
+  background: var(--surface-2);
+}
+
+@media (max-width: 640px) {
+  .layout {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    overflow-y: visible;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 14px 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .content {
+    padding: 20px 16px 130px;
+  }
+
+  .sidebar-brand {
+    flex: 0 0 auto;
+  }
+
+  .sidebar-brand-tag {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 4px;
+    flex: 1 1 auto;
+  }
+
+  .nav-group-label {
+    display: none;
+  }
+
+  .nav-link {
+    white-space: nowrap;
+    padding: 6px 10px;
+  }
+
+  .sync-badge {
+    margin-top: 0;
+    margin-left: auto; /* sidebar is a horizontal strip here, so "corner" is the right edge */
+    align-self: center;
+  }
+
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+/* Settings is now a full content section like Habits or Fitness (see
+   #settings-section in index.html) rather than a small dropdown pinned to
+   the sidebar. .settings-block just wraps each settings group so multiple
+   groups can sit in the section with consistent spacing/width. */
+
+.settings-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+.settings-title {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 10px;
+}
+
+.stat-tiles {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-tile {
+  padding: 2px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 74px;
+}
+
+.stat-tile + .stat-tile {
+  border-left: 1px solid var(--border);
+}
+
+.ring-tile {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.ring {
+  width: 46px;
+  height: 46px;
+  transform: rotate(-90deg);
+  flex-shrink: 0;
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--track);
+  stroke-width: 4;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.ring-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 500;
+}
+

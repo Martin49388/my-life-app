@@ -360,7 +360,6 @@ window.renderFood = function renderFood() {
   renderMeals();
   // Water shares Fuel's day switcher, so it follows the same day.
   if (window.renderWater) window.renderWater();
-  if (window.renderGlance) window.renderGlance();
   if (window.renderOverview) window.renderOverview();
 };
 

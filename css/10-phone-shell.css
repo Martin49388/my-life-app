@@ -1,0 +1,559 @@
+/* ------------------------------------------------------------------------
+   Phone app shell (<= 640px) — see mobile-nav.js. Replaces the sideways-
+   scrolling top nav with a slim header, a bottom tab bar (Home, two
+   pinned sections, center "Ask Alfred", More), a "More" sheet listing
+   every section, and the global ask bar restyled as a bottom sheet.
+   Desktop is untouched: everything new is hidden above 640px.
+   ------------------------------------------------------------------------ */
+
+.m-header,
+.m-tabbar,
+.m-sheet,
+.global-bar-handle,
+.global-bar-head,
+.global-bar-prompts {
+  display: none;
+}
+
+/* Desktop: the new wrapper row is transparent to the old flex layout. */
+.global-bar-row {
+  display: contents;
+}
+
+.m-icon {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.m-icon .m-icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.m-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  touch-action: none;
+}
+
+.m-scrim.is-visible {
+  opacity: 1;
+}
+
+.sheet-handle {
+  justify-content: center;
+  padding: 9px 0 7px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.sheet-handle span {
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--track);
+}
+
+@media (max-width: 640px) {
+  /* Stop iOS from zooming the page when an input is focused (it does
+     that for any text under 16px). */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  body.m-sheet-open {
+    overflow: hidden;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .content {
+    padding: 14px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 104px) max(16px, env(safe-area-inset-left));
+  }
+
+  /* Header -------------------------------------------------------------- */
+
+  .m-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: calc(env(safe-area-inset-top) + 10px) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+    border-bottom: 1px solid transparent;
+    background: var(--bg);
+    transition: border-color 0.2s ease;
+  }
+
+  .m-header.is-scrolled {
+    border-bottom-color: var(--border);
+  }
+
+  .m-header-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-family: "Manrope", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .m-header-mark {
+    width: auto;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  .m-sync-badge {
+    margin: 0;
+    align-self: center;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* Tab bar ------------------------------------------------------------- */
+
+  .m-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    padding: 5px max(6px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 5px) max(6px, env(safe-area-inset-left));
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .m-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 6px 0 4px;
+    border: none;
+    background: none;
+    color: var(--text-faint);
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .m-tab .m-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.12s ease;
+  }
+
+  .m-tab:active .m-icon {
+    transform: scale(0.88);
+  }
+
+  .m-tab-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .m-tab.is-active {
+    color: var(--text);
+  }
+
+  .m-tab.is-active .m-icon {
+    stroke-width: 2;
+  }
+
+  .m-tab.is-active .m-tab-label {
+    font-weight: 700;
+  }
+
+  .m-tab-ask {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .m-tab-ask-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-top: -20px;
+    border-radius: 50%;
+    outline: 5px solid var(--bg);
+    background: var(--accent);
+    color: var(--accent-ink);
+    transition: transform 0.15s ease;
+  }
+
+  .m-tab-ask-circle .m-icon {
+    width: 26px;
+    height: 26px;
+    stroke-width: 1.8;
+  }
+
+  .m-tab-ask:active .m-tab-ask-circle {
+    transform: scale(0.93);
+  }
+
+  /* Sheets -------------------------------------------------------------- */
+
+  .m-sheet,
+  #global-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    border: none;
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    background: var(--bg);
+    box-shadow: none;
+    visibility: hidden;
+    transform: translateY(105%);
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.32s;
+  }
+
+  .m-sheet.is-open,
+  #global-bar.is-open {
+    visibility: visible;
+    transform: translateY(0);
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+  }
+
+  .m-sheet.is-dragging,
+  #global-bar.is-dragging {
+    transition: none;
+  }
+
+  .sheet-handle {
+    display: flex;
+  }
+
+  /* More sheet */
+  .m-sheet {
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 88dvh;
+    padding: 0 max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 12px) max(16px, env(safe-area-inset-left));
+  }
+
+  .m-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 0 14px;
+    touch-action: none;
+  }
+
+  .m-sheet-title {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .m-sheet-edit {
+    padding: 6px 13px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .m-sheet.is-editing .m-sheet-edit {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .m-sheet-hint {
+    margin: -6px 0 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .m-sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+    padding-bottom: 6px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .m-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .m-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+    padding: 12px 11px 11px;
+    border: none;
+    border-radius: 12px;
+    outline: 1.5px solid transparent;
+    outline-offset: -1.5px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease, outline-color 0.2s ease;
+  }
+
+  .m-tile:active {
+    transform: scale(0.96);
+  }
+
+  .m-tile.is-current {
+    outline-color: var(--accent);
+  }
+
+  .m-tile:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .m-tile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 4px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .m-tile-icon .m-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .m-tile-label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .m-tile-sub {
+    max-width: 100%;
+    min-height: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .m-tile-sub.tone-up {
+    color: var(--gain);
+  }
+
+  .m-tile-sub.tone-down {
+    color: var(--danger);
+  }
+
+  .m-tile-pin {
+    display: none;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    font-family: "Manrope", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .m-sheet.is-editing .m-tile-pin {
+    display: inline-block;
+  }
+
+  .m-sheet.is-editing .m-tile.is-current:not(.is-pinned) {
+    outline-color: transparent;
+  }
+
+  .m-sheet.is-editing .m-tile.is-pinned {
+    outline-color: var(--accent);
+  }
+
+  .m-sheet.is-editing .m-tile.is-pinned .m-tile-pin {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* Ask sheet (the global bar) */
+  #global-bar {
+    bottom: var(--kb, 0px);
+    top: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 16px) max(16px, env(safe-area-inset-left));
+  }
+
+  html.kb-open #global-bar {
+    padding-bottom: 12px;
+  }
+
+  .global-bar-handle {
+    margin-bottom: -8px;
+  }
+
+  .global-bar-head {
+    display: block;
+    touch-action: none;
+  }
+
+  .global-bar-title {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .global-bar-hint {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .global-bar-row {
+    display: flex;
+    gap: 8px;
+    padding: 6px 6px 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+
+  #global-bar-input {
+    padding: 8px 0;
+  }
+
+  #global-bar button[type="submit"] {
+    padding: 0 16px;
+    border-radius: 10px;
+  }
+
+  .global-bar-prompts {
+    display: flex;
+    gap: 6px;
+    margin: 0 -16px;
+    padding: 0 16px 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .global-bar-prompts::-webkit-scrollbar {
+    display: none;
+  }
+
+  .global-bar-prompt {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .global-bar-prompt:active {
+    background: var(--surface-2);
+  }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .m-sheet,
+  .m-sheet.is-open,
+  #global-bar,
+  #global-bar.is-open,
+  .m-scrim,
+  .m-tile,
+  .m-tab .m-icon,
+  .m-tab-ask-circle {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* The header already names the section — drop the in-page label that
+     just repeats it (but keep eyebrows that say something else, like
+     Overview's date). */
+  .section-header-simple > .eyebrow:first-child,
+  #news-section .dash-topline > .eyebrow,
+  #blueprint-section .dash-topline > .eyebrow,
+  #markets-section .markets-topline > .eyebrow {
+    display: none;
+  }
+
+  /* The tab bar's center button is the phone's way to ask Alfred. */
+  #overview-section .dash-topline-actions .quick-chip {
+    display: none;
+  }
+}
+

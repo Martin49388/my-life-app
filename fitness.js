@@ -185,7 +185,6 @@ window.renderFitness = function renderFitness() {
 
   renderWeekStrip();
   renderSession();
-  if (window.renderGlance) window.renderGlance();
   if (window.renderOverview) window.renderOverview();
 };
 

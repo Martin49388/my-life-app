@@ -87,7 +87,6 @@ function renderWater() {
   document.getElementById("fuel-water")?.classList.toggle("is-met", ml >= water.target);
   renderWaterGlasses(ml);
 
-  if (window.renderGlance) window.renderGlance();
   if (window.renderOverview) window.renderOverview();
 }
 window.renderWater = renderWater;

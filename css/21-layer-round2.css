@@ -1,0 +1,843 @@
+/* ======================================================================
+   Round 2 (2026-09-23): fewer sections, status colours, calmer Overview,
+   daily check-in, weight + protein, flexible habits, Alfred logging,
+   weekly summary.
+   ====================================================================== */
+
+/* --- Status colours ---------------------------------------------------
+   Two colours only, used only for status: green = done / on track,
+   amber = behind or over. Everything else stays black and grey. */
+:root {
+  --good: #1f7a47;
+  --good-soft: rgba(31, 122, 71, 0.12);
+  --warn: #a3620a;
+  --warn-soft: rgba(163, 98, 10, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --good: #5cc98a;
+    --good-soft: rgba(92, 201, 138, 0.15);
+    --warn: #e8a94a;
+    --warn-soft: rgba(232, 169, 74, 0.15);
+  }
+}
+:root[data-theme="dark"] {
+  --good: #5cc98a;
+  --good-soft: rgba(92, 201, 138, 0.15);
+  --warn: #e8a94a;
+  --warn-soft: rgba(232, 169, 74, 0.15);
+}
+
+.ov-ring-fill.is-met {
+  stroke: var(--good);
+}
+
+.ov-tile-check {
+  background: var(--good);
+  color: var(--card);
+}
+
+.ov-tile.is-met {
+  background: color-mix(in srgb, var(--good) 9%, var(--card));
+  border-color: color-mix(in srgb, var(--good) 35%, transparent);
+}
+
+.ov-tile.is-met .ov-tile-bar span {
+  background: var(--good);
+}
+
+.ov-tile.is-behind .ov-tile-bar span,
+.ov-tile.is-over .ov-tile-bar span {
+  background: var(--warn);
+  opacity: 1;
+}
+
+.ov-tile.is-behind .ov-tile-sub,
+.ov-tile.is-over .ov-tile-sub {
+  color: var(--warn);
+}
+
+.ov-dot.is-done {
+  background: var(--good);
+  color: var(--card);
+}
+
+.habit-row input[type="checkbox"],
+.exercise-row input[type="checkbox"],
+.plan-check {
+  accent-color: var(--good);
+}
+
+.history-cell.filled {
+  background: var(--good);
+}
+
+.rev-row.is-good .rev-row-bar > span {
+  background: var(--good);
+}
+
+.rev-row.is-warn .rev-row-bar > span {
+  background: var(--warn);
+}
+
+.rev-row-delta[data-dir="up"] {
+  color: var(--good);
+}
+
+.rev-row-delta[data-dir="down"] {
+  color: var(--warn);
+}
+
+.fuel-water.is-met .fuel-glass > span {
+  background: var(--good);
+}
+
+/* --- Sections: Briefing = News + Markets on one page ------------------ */
+#briefing-section:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Markets and News sit behind two tabs, one at a time — the tabs are the
+   heading, so the parts' own "Markets"/"News" titles are hidden. */
+.briefing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.briefing-part[hidden] {
+  display: none !important;
+}
+
+.briefing-part .sub-title {
+  display: none;
+}
+
+.briefing-tabs .tab-btn {
+  min-width: 96px;
+}
+
+@media (max-width: 640px) {
+  .briefing-tabs {
+    width: 100%;
+  }
+
+  .briefing-tabs .tab-btn {
+    flex: 1 1 0;
+  }
+}
+
+/* --- Overview: calmer hero + check-in --------------------------------- */
+.ov-hero-stats {
+  display: none !important;
+}
+
+.checkin-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 14px;
+  padding: 12px 18px;
+  max-width: 380px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.checkin-cta:hover {
+  transform: translateY(-1px);
+}
+
+.checkin-cta-label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.checkin-cta-detail {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.checkin-cta.is-done {
+  background: var(--card);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--good) 45%, transparent);
+}
+
+.checkin-cta.is-done .checkin-cta-label::before {
+  content: "✓ ";
+  color: var(--good);
+}
+
+.checkin-cta.is-done .checkin-cta-detail {
+  opacity: 1;
+  color: var(--text-dim);
+}
+
+/* --- Empty states that do something ---------------------------------- */
+.empty-state.empty-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+}
+
+.empty-state.empty-action p {
+  margin: 0;
+}
+
+.empty-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-btn:hover {
+  border-color: var(--text-dim);
+}
+
+/* The input right above already says "nothing here yet". */
+.journal-list:not(#mindset-quotes-list) > .empty-state {
+  display: none;
+}
+
+/* --- Habits: day labels, frequency ------------------------------------ */
+.habit-days-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px 4px;
+  list-style: none;
+}
+
+.habit-days-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.habit-days {
+  display: flex;
+  gap: 4px;
+}
+
+.habit-days span {
+  width: 16px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.habit-days span.is-today {
+  color: var(--text);
+}
+
+.habit-history {
+  gap: 4px;
+}
+
+.history-cell {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.history-cell.is-today:not(.filled) {
+  box-shadow: inset 0 0 0 1.5px var(--text-faint);
+}
+
+.habit-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.habit-freq {
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.habit-freq:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+.habit-freq.is-weekly {
+  color: var(--text);
+}
+
+.habit-row.week-met .habit-freq {
+  color: var(--good);
+  border-color: color-mix(in srgb, var(--good) 45%, transparent);
+}
+
+#habit-freq-input {
+  padding: 10px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* --- Fuel: plain calorie bar, protein, weight -------------------------- */
+.fuel-header .budget-bar-wrap {
+  margin: 18px 0 10px;
+}
+
+.legend-maintain {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-family: "Manrope", system-ui, sans-serif;
+}
+
+.protein-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.protein-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.protein-bar {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.protein-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.protein-bar.is-met span {
+  background: var(--good);
+}
+
+.protein-caption {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.weight-figure {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-form {
+  display: flex;
+  gap: 8px;
+}
+
+.weight-form input {
+  width: 120px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.weight-form button {
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.weight-chart {
+  position: relative;
+  height: 120px;
+  padding-right: 40px;
+}
+
+.weight-chart[hidden] {
+  display: none;
+}
+
+.weight-chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.weight-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.weight-dot {
+  stroke: var(--text-faint);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.weight-axis {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.weight-caption {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+/* --- Alfred ------------------------------------------------------------ */
+.alfred-card {
+  gap: 14px;
+}
+
+.alfred-log {
+  max-height: min(60vh, 560px);
+  min-height: 120px;
+}
+
+.alfred-empty p {
+  margin: 0 0 6px;
+}
+
+.alfred-empty .alfred-empty-title {
+  margin-bottom: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.alfred-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.alfred-quick button.alfred-suggest {
+  width: auto;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 13.5px;
+}
+
+.alfred-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.alfred-action {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--good-soft);
+  color: var(--good);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* --- Review: Alfred's take --------------------------------------------- */
+.rev-ai-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-line;
+}
+
+.rev-ai-text.is-empty,
+.rev-ai-text.is-loading {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+/* --- Daily check-in sheet ---------------------------------------------- */
+.ci-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ci-overlay[hidden] {
+  display: none;
+}
+
+.ci-overlay.is-visible {
+  opacity: 1;
+}
+
+.ci-sheet {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  transform: translateY(12px);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ci-overlay.is-visible .ci-sheet {
+  transform: none;
+}
+
+.ci-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ci-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ci-sub {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.ci-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ci-body {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 22px 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ci-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+.ci-step + .ci-step {
+  border-top: 1px solid var(--border);
+}
+
+.ci-step-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ci-label {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.ci-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ci-chip {
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ci-chip.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.ci-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ci-inline input {
+  width: 110px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.ci-unit {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.ci-btn {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ci-hint {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+.ci-water {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ci-water-value {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ci-water-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.ci-habits {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ci-habit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ci-habit .ci-hint {
+  margin-left: auto;
+}
+
+.ci-check {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--text-faint);
+  border-radius: 6px;
+}
+
+.ci-habit.is-on {
+  border-color: color-mix(in srgb, var(--good) 45%, transparent);
+  background: var(--good-soft);
+}
+
+.ci-habit.is-on .ci-check {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+.ci-habit.is-on .ci-check::after {
+  content: "";
+  width: 10px;
+  height: 5px;
+  border-left: 2px solid var(--card);
+  border-bottom: 2px solid var(--card);
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.ci-foot {
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.ci-done {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body.ci-open {
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .ci-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .ci-sheet {
+    width: 100%;
+    max-height: 92vh;
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .ci-foot {
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .checkin-cta {
+    max-width: none;
+    width: 100%;
+  }
+
+  .protein-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .protein-caption {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-overlay,
+  .ci-sheet,
+  .checkin-cta {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* The phone hero is a grid (ring | greeting); the check-in button
+     spans both columns underneath. */
+  .ov-hero .checkin-cta {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+  }
+
+  /* Long habit names keep their full width; the frequency/streak chips
+     drop to their own line instead of truncating the name. */
+  .habit-name-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .habit-name {
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+}
+
