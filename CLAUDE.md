@@ -118,7 +118,7 @@ Sections (Overview is now the sidebar's default landing page, not Habits):
   dots all use the single app accent color; habits are told apart by
   name only
 - News — live RSS headlines, no API key needed
-- Goals — short/long-term horizon rail
+- Goals — rebuilt 2026-09-24, see "Goals rebuild" below
 - Fitness — "This week" stat is real completions vs the actual 5x/week
   target, not just how many template days have a plan
 - Food — 3500 kcal default target, FoodData Central lookup wired in,
@@ -760,6 +760,41 @@ iPhone yet.
   scored against days before tracking began. Root cause of the overflow:
   `grid-template-columns: repeat(7, 1fr)` — 1fr has an auto minimum, so
   cell content widened the grid; now `minmax(0, 1fr)`.
+
+## Goals rebuild (2026-09-24)
+
+Martin didn't like the Goals design. Old version: a swipe carousel that
+hid long-term goals behind a rail, completed goals mixed into the list,
+24px ± buttons, an unstyled browser-default "+ Add goal", no sense of
+pace. Rebuilt in Reading's visual language (reuses .read-header/
+.read-hero-*/.read-stats/.read-tabs/.read-primary-btn and the
+.book-overlay/.book-sheet shell, so the sheet is a bottom sheet on phone).
+- Storage key `goals` unchanged; old fields (id, name, term, target,
+  unit, current, deadline) kept as-is, so overview.js, alfred.js,
+  actions.js, reading.js, mobile-nav.js didn't need changes. New fields:
+  `created`, `start` (pace runs start -> target from created ->
+  deadline), `step` (per tap, decimals ok), `why`, `log` {date: value}
+  (capped 120, one point per day, drives the sheet sparkline),
+  `completedAt`. Old goals migrate on load with pace starting today.
+- Status per goal (`goalStatus`): done / overdue / behind (below even
+  pace minus 3% slack, ignored in the first 5% of the window) /
+  on-track / open (no deadline). Green/amber/red/grey via --good/--warn/
+  --danger. `goalNeedText` = "~2.5 kg/week" to land on time.
+- UI: hero = active count, "needs attention" callout (worst goal by
+  status then deadline), status stats, Short-term and Long-term cards
+  side by side >=1100px, rows with a pace tick on the bar, pill stepper
+  (+step), binary goals (target 1, no unit) get a single ✓ button, a
+  goal that hits target flashes green 1.6s then moves to the collapsed
+  Completed card. Tap a row -> edit sheet (deadline chips, current
+  value, step, why, sparkline, two-tap delete, mark complete/reopen).
+- Exports: window.renderGoals, window.openGoalSheet, window.goalPaceText
+  (Alfred's context now includes each goal's pace). adjustGoal/addGoal/
+  deleteGoal/deadlineLabel/daysUntil remain globals (used elsewhere).
+- Dead CSS for .horizon*/.goal-carousel*/.goal-row*/#add-goal-form
+  removed. Cache-bust bumped to 20260924-1 (index.html + sw.js).
+Verified in headless Chromium (desktop 1280 + phone 390, dark + light,
+seeded + empty): stepper, binary complete, add via sheet, edit sheet,
+completion flow, 13-section error sweep. Not yet seen on the iPhone.
 
 ## Rules
 

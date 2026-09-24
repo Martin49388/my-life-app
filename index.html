@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20260923-5" />
+  <link rel="stylesheet" href="style.css?v=20260924-1" />
 </head>
 <body>
   <main class="app">
@@ -242,63 +242,58 @@
     
 
     <section id="goals-section" hidden>
-      <header class="app-header">
-        <h1 class="eyebrow page-title">Goals</h1>
-        <div class="stat-tiles">
-          <div class="stat-tile">
-            <span class="stat-label">Active</span>
-            <span class="stat-value stat-value-primary" id="goals-active-count">0</span>
-          </div>
-          <div class="stat-tile stat-tile-muted">
-            <span class="stat-label">Completed</span>
-            <span class="stat-value" id="goals-done-count">0</span>
-          </div>
+      <header class="read-header goals-header">
+        <div class="read-topline">
+          <h1 class="eyebrow page-title">Goals</h1>
+          <button type="button" class="read-primary-btn" data-goal-new="short">+ New goal</button>
         </div>
+
+        <div class="gl-hero">
+          <div class="read-hero-main">
+            <p class="read-hero-number" id="goals-active-count">0</p>
+            <p class="read-hero-caption" id="goals-hero-caption">goals in motion</p>
+          </div>
+          <div class="gl-focus" id="goals-focus" role="button" tabindex="0" hidden></div>
+        </div>
+        <div class="read-stats gl-stats" id="goals-stats"></div>
       </header>
 
-      <nav class="horizon" aria-label="Goal time horizon">
-        <button type="button" class="horizon-node active" data-index="0">
-          <span class="horizon-dot"></span>
-          <span class="horizon-label">Short-term</span>
-          <span class="horizon-meta">weeks &middot; <span id="horizon-count-short">0</span> active</span>
-        </button>
-        <div class="horizon-rail">
-          <div class="horizon-rail-fill" id="horizon-rail-fill"></div>
+      <div class="read-block gl-empty" id="goals-empty" hidden>
+        <p class="gl-empty-title">What are you working toward?</p>
+        <p class="gl-empty-text">A goal is a number and a date. Batcave keeps the pace line for you and tells you when you're slipping, before it's too late to catch up.</p>
+        <div class="gl-ideas">
+          <button type="button" class="gl-chip-btn" data-goal-idea="Read 12 books|12|books|long|">Read 12 books</button>
+          <button type="button" class="gl-chip-btn" data-goal-idea="Bench 100 kg|100|kg|short|3">Bench 100 kg</button>
+          <button type="button" class="gl-chip-btn" data-goal-idea="Run 100 km|100|km|short|2">Run 100 km</button>
+          <button type="button" class="gl-chip-btn" data-goal-idea="Save 50 000 CZK|50000|CZK|long|12">Save 50 000 CZK</button>
         </div>
-        <button type="button" class="horizon-node" data-index="1">
-          <span class="horizon-dot"></span>
-          <span class="horizon-label">Long-term</span>
-          <span class="horizon-meta">years &middot; <span id="horizon-count-long">0</span> active</span>
-        </button>
-      </nav>
+        <button type="button" class="read-primary-btn gl-empty-cta" data-goal-new="short">+ New goal</button>
+      </div>
 
-      <div class="goal-carousel-viewport" id="goal-carousel-viewport">
-        <div class="goal-carousel-track" id="goal-carousel-track">
-          <div class="goal-group">
-            <ul id="goal-list-short"></ul>
+      <div class="gl-groups" id="goals-groups">
+        <div class="read-block gl-block">
+          <div class="read-block-head">
+            <p class="eyebrow">Short-term <span class="gl-block-n" id="goal-count-short"></span></p>
+            <span class="gl-block-sub">weeks to months</span>
           </div>
-          <div class="goal-group">
-            <ul id="goal-list-long"></ul>
+          <ul class="gl-list" id="goal-list-short"></ul>
+        </div>
+        <div class="read-block gl-block">
+          <div class="read-block-head">
+            <p class="eyebrow">Long-term <span class="gl-block-n" id="goal-count-long"></span></p>
+            <span class="gl-block-sub">a year and beyond</span>
           </div>
+          <ul class="gl-list" id="goal-list-long"></ul>
         </div>
       </div>
 
-      <div class="add-habit-toggle">
-        <button type="button" id="add-goal-toggle-btn">+ Add goal</button>
-        <form id="add-goal-form" hidden>
-          <input type="text" id="goal-name-input" placeholder="Goal, e.g. Read 12 books" required />
-          <select id="goal-term-input">
-            <option value="short">Short-term</option>
-            <option value="long">Long-term</option>
-          </select>
-          <input type="number" id="goal-target-input" placeholder="Target" min="1" required />
-          <input type="text" id="goal-unit-input" placeholder="Unit (optional)" />
-          <input type="date" id="goal-deadline-input" />
-          <button type="submit">Add</button>
-        </form>
+      <div class="read-block gl-done-block" id="goals-done-block" hidden>
+        <button type="button" class="gl-done-toggle" id="goals-done-toggle" aria-expanded="false" aria-controls="goal-list-done">
+          <span class="eyebrow">Completed <span class="gl-block-n" id="goals-done-count">0</span></span>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <ul class="gl-done-list" id="goal-list-done" hidden></ul>
       </div>
-
-      <p class="sync-note">Saved on this device only &middot; not yet synced across devices</p>
     </section>
     <section id="fitness-section" hidden>
       <header class="app-header">
@@ -1143,6 +1138,77 @@
     <div class="m-sheet-body" id="m-more-body"></div>
   </section>
 
+  <!-- Goal create/edit sheet (goals.js). Reuses the book sheet classes
+       so it's a centred card on desktop and rises from the bottom on the
+       phone, same as Reading. -->
+  <div class="modal-overlay book-overlay" id="goal-sheet-overlay" hidden>
+    <form class="modal-card book-sheet goal-sheet" id="goal-sheet" role="dialog" aria-modal="true" aria-labelledby="goal-sheet-title" novalidate>
+      <button type="button" class="modal-close" id="goal-sheet-close" aria-label="Close">&#10005;</button>
+      <p class="book-sheet-title" id="goal-sheet-title">New goal</p>
+
+      <label class="gl-field">
+        <span class="stat-label">Goal</span>
+        <input type="text" name="name" placeholder="e.g. Bench 100 kg" autocomplete="off" maxlength="80" />
+      </label>
+
+      <div class="gl-field">
+        <span class="stat-label">Horizon</span>
+        <div class="read-tabs gl-seg" role="radiogroup" aria-label="Horizon">
+          <button type="button" class="read-tab" role="radio" data-term-opt="short">Short-term</button>
+          <button type="button" class="read-tab" role="radio" data-term-opt="long">Long-term</button>
+        </div>
+      </div>
+
+      <div class="gl-field-row">
+        <label class="gl-field">
+          <span class="stat-label">Target</span>
+          <input type="number" name="target" inputmode="decimal" min="0" step="any" placeholder="100" />
+        </label>
+        <label class="gl-field">
+          <span class="stat-label">Unit</span>
+          <input type="text" name="unit" list="goal-unit-options" placeholder="kg, books, km…" autocomplete="off" maxlength="20" />
+        </label>
+      </div>
+      <datalist id="goal-unit-options">
+        <option value="kg"></option><option value="km"></option><option value="books"></option>
+        <option value="sessions"></option><option value="CZK"></option><option value="EUR"></option>
+        <option value="hours"></option><option value="days"></option><option value="%"></option>
+      </datalist>
+
+      <div class="gl-field-row">
+        <label class="gl-field">
+          <span class="stat-label" id="goal-current-label">Starting at</span>
+          <input type="number" name="current" inputmode="decimal" min="0" step="any" placeholder="0" />
+        </label>
+        <label class="gl-field">
+          <span class="stat-label">Each tap adds</span>
+          <input type="number" name="step" inputmode="decimal" min="0" step="any" placeholder="1" />
+        </label>
+      </div>
+
+      <div class="gl-field">
+        <span class="stat-label">Deadline</span>
+        <div class="gl-chips" id="goal-deadline-chips"></div>
+        <input type="date" name="deadline" aria-label="Deadline date" />
+      </div>
+
+      <label class="gl-field">
+        <span class="stat-label">Why it matters <em>optional</em></span>
+        <textarea name="why" rows="2" maxlength="240" placeholder="The reason you'll read when motivation is low"></textarea>
+      </label>
+
+      <div class="gl-history" id="goal-sheet-history" hidden></div>
+
+      <div class="gl-sheet-actions">
+        <span class="gl-sheet-edit-actions" id="goal-sheet-edit-actions" hidden>
+          <button type="button" class="gl-ghost-btn gl-danger" id="goal-sheet-delete">Delete</button>
+          <button type="button" class="gl-ghost-btn" id="goal-sheet-complete">Mark complete</button>
+        </span>
+        <button type="submit" class="read-primary-btn gl-submit" id="goal-sheet-submit">Add goal</button>
+      </div>
+    </form>
+  </div>
+
   <div class="modal-overlay book-overlay" id="book-modal-overlay" hidden>
     <div class="modal-card book-sheet" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
       <button type="button" class="modal-close" id="book-modal-close" aria-label="Close">&#10005;</button>
@@ -1232,34 +1298,34 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260923-5"></script>
+  <script src="config.js?v=20260924-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="sync.js?v=20260923-5"></script>
-  <script src="script.js?v=20260923-5"></script>
-  <script src="news.js?v=20260923-5"></script>
-  <script src="goals.js?v=20260923-5"></script>
-  <script src="markets.js?v=20260923-5"></script>
-  <script src="fitness.js?v=20260923-5"></script>
-  <script src="food.js?v=20260923-5"></script>
-  <script src="water.js?v=20260923-5"></script>
-  <script src="weight.js?v=20260923-5"></script>
-  <script src="blueprint.js?v=20260923-5"></script>
-  <script src="alfred.js?v=20260923-5"></script>
-  <script src="journal.js?v=20260923-5"></script>
-  <script src="reading.js?v=20260923-5"></script>
-  <script src="recovery.js?v=20260923-5"></script>
-  <script src="review.js?v=20260923-5"></script>
-  <script src="notes.js?v=20260923-5"></script>
-  <script src="quotes.js?v=20260923-5"></script>
-  <script src="actions.js?v=20260923-5"></script>
-  <script src="checkin.js?v=20260923-5"></script>
-  <script src="overview.js?v=20260923-5"></script>
-  <script src="global-bar.js?v=20260923-5"></script>
-  <script src="mobile-nav.js?v=20260923-5"></script>
-  <script src="backup.js?v=20260923-5"></script>
+  <script src="sync.js?v=20260924-1"></script>
+  <script src="script.js?v=20260924-1"></script>
+  <script src="news.js?v=20260924-1"></script>
+  <script src="goals.js?v=20260924-1"></script>
+  <script src="markets.js?v=20260924-1"></script>
+  <script src="fitness.js?v=20260924-1"></script>
+  <script src="food.js?v=20260924-1"></script>
+  <script src="water.js?v=20260924-1"></script>
+  <script src="weight.js?v=20260924-1"></script>
+  <script src="blueprint.js?v=20260924-1"></script>
+  <script src="alfred.js?v=20260924-1"></script>
+  <script src="journal.js?v=20260924-1"></script>
+  <script src="reading.js?v=20260924-1"></script>
+  <script src="recovery.js?v=20260924-1"></script>
+  <script src="review.js?v=20260924-1"></script>
+  <script src="notes.js?v=20260924-1"></script>
+  <script src="quotes.js?v=20260924-1"></script>
+  <script src="actions.js?v=20260924-1"></script>
+  <script src="checkin.js?v=20260924-1"></script>
+  <script src="overview.js?v=20260924-1"></script>
+  <script src="global-bar.js?v=20260924-1"></script>
+  <script src="mobile-nav.js?v=20260924-1"></script>
+  <script src="backup.js?v=20260924-1"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->
-  <script src="offline.js?v=20260923-5"></script>
+  <script src="offline.js?v=20260924-1"></script>
 </body>
 </html>

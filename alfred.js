@@ -43,7 +43,9 @@ function buildDailyContext() {
   });
 
   const goalLines = goals.map(
-    (g) => `${g.name} (${g.term}-term): ${g.current}/${g.target} ${g.unit}${g.deadline ? `, due ${g.deadline}` : ""}`
+    (g) =>
+      `${g.name} (${g.term}-term): ${g.current}/${g.target} ${g.unit}${g.deadline ? `, due ${g.deadline}` : ""}` +
+      (window.goalPaceText && g.current < g.target ? ` — ${window.goalPaceText(g)}` : "")
   );
 
   const trainedCount = typeof trainedThisWeek === "function" ? trainedThisWeek() : null;
