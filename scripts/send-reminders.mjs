@@ -231,7 +231,18 @@ async function sendTo(subs, payload) {
 }
 
 async function main() {
-  const rows = await rpc("push_due", {});
+  let rows;
+  try {
+    rows = await rpc("push_due", {});
+  } catch (err) {
+    // The Supabase half isn't installed yet: say so and succeed, so a
+    // half-finished setup doesn't email a failed run every 15 minutes.
+    if (/PGRST202|PGRST205|Could not find the function|schema cache/.test(err.message)) {
+      console.log("Supabase part not set up yet — run supabase/reminders.local.sql in the SQL Editor (see REMINDERS.md). Nothing sent.");
+      return;
+    }
+    throw err;
+  }
   const byUser = new Map();
   for (const r of rows || []) {
     if (!byUser.has(r.user_id)) byUser.set(r.user_id, []);

@@ -100,7 +100,12 @@
       },
       { onConflict: "endpoint" }
     );
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (/push_subscriptions|schema cache|PGRST205/.test(error.message)) {
+        throw new Error("the server side isn't installed yet — run supabase/reminders.local.sql in Supabase (REMINDERS.md, step 2)");
+      }
+      throw new Error(error.message);
+    }
   }
 
   async function turnOn() {
