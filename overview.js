@@ -82,8 +82,8 @@ function overviewStandards() {
       value: kcalToday.toLocaleString(),
       sub: `of ${kcalTarget.toLocaleString()} kcal · ${proteinToday}/${typeof proteinTarget === "function" ? proteinTarget() : 150}g protein`,
       progress: ratio(kcalToday, kcalTarget),
-      met: kcalToday > 0 && kcalToday <= kcalTarget,
-      over: kcalToday > kcalTarget,
+      met: window.kcalStatus ? window.kcalStatus(kcalToday, kcalTarget).met : kcalToday > 0 && kcalToday <= kcalTarget,
+      over: window.kcalStatus ? window.kcalStatus(kcalToday, kcalTarget).over : kcalToday > kcalTarget,
     },
     {
       id: "training",

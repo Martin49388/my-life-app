@@ -359,6 +359,14 @@
               <input type="number" id="kcal-target-input" class="target-input fuel-target-input" min="500" max="10000" step="50" inputmode="numeric" />
             </label>
             <label class="fuel-stat">
+              <span class="stat-label">Goal</span>
+              <select id="kcal-goal-input" class="fuel-goal-select" aria-label="Calorie goal">
+                <option value="bulk">Bulk</option>
+                <option value="maintain">Maintain</option>
+                <option value="cut">Cut</option>
+              </select>
+            </label>
+            <label class="fuel-stat">
               <span class="stat-label">Protein goal (g)</span>
               <input type="number" id="protein-target-input" class="target-input fuel-target-input" min="20" max="400" step="5" inputmode="numeric" />
             </label>

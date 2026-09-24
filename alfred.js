@@ -55,7 +55,9 @@ function buildDailyContext() {
   const kcalToday = foodEntries.reduce((sum, e) => sum + e.kcal, 0);
   const proteinToday = foodEntries.reduce((sum, e) => sum + (e.protein || 0), 0);
   const pGoal = typeof proteinTarget === "function" ? proteinTarget() : null;
-  const foodLine = `Food today: ${kcalToday}/${food.target} kcal, ${proteinToday}${pGoal ? `/${pGoal}` : ""}g protein`;
+  const kcalGoal = window.foodGoal ? window.foodGoal() : null;
+  const kcalGoalNote = { bulk: " (bulking: the target is a minimum to reach, going over is fine)", maintain: " (maintaining: aim to land within ~7% of it)", cut: " (cutting: the target is a ceiling)" }[kcalGoal] || "";
+  const foodLine = `Food today: ${kcalToday}/${food.target} kcal${kcalGoalNote}, ${proteinToday}${pGoal ? `/${pGoal}` : ""}g protein`;
   const latestKg = window.latestWeight ? window.latestWeight() : null;
   const weightLine = latestKg ? `Body weight: ${latestKg.kg.toFixed(1)} kg (logged ${latestKg.date})` : null;
 

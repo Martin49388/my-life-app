@@ -29,6 +29,8 @@ const DEFAULT_FOOD = {
   // Grams a day. null = suggest one from body weight (see proteinTarget).
   proteinTarget: null,
   maintenance: null,
+  // "bulk" | "maintain" | "cut". null = work it out (see foodGoal()).
+  goal: null,
   days: {},
   showEstimator: false,
   body: { weight: null, height: null, age: null, sex: "male", activity: "moderate" },
@@ -50,6 +52,46 @@ function maintenanceCalories() {
   const bmr = sex === "female" ? base - 161 : base + 5;
   return Math.round(bmr * ACTIVITY_FACTORS[activity]);
 }
+
+// ---------------------------------------------------------------------
+// Is today's kcal "on target"? ONE rule for the whole app — Fuel,
+// Overview, Review, the phone More sheet, Alfred and the reminder bot all
+// ask kcalStatus(). The old rule everywhere was "0 < kcal <= target",
+// which is right for a cut but backwards for a bulk (Martin's 3500 kcal
+// is a surplus target: eating 800 kcal counted as "met", eating 3600 as
+// "over"). Each goal gets a band around the target instead:
+//   bulk      met at >= 95% of target, never "over"
+//   maintain  met within ±7.5%, over above that
+//   cut       met between 90% and 100%, over above target
+const KCAL_BANDS = {
+  bulk: { lo: 0.95, hi: Infinity },
+  maintain: { lo: 0.925, hi: 1.075 },
+  cut: { lo: 0.9, hi: 1 },
+};
+
+function foodGoal() {
+  if (food.goal && KCAL_BANDS[food.goal]) return food.goal;
+  const maintain = maintenanceCalories() ?? food.maintenance;
+  if (maintain) {
+    if (food.target > maintain + 100) return "bulk";
+    if (food.target < maintain - 100) return "cut";
+    return "maintain";
+  }
+  // No maintenance known: a target this high is a surplus.
+  return food.target >= 3000 ? "bulk" : "maintain";
+}
+
+function kcalStatus(kcal, target = food.target) {
+  const goal = foodGoal();
+  const band = KCAL_BANDS[goal];
+  const k = Number(kcal) || 0;
+  const met = target > 0 && k > 0 && k >= band.lo * target && k <= band.hi * target;
+  const over = target > 0 && k > band.hi * target;
+  return { goal, met, over, ratio: target > 0 ? Math.min(1, k / target) : 0 };
+}
+
+window.foodGoal = foodGoal;
+window.kcalStatus = kcalStatus;
 
 function saveFood() {
   localStorage.setItem(FOOD_KEY, JSON.stringify(food));
@@ -134,13 +176,18 @@ function renderBudget() {
   const consumed = entries.reduce((sum, e) => sum + e.kcal, 0);
   const target = food.target;
   const remaining = target - consumed;
-  const over = remaining < 0;
+  const status = kcalStatus(consumed, target);
+  // "over" only means something bad when the goal says so — on a bulk,
+  // going past the target is the point.
+  const over = status.over;
+  const above = remaining < 0;
 
   const budgetEl = document.getElementById("budget-number");
   if (window.animateNumber) window.animateNumber(budgetEl, Math.abs(remaining));
   else budgetEl.textContent = Math.abs(remaining).toLocaleString();
-  document.getElementById("budget-caption").textContent = over ? "kcal over" : "kcal left";
+  document.getElementById("budget-caption").textContent = above ? (over ? "kcal over" : "kcal above target") : "kcal left";
   document.getElementById("budget-number").classList.toggle("over", over);
+  document.getElementById("budget-number").classList.toggle("is-met", status.met);
   const eatenEl = document.getElementById("fuel-eaten-caption");
   if (eatenEl) eatenEl.textContent = ` · ${consumed.toLocaleString()} of ${target.toLocaleString()} eaten`;
 
@@ -162,6 +209,7 @@ function renderBudget() {
   const bar = document.getElementById("budget-bar");
   bar.innerHTML = "";
   bar.classList.toggle("over", over);
+  bar.classList.toggle("is-met", status.met);
 
   MEALS.forEach((meal, i) => {
     const mealTotal = entries.filter((e) => e.meal === meal).reduce((sum, e) => sum + e.kcal, 0);
@@ -301,6 +349,8 @@ function renderScale() {
 
 window.renderFood = function renderFood() {
   document.getElementById("kcal-target-input").value = food.target;
+  const goalInput = document.getElementById("kcal-goal-input");
+  if (goalInput) goalInput.value = foodGoal();
   const pInput = document.getElementById("protein-target-input");
   if (pInput && document.activeElement !== pInput) pInput.value = proteinTarget();
   document.getElementById("food-date-label").textContent = formatDateLabel(viewedDate);
@@ -368,6 +418,12 @@ document.getElementById("kcal-target-input").addEventListener("change", (e) => {
     food.target = value;
     saveFood();
   }
+  window.renderFood();
+});
+
+document.getElementById("kcal-goal-input")?.addEventListener("change", (e) => {
+  food.goal = KCAL_BANDS[e.target.value] ? e.target.value : null;
+  saveFood();
   window.renderFood();
 });
 

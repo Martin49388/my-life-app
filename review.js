@@ -178,7 +178,7 @@
       const kcal = kcalOn(d);
       return { ratio: Math.min(1, kcal / food.target), text: kcal ? `${kcal.toLocaleString()} kcal` : "nothing logged" };
     });
-    const fuelMet = hasFood ? counted.filter((d) => kcalOn(d) > 0 && kcalOn(d) <= food.target).length : 0;
+    const fuelMet = hasFood ? counted.filter((d) => window.kcalStatus(kcalOn(d)).met).length : 0;
     const kcalAvg = hasFood ? average(counted.map(kcalOn).filter((k) => k > 0)) : null;
     metrics.push({
       id: "fuel",
