@@ -238,6 +238,28 @@
       ratio: recAvg == null ? null : recAvg / 100,
     });
 
+    // Goals ---------------------------------------------------------------
+    // Share of deadline goals on pace at the end of each day, rebuilt from
+    // each goal's daily log — so past weeks read back as they were then.
+    const paceAt = (d) => (window.goalsOnPaceAt ? window.goalsOnPaceAt(d) : null);
+    cells.goals = days.map((d) => {
+      if (future(d)) return { ratio: null, text: "still to come" };
+      const p = paceAt(d);
+      if (!p || !p.tracked) return { ratio: null, text: "no goals with a deadline" };
+      return { ratio: p.onPace.length / p.tracked, text: `${p.onPace.length}/${p.tracked} goals on pace` };
+    });
+    const lastDay = counted[counted.length - 1];
+    const pace = lastDay ? paceAt(lastDay) : null;
+    metrics.push({
+      id: "goals",
+      label: "Goals",
+      section: "goals",
+      value: pace && pace.tracked ? `${pace.onPace.length}/${pace.tracked}` : "—",
+      detail: pace && pace.tracked ? "on pace at week's end" : "no goals with a deadline",
+      ratio: pace && pace.tracked ? pace.onPace.length / pace.tracked : null,
+      pace,
+    });
+
     const scored = metrics.map((m) => m.ratio).filter((r) => r != null);
     const score = scored.length ? Math.round(average(scored) * 100) : null;
 
@@ -353,6 +375,18 @@
       const top = recCells.slice().sort((a, b) => b.ratio - a.ratio)[0];
       const low = recCells.slice().sort((a, b) => a.ratio - b.ratio)[0];
       out.push(`Readiness peaked ${dayName(top.date, { weekday: "long" })} (${Math.round(top.ratio * 100)}) and bottomed out ${dayName(low.date, { weekday: "long" })} (${Math.round(low.ratio * 100)}).`);
+    }
+
+    // Goals: which slipped, which landed.
+    const goalMetric = data.metrics.find((m) => m.id === "goals");
+    const pace = goalMetric && goalMetric.pace;
+    if (pace) {
+      const all = typeof goals !== "undefined" ? goals : [];
+      const landed = all.filter((g) => g.completedAt && g.completedAt >= data.days[0] && g.completedAt <= data.days[6]);
+      if (landed.length) out.push(`Goal${landed.length === 1 ? "" : "s"} completed: ${landed.map((g) => g.name).join(", ")}.`);
+      const slipping = [...pace.overdue, ...pace.behind];
+      if (slipping.length) out.push(`Behind pace: ${slipping.map((g) => g.name).join(", ")}.`);
+      else if (pace.tracked) out.push(`All ${pace.tracked} goal${pace.tracked === 1 ? "" : "s"} with a deadline on pace.`);
     }
 
     // What you wrote down, anywhere in the app.

@@ -434,7 +434,42 @@ function activeGoals() {
   return sortActive(goals.filter((g) => !goalIsDone(g)));
 }
 
+// For Review: which deadline goals were on pace at the end of `date`,
+// reconstructed from each goal's daily log (last value on/before that day).
+function goalValueAt(goal, date) {
+  const keys = Object.keys(goal.log || {}).filter((k) => k <= date).sort();
+  return keys.length ? goal.log[keys[keys.length - 1]] : goal.start ?? 0;
+}
+
+function goalsOnPaceAt(date) {
+  const out = { tracked: 0, onPace: [], behind: [], overdue: [], completed: [] };
+  for (const goal of goals) {
+    if (!goal.deadline || !goal.created || goal.created > date) continue;
+    if (goal.completedAt && goal.completedAt < date) continue;
+    const value = goalValueAt(goal, date);
+    const shadow = { ...goal, current: value };
+    if (goalIsDone(shadow)) {
+      out.completed.push(goal);
+      continue;
+    }
+    out.tracked++;
+    if (goal.deadline < date) {
+      out.overdue.push(goal);
+      continue;
+    }
+    const total = parseGoalDate(goal.deadline) - parseGoalDate(goal.created);
+    const frac = total > 0 ? Math.max(0, Math.min(1, (parseGoalDate(date) - parseGoalDate(goal.created)) / total)) : 1;
+    const expected = goal.start + (goal.target - goal.start) * frac;
+    const slack = Math.abs(goal.target - goal.start) * 0.03;
+    const behind = frac > 0.05 && (goalDir(goal) > 0 ? value + slack < expected : value - slack > expected);
+    (behind ? out.behind : out.onPace).push(goal);
+  }
+  return out;
+}
+
 Object.assign(window, {
+  isBinaryGoal,
+  goalsOnPaceAt,
   goalDir,
   goalIsDone,
   goalPct,

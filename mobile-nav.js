@@ -132,8 +132,10 @@ function mnavSubtitle(id) {
         return { text: habits.length ? `${done}/${habits.length} today` : "No habits yet" };
       }
       case "goals": {
-        const active = goals.filter((g) => g.current < g.target).length;
-        return { text: goals.length ? `${active} in progress` : "None yet" };
+        const active = window.activeGoals ? window.activeGoals() : goals.filter((g) => g.current < g.target);
+        const slipping = window.goalStatus ? active.filter((g) => ["overdue", "behind"].includes(window.goalStatus(g).status)).length : 0;
+        if (!goals.length) return { text: "None yet" };
+        return slipping ? { text: `${slipping} behind · ${active.length} active`, tone: "down" } : { text: `${active.length} in progress` };
       }
       case "alfred":
         return { text: "Ask anything" };

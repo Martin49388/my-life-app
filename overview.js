@@ -410,34 +410,31 @@ function renderOverviewGoals() {
     list.innerHTML = `<li class="empty-state empty-action"><p>No goals yet.</p><button type="button" class="empty-btn" data-goto="goals">Set a goal →</button></li>`;
     return;
   }
-  const active = goals
-    .filter((g) => g.current < g.target)
-    .sort((a, b) => {
-      if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
-      if (a.deadline) return -1;
-      if (b.deadline) return 1;
-      return b.current / b.target - a.current / a.target;
-    })
-    .slice(0, 4);
+  // Same order as the Goals page: overdue, behind, then by deadline.
+  const active = (window.activeGoals ? window.activeGoals() : goals.filter((g) => g.current < g.target)).slice(0, 4);
   if (!active.length) {
     list.innerHTML = `<li class="empty-state empty-action"><p>Every goal is complete.</p><button type="button" class="empty-btn" data-goto="goals">Set a new one →</button></li>`;
     return;
   }
   list.innerHTML = active
     .map((g) => {
-      const pct = Math.round((g.current / g.target) * 100);
+      const pct = Math.round(window.goalPct ? window.goalPct(g) : (g.current / g.target) * 100);
+      const s = window.goalStatus ? window.goalStatus(g) : { status: "open", label: "" };
+      const need = window.goalNeedText ? window.goalNeedText(g) : "";
       const due = g.deadline && typeof deadlineLabel === "function" ? deadlineLabel(g.deadline) : null;
+      const sep = window.goalDir && window.goalDir(g) < 0 ? " → " : " / ";
       return `
-      <li class="ov-goal" data-goto="goals" role="link" tabindex="0">
+      <li class="ov-goal" data-goto="goals" data-status="${s.status}" role="link" tabindex="0">
         <span class="ov-goal-top">
           <span class="ov-goal-name">${overviewEsc(g.name)}</span>
           <span class="ov-goal-pct">${pct}%</span>
         </span>
         <span class="ov-goal-bar"><span style="width:${pct}%"></span></span>
         <span class="ov-goal-meta">
-          <span>${overviewEsc(g.current)} / ${overviewEsc(g.target)} ${overviewEsc(g.unit)}</span>
-          <span class="ov-goal-term">${g.term === "long" ? "Long-term" : "Short-term"}</span>
+          ${s.label ? `<span class="gl-chip" data-status="${s.status}">${overviewEsc(s.label)}</span>` : ""}
+          <span>${window.isBinaryGoal && window.isBinaryGoal(g) ? "Not done yet" : `${overviewEsc(g.current)}${sep}${overviewEsc(g.target)} ${overviewEsc(g.unit)}`}</span>
           ${due ? `<span class="${due.overdue ? "tone-down" : ""}">${overviewEsc(due.text)}</span>` : ""}
+          ${need && !due?.overdue ? `<span>${overviewEsc(need)}</span>` : ""}
         </span>
       </li>`;
     })
@@ -473,6 +470,15 @@ function renderOverview() {
       : open.length === total
         ? "Nothing banked yet — start with whatever's quickest."
         : `Still open: ${open.map((s) => s.label.toLowerCase()).join(", ")}.`;
+  // A goal slipping is worth a line here too — it's the one thing on
+  // Overview that doesn't reset at midnight.
+  const slipping = window.activeGoals ? window.activeGoals().filter((g) => ["overdue", "behind"].includes(window.goalStatus(g).status)) : [];
+  if (slipping.length) {
+    document.getElementById("overview-status").textContent += ` ${slipping.length === 1 ? "Goal slipping" : "Goals slipping"}: ${slipping
+      .slice(0, 2)
+      .map((g) => g.name)
+      .join(", ")}${slipping.length > 2 ? ` +${slipping.length - 2}` : ""}.`;
+  }
 
   renderOverviewRing(standards);
   renderStandardTiles(standards);

@@ -42,10 +42,11 @@ function buildDailyContext() {
     return `${h.name}${weekly}: ${doneToday ? "done" : "not done"} today, ${habitStreakText(h)}`;
   });
 
+  if (window.refreshLinkedGoals) window.refreshLinkedGoals();
   const goalLines = goals.map(
     (g) =>
       `${g.name} (${g.term}-term): ${g.current}/${g.target} ${g.unit}${g.deadline ? `, due ${g.deadline}` : ""}` +
-      (window.goalPaceText && g.current < g.target ? ` — ${window.goalPaceText(g)}` : "")
+      (window.goalPaceText && !(window.goalIsDone ? window.goalIsDone(g) : g.current >= g.target) ? ` — ${window.goalPaceText(g)}` : "")
   );
 
   const trainedCount = typeof trainedThisWeek === "function" ? trainedThisWeek() : null;

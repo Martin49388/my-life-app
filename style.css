@@ -10457,3 +10457,13 @@ body.goal-sheet-open {
     flex: 1;
   }
 }
+
+/* Overview goals carry the same status as the Goals page. */
+.ov-goal[data-status="on-track"] .ov-goal-bar span { background: var(--good); }
+.ov-goal[data-status="behind"] .ov-goal-bar span { background: var(--warn); }
+.ov-goal[data-status="overdue"] .ov-goal-bar span { background: var(--danger); }
+
+.ov-goal-meta .gl-chip {
+  padding: 1px 8px 1px 7px;
+  font-size: 11.5px;
+}
