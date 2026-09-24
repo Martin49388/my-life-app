@@ -1,0 +1,39 @@
+name: Reminders
+
+# Sends Batcave's push reminders. See REMINDERS.md.
+# GitHub may start a scheduled run a few minutes late; the script allows
+# for that (a reminder can still go out up to 3 hours after its time,
+# never twice a day).
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test notification to every subscribed device"
+        type: boolean
+        default: false
+
+concurrency:
+  group: reminders
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save --no-package-lock --no-audit --no-fund web-push@3.6.7
+      - run: node scripts/send-reminders.mjs
+        env:
+          PUSH_SECRET: ${{ secrets.PUSH_SECRET }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test && 'true' || 'false' }}

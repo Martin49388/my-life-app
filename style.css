@@ -10687,3 +10687,95 @@ body.goal-sheet-open {
     padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
   }
 }
+
+/* ======================================================================
+   Reminders card (Settings, reminders.js)
+   ====================================================================== */
+.rm-state {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.rm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rm-actions .read-primary-btn {
+  padding: 9px 18px;
+  font-size: 14px;
+}
+
+.rm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.rm-row + .rm-row {
+  border-top: 1px solid var(--border);
+}
+
+.rm-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.rm-toggle input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--good);
+}
+
+.rm-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rm-label {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.rm-hint {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.rm-time {
+  flex-shrink: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  color-scheme: light dark;
+}
+
+.rm-status[data-tone="good"] {
+  color: var(--good);
+}
+
+.rm-status[data-tone="warn"] {
+  color: var(--warn);
+}

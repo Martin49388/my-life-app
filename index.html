@@ -1046,6 +1046,16 @@
         <p class="account-status" id="sync-status">Not signed in</p>
       </div>
 
+      <div class="settings-block" id="reminders-block">
+        <p class="settings-title">Reminders</p>
+        <p class="section-hint">
+          Real notifications, even with Batcave closed — and only when
+          something's still undone. Checked in already? No morning ping.
+        </p>
+        <div id="reminders-body"></div>
+        <p class="account-status rm-status" id="reminders-status"></p>
+      </div>
+
       <div class="settings-block">
         <p class="settings-title">Alfred (AI)</p>
         <p class="section-hint">
@@ -1371,6 +1381,7 @@
   <script src="global-bar.js?v=20260924-1"></script>
   <script src="mobile-nav.js?v=20260924-1"></script>
   <script src="backup.js?v=20260924-1"></script>
+  <script src="reminders.js?v=20260924-1"></script>
   <!-- Last: registering the service worker is the only thing here that
        can trigger a reload, so everything else is already wired up by
        the time it can. -->

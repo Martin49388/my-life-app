@@ -68,6 +68,7 @@ const SHELL = [
   "./global-bar.js",
   "./mobile-nav.js",
   "./backup.js",
+  "./reminders.js",
   "./offline.js",
 ];
 
@@ -155,6 +156,46 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => null);
       return cached || (await network) || Response.error();
+    })()
+  );
+});
+
+// ---------------------------------------------------------------------
+// Reminders (see reminders.js / REMINDERS.md). The sender puts
+// {title, body, url, tag} in the push payload; tapping the notification
+// focuses an open Batcave window (or opens one) at that url's #section.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Batcave", {
+      body: data.body || "",
+      icon: "icons/icon-192.png",
+      badge: "icons/icon-192.png",
+      tag: data.tag || "batcave",
+      renotify: Boolean(data.tag),
+      data: { url: data.url || "./index.html" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "./index.html", self.registration.scope).href;
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of windows) {
+        if (client.url.startsWith(self.registration.scope)) {
+          await client.focus();
+          return client.navigate(target);
+        }
+      }
+      return self.clients.openWindow(target);
     })()
   );
 });

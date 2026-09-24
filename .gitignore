@@ -4,3 +4,6 @@ node_modules/
 config.js
 Claude outputs/
 launchd/
+
+# Filled-in SQL (contains the reminder secret)
+*.local.sql

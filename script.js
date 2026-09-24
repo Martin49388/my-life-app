@@ -570,6 +570,7 @@ function switchSection(requested) {
   if (section === "recovery" && window.renderRecovery) window.renderRecovery();
   if (section === "review" && window.renderReview) window.renderReview();
   if (section === "notes" && window.renderNotes) window.renderNotes();
+  if (section === "settings" && window.renderReminders) window.renderReminders();
   if (window.renderOverview) window.renderOverview();
   const miniBar = document.getElementById("mini-overview");
   if (miniBar) miniBar.hidden = section === "overview";
