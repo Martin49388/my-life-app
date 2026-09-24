@@ -103,7 +103,8 @@
       const g = findGoal(a.name);
       const delta = Number(a.delta);
       if (!g || !delta || Math.abs(delta) > 100000 || typeof adjustGoal !== "function") return null;
-      adjustGoal(g.id, delta);
+      // Linked goals count themselves from Reading/Fitness/Habits/Fuel.
+      if (g.source || adjustGoal(g.id, delta) === false) return null;
       return `${g.name}: ${delta > 0 ? "+" : ""}${delta} ${g.unit}`;
     },
   };

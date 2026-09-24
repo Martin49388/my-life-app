@@ -270,6 +270,8 @@
         <button type="button" class="read-primary-btn gl-empty-cta" data-goal-new="short">+ New goal</button>
       </div>
 
+      <div class="gl-suggest" id="goals-link-suggest" hidden></div>
+
       <div class="gl-groups" id="goals-groups">
         <div class="read-block gl-block">
           <div class="read-block-head">
@@ -1159,6 +1161,18 @@
         <input type="text" name="name" placeholder="e.g. Bench 100 kg" autocomplete="off" maxlength="80" />
       </label>
 
+      <label class="gl-field">
+        <span class="stat-label">Progress comes from</span>
+        <select name="source" class="gl-select"></select>
+      </label>
+      <p class="gl-source-preview" id="goal-source-preview" hidden></p>
+
+      <div class="gl-field" id="goal-from-field" hidden>
+        <span class="stat-label">Count from</span>
+        <div class="gl-chips" id="goal-from-chips"></div>
+        <input type="date" name="from" aria-label="Count from date" />
+      </div>
+
       <div class="gl-field">
         <span class="stat-label">Horizon</span>
         <div class="read-tabs gl-seg" role="radiogroup" aria-label="Horizon">
@@ -1183,7 +1197,7 @@
         <option value="hours"></option><option value="days"></option><option value="%"></option>
       </datalist>
 
-      <div class="gl-field-row">
+      <div class="gl-field-row" id="goal-manual-fields">
         <label class="gl-field">
           <span class="stat-label" id="goal-current-label">Starting at</span>
           <input type="number" name="current" inputmode="decimal" min="0" step="any" placeholder="0" />

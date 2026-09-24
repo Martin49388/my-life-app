@@ -405,7 +405,9 @@
 
   function readingGoal() {
     if (typeof goals === "undefined") return null;
-    return goals.find((g) => /^read/i.test(g.name || "")) || null;
+    if (window.refreshLinkedGoals) window.refreshLinkedGoals();
+    const open = goals.filter((g) => !(window.goalIsDone ? window.goalIsDone(g) : g.current >= g.target));
+    return open.find((g) => g.source && g.source.type === "books") || open.find((g) => /^read/i.test(g.name || "")) || null;
   }
 
   function coverHtml(book, size = "M") {
