@@ -84,13 +84,17 @@ themselves; goal status on Overview/Review/More; calorie rule by
 Bulk/Maintain/Cut; Alfred's week planner; push reminders; CSS split into
 `css/`, dead code removed, smoke test + CI; this file pruned.
 
+Done since (2026-09-24, later same day): `supabase/reminders.local.sql`
+run in Supabase; reminders job verified end-to-end via a manual
+workflow_dispatch (came back "0 subscription(s), 0 user(s)" — reached
+Supabase fine, just nothing subscribed yet). Old GitHub PAT (the one
+embedded in the git remote URL) revoked from GitHub settings; push auth
+now goes through `gh auth setup-git` only.
+
 Waiting on Martin:
-- Run `supabase/reminders.local.sql` (gitignored; has the secret) in
-  Supabase -> SQL Editor. Until then the reminder job logs "not set up"
-  and exits cleanly. Secrets are already in GitHub + `.env`.
 - iPhone: Add to Home Screen, open from there, sign in to sync,
   Settings -> Reminders -> Turn on. Nothing here has been tried on the
-  real iPhone yet (mobile nav, offline, sheets, reminders).
+  real iPhone yet (mobile nav, offline, sheets, reminders, push).
 - Confirm sync shows "Synced" on both devices; a real Twelve Data key
   for Markets charts; FoodData lookup still untested live.
 
