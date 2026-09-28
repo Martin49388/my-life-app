@@ -77,26 +77,20 @@ details are in `git log`.
   `minmax(0, 1fr)`.
 - Dead-class scans must allow names built as `` `is-${x}` `` / `"tone-" + x`.
 
-## Current state (2026-09-24)
+## Current state (2026-09-28)
 
-Done this session: Goals rebuilt around pace; goals that count
-themselves; goal status on Overview/Review/More; calorie rule by
-Bulk/Maintain/Cut; Alfred's week planner; push reminders; CSS split into
-`css/`, dead code removed, smoke test + CI; this file pruned.
+Everything through roadmap steps 3-8 is shipped and live (see git log
+and the vault for detail). Reminders backend verified end to end on
+2026-09-24; old PAT revoked.
 
-Done since (2026-09-24, later same day): `supabase/reminders.local.sql`
-run in Supabase; reminders job verified end-to-end via a manual
-workflow_dispatch (came back "0 subscription(s), 0 user(s)" — reached
-Supabase fine, just nothing subscribed yet). Old GitHub PAT (the one
-embedded in the git remote URL) revoked from GitHub settings; push auth
-now goes through `gh auth setup-git` only.
+2026-09-28: Martin reports everything works fine, which closes the
+open "try it on the real iPhone" checklist. Nothing is waiting on him.
 
-Waiting on Martin:
-- iPhone: Add to Home Screen, open from there, sign in to sync,
-  Settings -> Reminders -> Turn on. Nothing here has been tried on the
-  real iPhone yet (mobile nav, offline, sheets, reminders, push).
-- Confirm sync shows "Synced" on both devices; a real Twelve Data key
-  for Markets charts; FoodData lookup still untested live.
+Next big idea: the cross-section "patterns" layer (what actually moves
+sleep, weight, training and habits). Deliberately not built yet: it
+needs 60-90 days of dense daily data to say anything true rather than
+noise, so revisit around December 2026. Until then the job is using the
+app daily and noting friction in Notes #batcave.
 
 Ideas parked (step 9 of the roadmap, "talk later"): no new sections;
 anything new should fold into an existing one.
