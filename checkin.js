@@ -111,7 +111,7 @@
       ? `<section class="ci-step">
           <h3 class="ci-step-title">Weight</h3>
           <form class="ci-inline" data-ci-form="weight">
-            <input type="number" step="0.1" min="25" max="350" inputmode="decimal" id="ci-weight"
+            <input type="text" step="0.1" min="25" max="350" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" id="ci-weight"
               value="${todayKg ? todayKg.toFixed(1) : ""}" placeholder="${latest ? latest.kg.toFixed(1) : "kg"}" aria-label="Weight in kg" />
             <span class="ci-unit">kg</span>
             <button type="submit" class="ci-btn">${todayKg ? "Update" : "Save"}</button>

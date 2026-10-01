@@ -378,9 +378,15 @@ const BODY_FIELDS = {
 };
 
 for (const [elementId, key] of Object.entries(BODY_FIELDS)) {
-  document.getElementById(elementId).addEventListener("input", (e) => {
+  const fieldEl = document.getElementById(elementId);
+  // body-weight is type="text" (inputmode="decimal") so a phone whose
+  // keyboard uses "," for the decimal point can actually type one —
+  // type="number" silently swallows that keystroke. Still numeric input,
+  // so still parsed as a float.
+  const numeric = fieldEl.type === "number" || fieldEl.inputMode === "decimal";
+  fieldEl.addEventListener("input", (e) => {
     const raw = e.target.value;
-    food.body[key] = e.target.type === "number" ? parseFloat(raw) || null : raw;
+    food.body[key] = numeric ? parseFloat(String(raw).replace(",", ".")) || null : raw;
     saveFood();
     renderEstimator();
   });

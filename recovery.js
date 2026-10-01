@@ -440,7 +440,7 @@
         <div class="rec-field-head">
           <span class="stat-label">Sleep</span>
           <span class="rec-field-note">
-            <input type="number" id="rec-target-input" class="rec-target-input" min="3" max="14" step="0.25" value="${(target / 60).toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}" aria-label="Sleep target, hours" />h target
+            <input type="text" id="rec-target-input" class="rec-target-input" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="3" max="14" step="0.25" value="${(target / 60).toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}" aria-label="Sleep target, hours" />h target
           </span>
         </div>
         <div class="rec-sleep-row">
@@ -701,7 +701,7 @@
     // focus.
     section.addEventListener("change", (ev) => {
       if (ev.target.id !== "rec-target-input") return;
-      const hours = Number(ev.target.value);
+      const hours = Number(String(ev.target.value).replace(",", "."));
       if (!(hours >= 3 && hours <= 14)) {
         renderCheckin();
         return;

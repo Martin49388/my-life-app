@@ -77,14 +77,28 @@ details are in `git log`.
   `minmax(0, 1fr)`.
 - Dead-class scans must allow names built as `` `is-${x}` `` / `"tone-" + x`.
 
-## Current state (2026-09-28)
+## Current state (2026-10-01)
 
 Everything through roadmap steps 3-8 is shipped and live (see git log
 and the vault for detail). Reminders backend verified end to end on
 2026-09-24; old PAT revoked.
 
-2026-09-28: Martin reports everything works fine, which closes the
-open "try it on the real iPhone" checklist. Nothing is waiting on him.
+2026-10-01: first real-world bugs from daily use, fixed same day —
+- Decimal number fields (`type="number"`) silently ate a typed ","
+  (weight, goal target/current/step, sleep target): switched to
+  `type="text"` + `inputmode="decimal"`, comma normalized to "." before
+  every parse. If a future decimal field gets added, give it the same
+  treatment or it'll have the same bug.
+- Habits had no past-day editing (Fuel and Recovery already did, via
+  their own date pickers). The month view's day-detail panel now reuses
+  the check-in sheet's `.ci-habit` chip rows to toggle any non-future
+  day's habits.
+- Push notifications: no code bug found after reading the whole
+  pipeline; last 25 scheduled Actions runs all succeeded. Waiting on
+  Martin to run the real test (Actions -> Reminders -> Run workflow ->
+  "Send a test notification") to see whether a device is actually
+  subscribed — I can't read the run's console log without his GitHub
+  login.
 
 Next big idea: the cross-section "patterns" layer (what actually moves
 sleep, weight, training and habits). Deliberately not built yet: it

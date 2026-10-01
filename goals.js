@@ -967,7 +967,7 @@ field("unit").addEventListener("input", () => {
 goalForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const name = field("name").value.trim();
-  const target = parseFloat(field("target").value);
+  const target = parseFloat(String(field("target").value).replace(",", "."));
   if (!name || !(target > 0)) {
     (!name ? field("name") : field("target")).focus();
     return;
@@ -976,8 +976,9 @@ goalForm.addEventListener("submit", (e) => {
   if (source) source.from = GOAL_SOURCES[source.type].counts ? field("from").value || sourceDefaultFrom(source.type) : editingGoalId ? goals.find((g) => g.id === editingGoalId)?.source?.from || goalToday() : goalToday();
   const unit = field("unit").value.trim() || (source ? GOAL_SOURCES[source.type].unit : "done");
   const currentRaw = field("current").value;
-  const current = currentRaw === "" ? null : Math.max(0, parseFloat(currentRaw));
-  const step = parseFloat(field("step").value) > 0 ? roundGoalNum(parseFloat(field("step").value)) : 1;
+  const current = currentRaw === "" ? null : Math.max(0, parseFloat(String(currentRaw).replace(",", ".")));
+  const stepRaw = parseFloat(String(field("step").value).replace(",", "."));
+  const step = stepRaw > 0 ? roundGoalNum(stepRaw) : 1;
   const deadline = field("deadline").value || null;
   const why = field("why").value.trim();
   const term = goalForm.dataset.term || "short";

@@ -384,16 +384,28 @@ function renderMonthly() {
     ? `<strong>${perfect}</strong> perfect ${perfect === 1 ? "day" : "days"} · ${possible ? Math.round((checks / possible) * 100) : 0}% of habits done · ${elapsedDays} ${elapsedDays === 1 ? "day" : "days"} tracked`
     : "Nothing to show yet for this month.";
 
-  // Tapped day: what was and wasn't done.
+  // Tapped day: what was and wasn't done — and, since this is the one
+  // place you can look at a past day at all, tappable here too. Backfilling
+  // a forgotten day used to mean it just stayed wrong in the stats forever.
   const detail = document.getElementById("month-day-detail");
   const inMonth = monthSelectedDate && monthSelectedDate.startsWith(`${viewedYear}-${String(viewedMonth + 1).padStart(2, "0")}`);
   if (inMonth && total) {
     const doneList = habitsDoneOn(monthSelectedDate);
-    const missed = habits.filter((h) => !doneList.includes(h));
     const when = new Date(`${monthSelectedDate}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
-    detail.innerHTML = `<strong>${habitEsc(when)} · ${doneList.length}/${total}</strong>` +
-      (doneList.length ? `<span class="month-done">✓ ${doneList.map((h) => habitEsc(h.name)).join(", ")}</span>` : "") +
-      (missed.length ? `<span class="month-missed">✗ ${missed.map((h) => habitEsc(h.name)).join(", ")}</span>` : "");
+    detail.innerHTML = `<strong>${habitEsc(when)} · ${doneList.length}/${total}</strong>
+      <ul class="ci-habits">
+        ${habits
+          .map((h) => {
+            const ticked = !!h.history[monthSelectedDate];
+            const weekMet = !ticked && doneList.includes(h);
+            return `<li><button type="button" class="ci-habit${ticked ? " is-on" : ""}" data-toggle-habit="${habitEsc(h.id)}" aria-pressed="${ticked}">
+              <span class="ci-check" aria-hidden="true"></span>
+              <span class="ci-habit-name">${habitEsc(h.name)}</span>
+              ${weekMet ? `<span class="ci-hint">week done</span>` : ""}
+            </button></li>`;
+          })
+          .join("")}
+      </ul>`;
     detail.hidden = false;
   } else {
     detail.innerHTML = "";
@@ -425,6 +437,14 @@ document.getElementById("calendar").addEventListener("click", (e) => {
   if (!cell || cell.disabled) return;
   monthSelectedDate = monthSelectedDate === cell.dataset.date ? null : cell.dataset.date;
   renderMonthly();
+});
+
+// Tapping a habit in the tapped day's detail panel toggles it for that
+// day — the only way to fix a day you forgot to log, short of editing
+// localStorage by hand.
+document.getElementById("month-day-detail").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-toggle-habit]");
+  if (btn && monthSelectedDate) toggleDate(btn.dataset.toggleHabit, monthSelectedDate);
 });
 
 function render() {

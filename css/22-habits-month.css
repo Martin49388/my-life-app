@@ -124,14 +124,6 @@
   display: none;
 }
 
-.month-done {
-  color: var(--good);
-}
-
-.month-missed {
-  color: var(--text-dim);
-}
-
 .month-habits {
   display: flex;
   flex-direction: column;
