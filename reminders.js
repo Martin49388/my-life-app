@@ -137,6 +137,26 @@
     setStatus("Reminders are off for this device.");
   }
 
+  // The browser remembering a subscription and the server actually having
+  // it saved are two different things — a save that failed right after
+  // subscribing (a network blip, a sign-in timing issue) used to leave
+  // this screen saying "On for this device" forever, with nothing ever
+  // actually sent, because nothing ever re-checked. This runs on every
+  // render and silently re-saves if the two have drifted apart, so a
+  // one-time save failure heals itself instead of hiding indefinitely.
+  async function confirmSaved(sub) {
+    const c = client();
+    if (!c) return true; // can't check — don't flip a working state to off
+    try {
+      const { data } = await c.from("push_subscriptions").select("endpoint").eq("endpoint", sub.endpoint).maybeSingle();
+      if (data) return true;
+      await saveSubscription(sub);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async function sendLocalTest() {
     const reg = await navigator.serviceWorker.ready;
     await reg.showNotification("Batcave", {
@@ -189,7 +209,8 @@
       action = `<button type="button" class="empty-btn" data-rm-goto-sync>Go to sign-in ↑</button>`;
     } else {
       const sub = await currentSubscription();
-      const on = Boolean(sub) && Notification.permission === "granted";
+      let on = Boolean(sub) && Notification.permission === "granted";
+      if (on) on = await confirmSaved(sub);
       state = on ? "On for this device." : "Off for this device.";
       action = on
         ? `<button type="button" class="empty-btn" data-rm-test>Show a sample</button><button type="button" class="gl-ghost-btn" data-rm-off>Turn off here</button>`

@@ -80,25 +80,27 @@ details are in `git log`.
 ## Current state (2026-10-01)
 
 Everything through roadmap steps 3-8 is shipped and live (see git log
-and the vault for detail). Reminders backend verified end to end on
-2026-09-24; old PAT revoked.
+and the vault for detail).
 
 2026-10-01: first real-world bugs from daily use, fixed same day —
-- Decimal number fields (`type="number"`) silently ate a typed ","
-  (weight, goal target/current/step, sleep target): switched to
-  `type="text"` + `inputmode="decimal"`, comma normalized to "." before
-  every parse. If a future decimal field gets added, give it the same
-  treatment or it'll have the same bug.
-- Habits had no past-day editing (Fuel and Recovery already did, via
-  their own date pickers). The month view's day-detail panel now reuses
-  the check-in sheet's `.ci-habit` chip rows to toggle any non-future
-  day's habits.
-- Push notifications: no code bug found after reading the whole
-  pipeline; last 25 scheduled Actions runs all succeeded. Waiting on
-  Martin to run the real test (Actions -> Reminders -> Run workflow ->
-  "Send a test notification") to see whether a device is actually
-  subscribed — I can't read the run's console log without his GitHub
-  login.
+- `type="number"` fields silently ate a typed "," (any locale whose
+  decimal key is "," instead of "."): weight, goal target/current/step
+  and sleep target are now `type="text"` + `inputmode="decimal"`,
+  comma normalized to "." before every parse. Give any future decimal
+  field the same treatment.
+- Habits had no past-day editing (Fuel and Recovery already did via
+  their own date pickers). The month view's day-detail panel now
+  reuses the check-in sheet's `.ci-habit` chip rows to toggle any
+  non-future day.
+- Push notifications were never actually reaching Martin's phone:
+  Settings' "On for this device" only checked the browser's own memory
+  of subscribing, never the server, so a save to push_subscriptions
+  that failed once left it reporting "On" with 0 server-side rows
+  forever (confirmed via the Reminders workflow's test run: `0
+  subscription(s)`, while "Show a sample" — a local, no-network
+  notification — always worked and masked it). `render()` now calls
+  `confirmSaved()` on every open to re-verify and silently re-save, so
+  this drift self-heals. Martin re-subscribed to fix today's instance.
 
 Next big idea: the cross-section "patterns" layer (what actually moves
 sleep, weight, training and habits). Deliberately not built yet: it
