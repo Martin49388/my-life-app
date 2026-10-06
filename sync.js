@@ -36,6 +36,19 @@ function isSupabaseInternalKey(key) {
   return key.startsWith("sb-");
 }
 
+// This device's own record of "local already matches what was last
+// confirmed pushed to, or pulled from, Supabase." Written only through
+// _origSetItem (see below), so it never schedules a push itself, and
+// excluded from dumpLocalStorage/the restore logic below — same
+// treatment as the Supabase session keys. pullFromSupabase uses this to
+// tell "local changed since we last confirmed a sync" (don't overwrite
+// it — push it) apart from "local is exactly what it was last time we
+// synced, and remote has since moved on" (safe to take remote).
+const SYNC_META_KEY = "_sync_confirmed_hash";
+function isSyncMetaKey(key) {
+  return key === SYNC_META_KEY;
+}
+
 let supa = null;
 if (window.supabase && !SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("YOUR-ANON")) {
   // Explicit rather than relying on the library's defaults (which are the
@@ -74,7 +87,7 @@ function dumpLocalStorage() {
   const obj = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (isSupabaseInternalKey(key)) continue; // never sync auth session tokens
+    if (isSupabaseInternalKey(key) || isSyncMetaKey(key)) continue; // never sync auth tokens or our own sync bookkeeping
     obj[key] = localStorage.getItem(key);
   }
   return obj;
@@ -111,9 +124,13 @@ async function pushToSupabase() {
   if (!supa || !session) return;
   setSyncStatus("Syncing…");
   setSynced(false);
+  const localDump = dumpLocalStorage();
   const { error } = await supa
     .from("app_state")
-    .upsert({ user_id: session.user.id, data: dumpLocalStorage(), updated_at: new Date().toISOString() });
+    .upsert({ user_id: session.user.id, data: localDump, updated_at: new Date().toISOString() });
+  // Only record this as "confirmed" once Supabase has actually accepted it —
+  // an errored upsert must not make the next pull think local is clean.
+  if (!error) _origSetItem(SYNC_META_KEY, stableStringify(localDump));
   setSyncStatus(error ? `Sync failed: ${error.message}` : `Synced ${new Date().toLocaleTimeString()}`);
   setSynced(!error);
 }
@@ -145,10 +162,36 @@ async function pullFromSupabase() {
     syncReady = true;
     setSyncStatus(`Synced ${new Date().toLocaleTimeString()}`);
     setSynced(true);
+    _origSetItem(SYNC_META_KEY, local);
     return;
   }
 
-  // Different device, or this one's behind — take the remote copy.
+  // Local differs from remote. That's ambiguous on its own — it's both
+  // what "another device synced something new, take it" looks like AND
+  // what "this device's own push from a few minutes ago never finished"
+  // looks like (closing the app, locking the phone, or switching away
+  // from an installed PWA can suspend or kill this page well inside the
+  // 1.5s push debounce, or cut off the fetch before it completes). Those
+  // need opposite handling, and SYNC_META_KEY is what tells them apart:
+  // it's this device's own record of what local looked like the last
+  // time a push or pull actually confirmed local and remote agreed.
+  const confirmedHash = localStorage.getItem(SYNC_META_KEY);
+  if (confirmedHash !== null && local !== confirmedHash) {
+    // Local has moved on from the last confirmed state, on THIS device —
+    // so the mismatch is this device's own unconfirmed edit, not
+    // (necessarily) something newer from elsewhere. Taking remote here
+    // is exactly the bug: it would silently erase whatever was just
+    // logged. Push local instead of overwriting it.
+    syncReady = true;
+    await pushToSupabase();
+    return;
+  }
+
+  // Either this device has never completed a sync before (confirmedHash
+  // is null — nothing of its own to protect), or local is still exactly
+  // what it was last time it was confirmed in sync — so the mismatch is
+  // genuinely "another device pushed something new." Take the remote
+  // copy.
   //
   // Earlier versions of this function reacted to a mismatch by clearing
   // localStorage, writing the remote copy in, and calling
@@ -193,6 +236,7 @@ async function pullFromSupabase() {
   for (const [key, value] of Object.entries(row.data)) {
     _origSetItem(key, value);
   }
+  _origSetItem(SYNC_META_KEY, remote);
   applyingRemote = false;
   syncReady = true;
   setSyncStatus("Synced from another device — reopen the app to see the latest (this screen may be a step behind until then).");
@@ -347,5 +391,15 @@ async function initSync() {
     }
   });
 }
+
+function flushPendingPush() {
+  if (!supa || !session || applyingRemote || !syncReady) return;
+  clearTimeout(pushTimer);
+  pushToSupabase();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushPendingPush();
+});
+window.addEventListener("pagehide", flushPendingPush);
 
 initSync();

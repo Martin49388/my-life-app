@@ -77,7 +77,7 @@ details are in `git log`.
   `minmax(0, 1fr)`.
 - Dead-class scans must allow names built as `` `is-${x}` `` / `"tone-" + x`.
 
-## Current state (2026-10-01)
+## Current state (2026-10-06)
 
 Everything through roadmap steps 3-8 is shipped and live (see git log
 and the vault for detail).
@@ -101,6 +101,28 @@ and the vault for detail).
   notification — always worked and masked it). `render()` now calls
   `confirmSaved()` on every open to re-verify and silently re-save, so
   this drift self-heals. Martin re-subscribed to fix today's instance.
+
+2026-10-04/06: Fitness got Habits' past-day editing (day arrows next
+to the session title, `plan.log[<date>]` instead of always today) —
+a late or forgotten workout no longer stays wrong forever in "This
+week" and Overview's training dots. Shipped with the real `npm test`
+clean (desktop + phone, Fuel specifically re-checked — an earlier
+draft had briefly broken it). Full story: vault decisions-log.md.
+
+2026-10-06: fixed sync silently erasing a morning's check-in/habits/
+water entries. `pullFromSupabase` (sync.js) treated any mismatch
+between local and the Supabase row as "another device synced
+something newer" and overwrote local with it — but a mismatch also
+happens when this device's own push from a few minutes ago just
+never finished (debounce, then the installed PWA gets backgrounded
+or killed before the fetch completes). A `_sync_confirmed_hash` in
+localStorage now tells those apart: local unchanged since the last
+confirmed sync -> take remote as before; local has moved on from it
+-> push local instead of overwriting it. Also flushes a pending push
+on `visibilitychange`/`pagehide` so fewer pushes miss their window in
+the first place. Verified with a standalone Playwright harness against
+a stubbed Supabase client (not covered by tests/smoke.mjs, which
+never configures real sync). Full story: vault decisions-log.md.
 
 Next big idea: the cross-section "patterns" layer (what actually moves
 sleep, weight, training and habits). Deliberately not built yet: it

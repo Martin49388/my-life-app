@@ -432,6 +432,12 @@
   gap: 2px;
 }
 
+.session-day-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .session-day {
   font-family: "Manrope", system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
@@ -441,6 +447,49 @@
   color: var(--text-faint);
   margin: 0;
   font-weight: 500;
+}
+
+.session-day-nav-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.session-day-nav-btn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.session-day-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Shown only once you've stepped back to a past day — one tap home. */
+.session-today-btn {
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-dim);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.session-today-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
 }
 
 /* Reads as a heading until you click it, then behaves like the input it is. */

@@ -27,18 +27,35 @@ function savePlan() {
 let plan = loadPlan();
 
 // Monday-first index, matching the week strip and the habit calendar.
-const todayIndex = (new Date().getDay() + 6) % 7;
-let selectedDay = todayIndex;
+function weekdayIndex(date) {
+  return (new Date(date + "T00:00:00").getDay() + 6) % 7;
+}
+
+// Which calendar date the session panel is showing. Defaults to today;
+// the day arrows next to the session title (see shiftFitnessDay) step it
+// into the past so a forgotten day can be checked off after the fact —
+// same idea as the habit month calendar's backfill, one day at a time.
+let fitnessViewedDate = todayKey();
+const todayIndex = weekdayIndex(todayKey());
+let selectedDay = weekdayIndex(fitnessViewedDate);
+
+function completedOn(date) {
+  return plan.log[date] || [];
+}
 
 function completedToday() {
-  return plan.log[todayKey()] || [];
+  return completedOn(todayKey());
+}
+
+// Monday of the week containing `date`.
+function mondayOf(date) {
+  return addDays(date, -weekdayIndex(date));
 }
 
 // Monday of the current week, through today — future days in the week
 // can't have been trained yet, so they don't count against the target.
 function weekDatesSoFar() {
-  const mondayOffset = -((new Date().getDay() + 6) % 7);
-  const monday = addDays(todayKey(), mondayOffset);
+  const monday = mondayOf(todayKey());
   const dates = [];
   for (let d = monday; ; d = addDays(d, 1)) {
     dates.push(d);
@@ -52,12 +69,24 @@ function trainedThisWeek() {
 }
 
 function toggleExerciseDone(exerciseId) {
-  const date = todayKey();
-  const done = new Set(plan.log[date] || []);
+  if (fitnessViewedDate > todayKey()) return; // can't check off a day that hasn't happened yet
+  const done = new Set(plan.log[fitnessViewedDate] || []);
   if (done.has(exerciseId)) done.delete(exerciseId);
   else done.add(exerciseId);
-  plan.log[date] = [...done];
+  plan.log[fitnessViewedDate] = [...done];
   savePlan();
+  window.renderFitness();
+}
+
+// Step the viewed day back or forward (never past today) — the backfill
+// control: go back to a day you forgot to log and tick off what you
+// actually did. Also moves `selectedDay` so the right weekday's
+// exercises show.
+function shiftFitnessDay(delta) {
+  const next = addDays(fitnessViewedDate, delta);
+  if (next > todayKey()) return;
+  fitnessViewedDate = next;
+  selectedDay = weekdayIndex(fitnessViewedDate);
   window.renderFitness();
 }
 
@@ -114,19 +143,30 @@ function renderWeekStrip() {
     btn.append(label, title, bars);
     btn.addEventListener("click", () => {
       selectedDay = i;
+      fitnessViewedDate = addDays(mondayOf(todayKey()), i);
       window.renderFitness();
     });
     strip.appendChild(btn);
   });
 }
 
+// "Tuesday · today", "Tuesday · yesterday", or "Tuesday · 3 Oct" further back.
+function sessionDayLabel() {
+  const name = DAY_NAMES[selectedDay];
+  if (fitnessViewedDate === todayKey()) return `${name} · today`;
+  if (fitnessViewedDate === addDays(todayKey(), -1)) return `${name} · yesterday`;
+  const d = new Date(fitnessViewedDate + "T00:00:00");
+  return `${name} · ${d.toLocaleDateString(undefined, { day: "numeric", month: "short" })}`;
+}
+
 function renderSession() {
   const day = plan.days[selectedDay];
-  const isToday = selectedDay === todayIndex;
-  const done = completedToday();
+  const isFuture = fitnessViewedDate > todayKey();
+  const done = completedOn(fitnessViewedDate);
 
-  document.getElementById("session-day").textContent =
-    DAY_NAMES[selectedDay] + (isToday ? " · today" : "");
+  document.getElementById("session-day").textContent = sessionDayLabel();
+  document.getElementById("fitness-next-day").disabled = fitnessViewedDate >= todayKey();
+  document.getElementById("fitness-today-btn").hidden = fitnessViewedDate === todayKey();
   document.getElementById("session-title-input").value = day.title;
 
   const list = document.getElementById("exercise-list");
@@ -138,12 +178,12 @@ function renderSession() {
   }
 
   for (const ex of day.exercises) {
-    const isDone = isToday && done.includes(ex.id);
+    const isDone = !isFuture && done.includes(ex.id);
 
     const li = document.createElement("li");
     li.className = "exercise-row" + (isDone ? " done" : "");
 
-    if (isToday) {
+    if (!isFuture) {
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = isDone;
@@ -192,6 +232,14 @@ document.getElementById("session-title-input").addEventListener("input", (e) => 
   plan.days[selectedDay].title = e.target.value;
   savePlan();
   renderWeekStrip();
+});
+
+document.getElementById("fitness-prev-day").addEventListener("click", () => shiftFitnessDay(-1));
+document.getElementById("fitness-next-day").addEventListener("click", () => shiftFitnessDay(1));
+document.getElementById("fitness-today-btn").addEventListener("click", () => {
+  fitnessViewedDate = todayKey();
+  selectedDay = todayIndex;
+  window.renderFitness();
 });
 
 const exerciseToggleBtn = document.getElementById("add-exercise-toggle-btn");
